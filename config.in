@@ -1,0 +1,21 @@
+#if !defined(CONFIG_H)
+#define CONFIG_H
+
+#define UseMCJIT	${UseMCJIT}
+#define UseLLVM35	${UseLLVM35}
+#define UseLLVM37	${UseLLVM37}
+#define UseLLVM36	${UseLLVM36}
+#if UseLLVM35
+#define LLVM35
+#endif
+#if UseLLVM36
+#define LLVM36
+#endif
+#if UseLLVM37
+#define LLVM37
+#endif
+#if UseMCJIT
+#define USE_MCJIT
+#endif
+
+#endif
