@@ -316,7 +316,7 @@ public:
     FunctionDeclaration(Identifier* type, Identifier* id, VariableList* arguments, Block* block, YYLTYPE loc)
     : type(type), id(id), arguments(arguments), block(block), location(loc) {}
     FunctionDeclaration(Identifier* id, VariableList* arguments, Block* block, YYLTYPE loc)
-    : type(new Identifier("void", location)), id(id), arguments(arguments), block(block), location(loc) {}
+    : type(new Identifier("var", location)), id(id), arguments(arguments), block(block), location(loc) {}
     virtual ~FunctionDeclaration()
     {
         for(VariableList::iterator i = arguments->begin() ; i != arguments->end() ; ++i) {

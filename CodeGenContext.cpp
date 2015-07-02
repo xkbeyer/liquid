@@ -173,6 +173,12 @@ void CodeGenContext::generateCode(Block& root)
     endScope();
 
     std::cout << "Code is generated.\n";
+#if defined(_DEBUG)
+    /* Print the byte code in a human-readable format
+    *     to see if our program compiled properly
+    */
+    module->dump();
+#endif
 
     std::cout << "verifying... ";
     if( verifyModule(*getModule()) ) {
@@ -183,11 +189,6 @@ void CodeGenContext::generateCode(Block& root)
 
 #if !defined(_DEBUG)
     optimize();
-#else
-    /* Print the byte code in a human-readable format
-     *     to see if our program compiled properly
-     */
-    module->dump();
 #endif
 }
 
