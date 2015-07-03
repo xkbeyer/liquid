@@ -31,9 +31,9 @@ typedef struct YYLTYPE {
 namespace AST {
 class CodeGenContext;
 
-typedef std::vector<class Statement*> StatementList;
-typedef std::vector<class Expression*> ExpressionList;
-typedef std::vector<class VariableDeclaration*> VariableList;
+using StatementList = std::vector<class Statement*>;
+using ExpressionList = std::vector<class Expression*>;
+using VariableList = std::vector<class VariableDeclaration*>;
 
 enum class NodeType
 {
