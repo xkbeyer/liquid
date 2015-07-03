@@ -71,7 +71,7 @@ public:
     virtual void toString() {std::cout << "Expression\n" ;}
 };
 
-class Statement : public Node {
+class Statement : public Expression {
 public:
     virtual ~Statement() {}
     NodeType::Enum getType() {return NodeType::expression;}
@@ -139,27 +139,6 @@ public:
     virtual void toString() {std::cout << "  Creating identifier reference: " << structName << "::" << name << std::endl;}
 };
 
-class MethodCall : public Expression {
-    Identifier* id;
-    ExpressionList* arguments;
-    YYLTYPE location;
-public:
-    MethodCall(Identifier* id, ExpressionList* arguments, YYLTYPE loc) : id(id), arguments(arguments), location(loc) {}
-    virtual ~MethodCall()
-    {
-        for(ExpressionList::iterator i = arguments->begin() ; i != arguments->end() ; ++i) {
-            delete *i;
-        }
-        arguments->clear();
-        delete arguments;
-        delete id;
-    }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::expression;}
-    virtual void toString() {std::cout << "  Creating method call: " << id->getStructName() << "." << id->getName() << std::endl;}
-private:
-    std::string getTypeNameOfFirstArg(CodeGenContext& context);
-};
 
 class UnaryOperator : public Expression {
     int op;
@@ -210,18 +189,6 @@ public:
     virtual void toString() {std::cout << "  Creating compare operation " << op << std::endl;}
 };
 
-class Assignment : public Expression {
-    Identifier* lhs;
-    Expression* rhs;
-    YYLTYPE location;
-public:
-    Assignment(Identifier* lhs, Expression* rhs, YYLTYPE loc) : lhs(lhs), rhs(rhs), location(loc) {}
-    virtual ~Assignment() {delete lhs; delete rhs; }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::expression;}
-    virtual void toString() {std::cout << "  Creating assignment for " << lhs->getStructName() << "::" << lhs->getName() << std::endl;}
-};
-
 class Block : public Expression {
 public:
     StatementList statements;
@@ -256,6 +223,44 @@ public:
     NodeType::Enum getType() {return NodeType::expression;}
     virtual void toString() {/*std::cout << "  Creating expression statement " << std::endl;*/}
 };
+
+class Assignment : public Statement
+{
+    Identifier* lhs;
+    Expression* rhs;
+    YYLTYPE location;
+public:
+    Assignment( Identifier* lhs, Expression* rhs, YYLTYPE loc ) : lhs( lhs ), rhs( rhs ), location( loc ) {}
+    virtual ~Assignment() { delete lhs; delete rhs; }
+    virtual llvm::Value* codeGen( CodeGenContext& context );
+    NodeType::Enum getType() { return NodeType::expression; }
+    virtual void toString() { std::cout << "  Creating assignment for " << lhs->getStructName() << "::" << lhs->getName() << std::endl; }
+};
+
+
+class MethodCall : public Statement
+{
+    Identifier* id;
+    ExpressionList* arguments;
+    YYLTYPE location;
+public:
+    MethodCall( Identifier* id, ExpressionList* arguments, YYLTYPE loc ) : id( id ), arguments( arguments ), location( loc ) {}
+    virtual ~MethodCall()
+    {
+        for( ExpressionList::iterator i = arguments->begin(); i != arguments->end(); ++i ) {
+            delete *i;
+        }
+        arguments->clear();
+        delete arguments;
+        delete id;
+    }
+    virtual llvm::Value* codeGen( CodeGenContext& context );
+    NodeType::Enum getType() { return NodeType::expression; }
+    virtual void toString() { std::cout << "  Creating method call: " << id->getStructName() << "." << id->getName() << std::endl; }
+private:
+    std::string getTypeNameOfFirstArg( CodeGenContext& context );
+};
+
 
 class VariableDeclaration : public Statement
 {
@@ -302,74 +307,6 @@ public:
     YYLTYPE& getLocation() { return location; }
     virtual void toString() { std::cout << "  Creating variable declaration for " << id->getName() << " of unknown type " << std::endl; }
 };
-
-
-class FunctionDeclaration : public Statement
-{
-    friend class ClassDeclaration;
-    Identifier* type;
-    Identifier* id;
-    VariableList* arguments;
-    Block* block;
-    YYLTYPE location;
-public:
-    FunctionDeclaration(Identifier* type, Identifier* id, VariableList* arguments, Block* block, YYLTYPE loc)
-    : type(type), id(id), arguments(arguments), block(block), location(loc) {}
-    FunctionDeclaration(Identifier* id, VariableList* arguments, Block* block, YYLTYPE loc)
-    : type(new Identifier("var", location)), id(id), arguments(arguments), block(block), location(loc) {}
-    virtual ~FunctionDeclaration()
-    {
-        for(VariableList::iterator i = arguments->begin() ; i != arguments->end() ; ++i) {
-            delete *i;
-        }
-        delete type;
-        delete id;
-        delete arguments;
-        delete block;
-    }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::function;}
-    Identifier* getId() { return id; }
-    virtual void toString() {
-        std::cout << "  Creating function: " << id->getName() << std::endl;
-        std::cout << "  Parameters : " << std::endl;
-        std::for_each(std::begin(*arguments), std::end(*arguments),
-            [] (VariableDeclaration* decl) {
-                std::cout << "      " << decl->getVariablenTypeName() << ", " << decl->getVariablenName() << std::endl;
-                decl->toString();
-            }
-        );
-    }
-};
-
-class ClassDeclaration : public Statement
-{
-    Identifier* id;
-    Block* block;
-public:
-    ClassDeclaration(Identifier* id, Block* block)
-    : id(id), block(block) {}
-    virtual ~ClassDeclaration()
-    {
-        delete id;
-        delete block;
-    }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::klass;}
-    virtual void toString() {
-        std::cout << "  Creating Class: " << id->getName() << std::endl;
-        std::for_each(std::begin(block->statements), std::end(block->statements),
-            [] (Statement* s) {
-                s->toString();
-            });
-    }
-private:
-    void removeVarDeclStatements();
-    void constructStructFields(std::vector<llvm::Type*>& StructTy_fields, CodeGenContext& context);
-    void addVarsToClassAttributes(CodeGenContext& context);
-};
-
-
 
 class Conditional : public Statement
 {

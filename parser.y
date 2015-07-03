@@ -6,6 +6,8 @@
 
 %{
     #include "AstNode.h"
+	#include "FunctionDeclaration.h"
+	#include "ClassDeclaration.h"
     #include <stdio.h>
     AST::Block *programBlock; /* the top level root node of our final AST */
 
