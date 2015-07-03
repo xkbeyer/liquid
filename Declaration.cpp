@@ -18,7 +18,7 @@ Value* VariableDeclaration::codeGen(CodeGenContext& context)
     }
 
     Type* ty = context.typeOf(*type);
-    if( ty->isStructTy() && context.getScopeType() != FunctionDeclarationScope ) {
+    if( ty->isStructTy() && context.getScopeType() != ScopeType::FunctionDeclaration ) {
         // It is really a declaration of a class type which we put always onto the heap.
         AllocaInst* alloc = new AllocaInst(ty, id->getName().c_str(), context.currentBlock());
         context.locals()[id->getName()] = alloc;

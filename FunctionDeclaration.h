@@ -29,7 +29,7 @@ public:
         delete block;
     }
     virtual llvm::Value* codeGen( CodeGenContext& context );
-    NodeType::Enum getType() { return NodeType::function; }
+    NodeType getType() { return NodeType::function; }
     Identifier* getId() { return id; }
     virtual void toString()
     {

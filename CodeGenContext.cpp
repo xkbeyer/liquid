@@ -188,7 +188,7 @@ void CodeGenContext::optimize()
 #endif
 }
 
-void CodeGenContext::newScope(BasicBlock* bb, enum ScopeType scopeType)
+void CodeGenContext::newScope(BasicBlock* bb, ScopeType scopeType)
 {
     currentScopeType = scopeType;
     if( bb == nullptr) {
@@ -201,7 +201,7 @@ void CodeGenContext::endScope() {
     CodeGenBlock* top = codeBlocks.front();
     codeBlocks.pop_front();
     delete top;
-    currentScopeType = CodeBlockScope;
+    currentScopeType = ScopeType::CodeBlock;
 }
 
 /*! Searches a variable name in all known locals of the current code block.

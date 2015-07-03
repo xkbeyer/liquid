@@ -35,8 +35,8 @@ typedef std::vector<class Statement*> StatementList;
 typedef std::vector<class Expression*> ExpressionList;
 typedef std::vector<class VariableDeclaration*> VariableList;
 
-namespace NodeType {
-enum Enum {
+enum class NodeType
+{
     expression,
     variable,
     klass,
@@ -47,13 +47,12 @@ enum Enum {
     boolean,
     identifier
 };
-}
 
 class Node {
 public:
     virtual ~Node() {}
     virtual llvm::Value* codeGen(CodeGenContext& context) = 0 ;
-    virtual NodeType::Enum getType() = 0 ;
+    virtual NodeType getType() = 0 ;
     virtual void toString() {std::cout << "Node\n" ;}
     static void printError(YYLTYPE location, std::string msg) {
         std::cerr
@@ -74,7 +73,7 @@ public:
 class Statement : public Expression {
 public:
     virtual ~Statement() {}
-    NodeType::Enum getType() {return NodeType::expression;}
+    NodeType getType() {return NodeType::expression;}
     virtual void toString() {std::cout << "Statement\n" ;}
 };
 
@@ -84,7 +83,7 @@ public:
     Integer(long long value) : value(value) {}
     virtual ~Integer() {}
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::integer;}
+    NodeType getType() {return NodeType::integer;}
     virtual void toString() {std::cout << "  Creating integer: " << value << std::endl;}
 };
 
@@ -94,7 +93,7 @@ public:
     Double(double value) : value(value) {}
     virtual ~Double() {}
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::decimal;}
+    NodeType getType() {return NodeType::decimal;}
     virtual void toString() {std::cout << "  Creating double: " << value << std::endl;}
 };
 
@@ -104,7 +103,7 @@ public:
     String(const std::string& value) : value(value) {}
     virtual ~String() { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::string;}
+    NodeType getType() {return NodeType::string;}
     virtual void toString() {std::cout << "  Creating string: " << value << std::endl;}
 };
 
@@ -118,7 +117,7 @@ public:
     }
     virtual ~Boolean() {}
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::boolean;}
+    NodeType getType() {return NodeType::boolean;}
     virtual void toString() {std::cout << "  Creating boolean: " << value << std::endl;}
 };
 
@@ -135,7 +134,7 @@ public:
     std::string getStructName() const {return structName;}
     YYLTYPE getLocation() const { return location; }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::identifier;}
+    NodeType getType() {return NodeType::identifier;}
     virtual void toString() {std::cout << "  Creating identifier reference: " << structName << "::" << name << std::endl;}
 };
 
@@ -150,7 +149,7 @@ public:
         delete rhs;
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::expression;}
+    NodeType getType() {return NodeType::expression;}
     virtual void toString() {std::cout << "  Creating unary operation " << op << std::endl;}
 };
 
@@ -168,7 +167,7 @@ public:
     }
     int getOperator() const {return op;}
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::expression;}
+    NodeType getType() {return NodeType::expression;}
     virtual void toString() {std::cout << "  Creating binary operation " << op << std::endl;}
 };
 
@@ -185,7 +184,7 @@ public:
     }
     int getOperator() const {return op;}
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::expression;}
+    NodeType getType() {return NodeType::expression;}
     virtual void toString() {std::cout << "  Creating compare operation " << op << std::endl;}
 };
 
@@ -201,7 +200,7 @@ public:
         statements.clear();
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::expression;}
+    NodeType getType() {return NodeType::expression;}
     virtual void toString() {
         std::cout << "Creating block " << std::endl;
         std::for_each(std::begin(statements), std::end(statements),
@@ -220,7 +219,7 @@ public:
     ExpressionStatement(Expression* expression) : expression(expression) {}
     virtual ~ExpressionStatement() { delete expression; }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::expression;}
+    NodeType getType() {return NodeType::expression;}
     virtual void toString() {/*std::cout << "  Creating expression statement " << std::endl;*/}
 };
 
@@ -233,7 +232,7 @@ public:
     Assignment( Identifier* lhs, Expression* rhs, YYLTYPE loc ) : lhs( lhs ), rhs( rhs ), location( loc ) {}
     virtual ~Assignment() { delete lhs; delete rhs; }
     virtual llvm::Value* codeGen( CodeGenContext& context );
-    NodeType::Enum getType() { return NodeType::expression; }
+    NodeType getType() { return NodeType::expression; }
     virtual void toString() { std::cout << "  Creating assignment for " << lhs->getStructName() << "::" << lhs->getName() << std::endl; }
 };
 
@@ -255,7 +254,7 @@ public:
         delete id;
     }
     virtual llvm::Value* codeGen( CodeGenContext& context );
-    NodeType::Enum getType() { return NodeType::expression; }
+    NodeType getType() { return NodeType::expression; }
     virtual void toString() { std::cout << "  Creating method call: " << id->getStructName() << "." << id->getName() << std::endl; }
 private:
     std::string getTypeNameOfFirstArg( CodeGenContext& context );
@@ -283,7 +282,7 @@ public:
     std::string getVariablenTypeName() const {return type->getName();}
     std::string getVariablenName() const {return id->getName();}
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::variable;}
+    NodeType getType() {return NodeType::variable;}
     bool hasAssignmentExpr() {return assignmentExpr != nullptr;}
     Expression* getAssignment() { return assignmentExpr; }
     YYLTYPE& getLocation() {return location;} 
@@ -301,7 +300,7 @@ public:
     const Identifier& getIdentifierOfVariable() const { return *id; }
     std::string getVariablenName() const { return id->getName(); }
     virtual llvm::Value* codeGen( CodeGenContext& context );
-    NodeType::Enum getType() { return NodeType::variable; }
+    NodeType getType() { return NodeType::variable; }
     bool hasAssignmentExpr() { return assignmentExpr != nullptr; }
     Expression* getAssignment() { return assignmentExpr; }
     YYLTYPE& getLocation() { return location; }
@@ -321,7 +320,7 @@ public:
         delete cmpOp; delete thenExpr; delete elseExpr;
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::expression;}
+    NodeType getType() {return NodeType::expression;}
     virtual void toString() {std::cout << "  Creating conditional " << std::endl;}
 };
 
@@ -338,7 +337,7 @@ public:
         delete condition; delete loopBlock; delete elseBlock;
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::expression;}
+    NodeType getType() {return NodeType::expression;}
     virtual void toString() {std::cout << "  Creating while loop " << std::endl;}
 };
 
@@ -350,7 +349,7 @@ public:
     Return(Expression* expr = NULL) : retExpr(expr) {}
     virtual ~Return() {delete retExpr;}
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::expression;}
+    NodeType getType() {return NodeType::expression;}
     virtual void toString() {std::cout << "  Creating return statement " << std::endl;}
 };
 

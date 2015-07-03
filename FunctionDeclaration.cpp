@@ -38,7 +38,7 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
     }
     Function *function = Function::Create( ftype, GlobalValue::InternalLinkage, functionName.c_str(), context.getModule() );
     BasicBlock *bblock = BasicBlock::Create( context.getGlobalContext(), "entry", function, 0 );
-    context.newScope( bblock, FunctionDeclarationScope );
+    context.newScope( bblock, ScopeType::FunctionDeclaration );
 
     // Put the parameter onto the stack in order to be accessed in the function.
     Function::arg_iterator actualArgs = function->arg_begin();

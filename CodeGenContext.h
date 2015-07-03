@@ -55,10 +55,10 @@ private:
 };
 
 ///< Used to keep track the context of a code block.
-enum ScopeType {
-    ClassScope,
-    FunctionDeclarationScope,
-    CodeBlockScope,
+enum class ScopeType {
+    Class,
+    FunctionDeclaration,
+    CodeBlock,
 };
 
 ///< Maps a variable name to its alloca instruction.
@@ -99,7 +99,7 @@ class CodeGenContext {
     KlassAttributes classAttributes;        ///< List of attributes for the current class being processed
     KlassInitCode classInitCode;
 
-    enum ScopeType currentScopeType;
+    ScopeType currentScopeType;
     void setCurrentBlock(llvm::BasicBlock *block) {
         codeBlocks.front()->setCodeBlock(block);
     }
@@ -112,9 +112,9 @@ public:
         
     llvm::Module * getModule() {return module;}
     llvm::LLVMContext& getGlobalContext() {return llvmContext;}
-    void newScope(llvm::BasicBlock* bb = nullptr, enum ScopeType scopeType = CodeBlockScope) ;
+    void newScope(llvm::BasicBlock* bb = nullptr, ScopeType scopeType = ScopeType::CodeBlock) ;
     void endScope();
-    enum ScopeType getScopeType() { return currentScopeType;}
+    ScopeType getScopeType() { return currentScopeType;}
     void setInsertPoint(llvm::BasicBlock* bblock) {setCurrentBlock(bblock);}
     llvm::BasicBlock* getInsertPoint() {return currentBlock();}
     void generateCode(class Block& root);

@@ -18,7 +18,7 @@ public:
         delete block;
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
-    NodeType::Enum getType() {return NodeType::klass;}
+    NodeType getType() {return NodeType::klass;}
     virtual void toString() {
         std::cout << "  Creating Class: " << id->getName() << std::endl;
         std::for_each(std::begin(block->statements), std::end(block->statements),
