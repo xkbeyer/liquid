@@ -28,7 +28,8 @@ typedef struct YYLTYPE {
     int last_column;
 } YYLTYPE;
 
-namespace AST {
+namespace liquid {
+
 class CodeGenContext;
 
 using StatementList = std::vector<class Statement*>;
@@ -353,6 +354,6 @@ public:
     virtual void toString() {std::cout << "  Creating return statement " << std::endl;}
 };
 
-};
+}
 
 #endif

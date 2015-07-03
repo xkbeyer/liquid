@@ -8,7 +8,7 @@
 using namespace std;
 using namespace llvm;
 
-namespace AST {
+namespace liquid {
 
 
 Value* ClassDeclaration::codeGen( CodeGenContext& context )

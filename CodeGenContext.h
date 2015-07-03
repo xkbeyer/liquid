@@ -40,7 +40,7 @@
 
 #include "AstNode.h"
 
-namespace AST {
+namespace liquid {
     
 
 class VarDef
@@ -131,7 +131,7 @@ public:
     void klassAddVariableAccess(std::string name, int index);
     llvm::Instruction* getKlassVarAccessInst(std::string klass, std::string name, llvm::AllocaInst* this_ptr);
     std::string getKlassName() {return klassName;}
-    llvm::Type* typeOf(const class AST::Identifier& type);
+    llvm::Type* typeOf(const class Identifier& type);
     llvm::Type* typeOf(const std::string name);
     void addKlassInitCode( std::string name, Assignment* assign );
     KlassInitCodeAssign& getKlassInitCode( std::string name );

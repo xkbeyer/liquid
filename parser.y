@@ -9,7 +9,7 @@
 	#include "FunctionDeclaration.h"
 	#include "ClassDeclaration.h"
     #include <stdio.h>
-    AST::Block *programBlock; /* the top level root node of our final AST */
+    liquid::Block *programBlock; /* the top level root node of our final AST */
 
     extern int yylex();
     int yyerror(char const * s );
@@ -19,15 +19,15 @@
 
 /* Represents the many different ways we can access our data */
 %union {
-    AST::Node *node;
-    AST::Block *block;
-    AST::Expression *expr;
-    AST::Statement *stmt;
-    AST::Identifier *ident;
-    AST::VariableDeclaration *var_decl;
-    AST::VariableDeclarationDeduce *var_decl_deduce;
-    std::vector<AST::VariableDeclaration*> *varvec;
-    std::vector<AST::Expression*> *exprvec;
+    liquid::Node *node;
+    liquid::Block *block;
+    liquid::Expression *expr;
+    liquid::Statement *stmt;
+    liquid::Identifier *ident;
+    liquid::VariableDeclaration *var_decl;
+    liquid::VariableDeclarationDeduce *var_decl_deduce;
+    std::vector<liquid::VariableDeclaration*> *varvec;
+    std::vector<liquid::Expression*> *exprvec;
     std::string *string;
     int token;
 }
@@ -70,11 +70,11 @@
 
 %%
 
-program : /* blank */ { programBlock = new AST::Block(); }
+program : /* blank */ { programBlock = new liquid::Block(); }
         | stmts { programBlock = $1; }
         ;
 
-stmts : stmt { $$ = new AST::Block(); $$->statements.push_back($<stmt>1); }
+stmts : stmt { $$ = new liquid::Block(); $$->statements.push_back($<stmt>1); }
       | stmts stmt { $1->statements.push_back($<stmt>2); }
       ;
 
@@ -85,58 +85,58 @@ stmt : var_decl
      | conditional 
      | return
      | while
-     | expr { $$ = new AST::ExpressionStatement($1); }
+     | expr { $$ = new liquid::ExpressionStatement($1); }
      ;
 
 
 block : INDENT stmts UNINDENT { $$ = $2; }
-      | INDENT UNINDENT { $$ = new AST::Block(); }
+      | INDENT UNINDENT { $$ = new liquid::Block(); }
       ;
 
-conditional : TIF expr block TELSE block {$$ = new AST::Conditional($2,$3,$5);}
-            | TIF expr block {$$ = new AST::Conditional($2,$3);}
+conditional : TIF expr block TELSE block {$$ = new liquid::Conditional($2,$3,$5);}
+            | TIF expr block {$$ = new liquid::Conditional($2,$3);}
             ; 
 
-while : TWHILE expr block TELSE block {$$ = new AST::WhileLoop($2,$3,$5);}
-      | TWHILE expr block {$$ = new AST::WhileLoop($2,$3);}
+while : TWHILE expr block TELSE block {$$ = new liquid::WhileLoop($2,$3,$5);}
+      | TWHILE expr block {$$ = new liquid::WhileLoop($2,$3);}
       ; 
 
-var_decl : ident ident { $$ = new AST::VariableDeclaration($1, $2, @2); }
-         | ident ident TEQUAL expr { $$ = new AST::VariableDeclaration($1, $2, $4, @2); }
+var_decl : ident ident { $$ = new liquid::VariableDeclaration($1, $2, @2); }
+         | ident ident TEQUAL expr { $$ = new liquid::VariableDeclaration($1, $2, $4, @2); }
          ;
 
-var_decl_deduce : TVAR ident TEQUAL expr { $$ = new AST::VariableDeclarationDeduce($2, $4, @2); }
+var_decl_deduce : TVAR ident TEQUAL expr { $$ = new liquid::VariableDeclarationDeduce($2, $4, @2); }
          ;
 
-func_decl : TDEF ident TLPAREN func_decl_args TRPAREN TCOLON ident block { $$ = new AST::FunctionDeclaration($7, $2, $4, $8, @2); }
-          | TDEF ident TLPAREN func_decl_args TRPAREN block { $$ = new AST::FunctionDeclaration($2, $4, $6, @2); }
+func_decl : TDEF ident TLPAREN func_decl_args TRPAREN TCOLON ident block { $$ = new liquid::FunctionDeclaration($7, $2, $4, $8, @2); }
+          | TDEF ident TLPAREN func_decl_args TRPAREN block { $$ = new liquid::FunctionDeclaration($2, $4, $6, @2); }
           ;
 
-func_decl_args : /*blank*/  { $$ = new AST::VariableList(); }
-          | var_decl { $$ = new AST::VariableList(); $$->push_back($<var_decl>1); }
+func_decl_args : /*blank*/  { $$ = new liquid::VariableList(); }
+          | var_decl { $$ = new liquid::VariableList(); $$->push_back($<var_decl>1); }
           | func_decl_args TCOMMA var_decl { $1->push_back($<var_decl>3); }
           ;
 
-class_decl: TDEF ident block {$$ = new AST::ClassDeclaration($2, $3); }
+class_decl: TDEF ident block {$$ = new liquid::ClassDeclaration($2, $3); }
           ;
 
-ident : TIDENTIFIER { $$ = new AST::Identifier(*$1, @1); delete $1; }
-      | TIDENTIFIER TDOT TIDENTIFIER { $$ = new AST::Identifier(*$1,*$3, @1); delete $1; delete $3;}
+ident : TIDENTIFIER { $$ = new liquid::Identifier(*$1, @1); delete $1; }
+      | TIDENTIFIER TDOT TIDENTIFIER { $$ = new liquid::Identifier(*$1,*$3, @1); delete $1; delete $3;}
       ;
 
-literals : TINTEGER { $$ = new AST::Integer(atol($1->c_str())); delete $1; }
-         | TDOUBLE { $$ = new AST::Double(atof($1->c_str())); delete $1; }
-         | TSTR { $$ = new AST::String(*$1); delete $1; }
-         | TBOOL { $$ = new AST::Boolean(*$1); delete $1; }
+literals : TINTEGER { $$ = new liquid::Integer(atol($1->c_str())); delete $1; }
+         | TDOUBLE { $$ = new liquid::Double(atof($1->c_str())); delete $1; }
+         | TSTR { $$ = new liquid::String(*$1); delete $1; }
+         | TBOOL { $$ = new liquid::Boolean(*$1); delete $1; }
          ;
 
 
-return :  TRETURN expr { $$ = new AST::Return($2); }
-       | TRETURN_SIMPLE { $$ = new AST::Return(); }
+return :  TRETURN expr { $$ = new liquid::Return($2); }
+       | TRETURN_SIMPLE { $$ = new liquid::Return(); }
        ;
 
-expr : ident TEQUAL expr { $$ = new AST::Assignment($<ident>1, $3, @1); }
-     | ident TLPAREN call_args TRPAREN { $$ = new AST::MethodCall($1, $3, @1);  }
+expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @1); }
+     | ident TLPAREN call_args TRPAREN { $$ = new liquid::MethodCall($1, $3, @1);  }
      | ident { $<ident>$ = $1; }
      | literals
      | boolean_expr 
@@ -145,22 +145,22 @@ expr : ident TEQUAL expr { $$ = new AST::Assignment($<ident>1, $3, @1); }
      | TLPAREN expr TRPAREN { $$ = $2; }
      ;
 /* have to write it explecity to have the right operator precedence */
-binop_expr : expr TAND expr { $$ = new AST::BinaryOp($1, $2, $3); }
-           | expr TOR expr { $$ = new AST::BinaryOp($1, $2, $3); }
-           | expr TPLUS expr { $$ = new AST::BinaryOp($1, $2, $3); }
-           | expr TMINUS expr { $$ = new AST::BinaryOp($1, $2, $3); }
-           | expr TMUL expr { $$ = new AST::BinaryOp($1, $2, $3); }
-           | expr TDIV expr { $$ = new AST::BinaryOp($1, $2, $3); }
+binop_expr : expr TAND expr { $$ = new liquid::BinaryOp($1, $2, $3); }
+           | expr TOR expr { $$ = new liquid::BinaryOp($1, $2, $3); }
+           | expr TPLUS expr { $$ = new liquid::BinaryOp($1, $2, $3); }
+           | expr TMINUS expr { $$ = new liquid::BinaryOp($1, $2, $3); }
+           | expr TMUL expr { $$ = new liquid::BinaryOp($1, $2, $3); }
+           | expr TDIV expr { $$ = new liquid::BinaryOp($1, $2, $3); }
            ;
 
-unaryop_expr : TNOT expr { $$ = new AST::UnaryOperator($1, $2); }
+unaryop_expr : TNOT expr { $$ = new liquid::UnaryOperator($1, $2); }
              ;
 
-boolean_expr : expr comparison expr { $$ = new AST::CompOperator($1, $2, $3); }
+boolean_expr : expr comparison expr { $$ = new liquid::CompOperator($1, $2, $3); }
              ;
 
-call_args : /*blank*/  { $$ = new AST::ExpressionList(); }
-          | expr { $$ = new AST::ExpressionList(); $$->push_back($1); }
+call_args : /*blank*/  { $$ = new liquid::ExpressionList(); }
+          | expr { $$ = new liquid::ExpressionList(); $$->push_back($1); }
           | call_args TCOMMA expr  { $1->push_back($3); }
           ;
  

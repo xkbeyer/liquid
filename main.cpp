@@ -9,7 +9,7 @@
 extern int yyparse();
 extern int yylex_destroy();
 extern FILE* yyin;
-extern AST::Block* programBlock;
+extern liquid::Block* programBlock;
 
 
 int main(int argc, char **argv)
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     
     yyparse();
     assert(programBlock);
-    AST::CodeGenContext context;
+    liquid::CodeGenContext context;
     context.printCodeGeneration(*programBlock);
     context.generateCode(*programBlock);
     context.runCode();

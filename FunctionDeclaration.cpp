@@ -7,8 +7,19 @@
 using namespace std;
 using namespace llvm;
 
-namespace AST {
+namespace liquid {
 
+
+FunctionDeclaration::~FunctionDeclaration()
+{
+    for( VariableList::iterator i = arguments->begin(); i != arguments->end(); ++i ) {
+        delete *i;
+    }
+    delete type;
+    delete id;
+    delete arguments;
+    delete block;
+}
 
 Value* FunctionDeclaration::codeGen( CodeGenContext& context )
 {
@@ -127,6 +138,18 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
 
     context.endScope();
     return function;
+}
+
+void FunctionDeclaration::toString()
+{
+    std::cout << "  Creating function: " << id->getName() << std::endl;
+    std::cout << "  Parameters : " << std::endl;
+    std::for_each( std::begin( *arguments ), std::end( *arguments ),
+                   [] ( VariableDeclaration* decl ) {
+        std::cout << "      " << decl->getVariablenTypeName() << ", " << decl->getVariablenName() << std::endl;
+        decl->toString();
+    }
+    );
 }
 
 }

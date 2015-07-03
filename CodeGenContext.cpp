@@ -39,7 +39,7 @@ using namespace llvm;
 
 
 
-namespace AST {
+namespace liquid {
 
 CodeGenContext::CodeGenContext()
 : self(nullptr)

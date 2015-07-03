@@ -7,7 +7,7 @@
 using namespace std;
 using namespace llvm;
 
-namespace AST {
+namespace liquid {
     
 Value* VariableDeclaration::codeGen(CodeGenContext& context)
 {

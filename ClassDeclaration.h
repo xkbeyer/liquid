@@ -2,7 +2,7 @@
 #define ClassDeclaration_h__
 #include "AstNode.h"
 
-namespace AST 
+namespace liquid 
 {
 
 class ClassDeclaration : public Statement
