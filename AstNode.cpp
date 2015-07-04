@@ -171,9 +171,14 @@ Value* BinaryOp::codeGen(CodeGenContext& context)
     Value* rhsValue = rhs->codeGen( context );
     Value* lhsValue = lhs->codeGen( context );
     if( rhsValue->getType() != lhsValue->getType() ) {
-       Node::printError( location, "Binary operation of incompatible types. Is a cast missing?" );
-       return nullptr;
+       // since we only support double and int, always cast to double in case of different types.
+       auto doubleTy = Type::getDoubleTy( context.getGlobalContext() );
+       auto cinstr = CastInst::getCastOpcode( rhsValue, true, doubleTy, true );
+       rhsValue = CastInst::Create( cinstr, rhsValue, doubleTy, "castdb", context.currentBlock() );
+       cinstr = CastInst::getCastOpcode( lhsValue, true, doubleTy, true );
+       lhsValue = CastInst::Create( cinstr, lhsValue, doubleTy, "castdb", context.currentBlock() );
     }
+
     bool isDoubleTy = rhsValue->getType()->isFloatingPointTy();
     if( isDoubleTy && (op == TAND || op == TOR) ) {
        Node::printError( location, "Binary operation (AND,OR) on floating point value is not supported. Is a cast missing?" );
@@ -198,7 +203,7 @@ Value* CompOperator::codeGen(CodeGenContext& context)
     Value * rhsVal = rhs->codeGen(context);
     Value * lhsVal = lhs->codeGen(context);
     if( rhsVal->getType() != lhsVal->getType() ) {
-        // since we only support double and int, always cast to double in case of differnt types.
+        // since we only support double and int, always cast to double in case of different types.
         auto cinstr = CastInst::getCastOpcode(rhsVal,true, Type::getDoubleTy(context.getGlobalContext()), true);
         rhsVal = CastInst::Create(cinstr, rhsVal , Type::getDoubleTy(context.getGlobalContext()), "castdb" , context.currentBlock());
         cinstr = CastInst::getCastOpcode(lhsVal,true, Type::getDoubleTy(context.getGlobalContext()), true);
