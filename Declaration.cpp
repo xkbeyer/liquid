@@ -84,7 +84,10 @@ Value* VariableDeclarationDeduce::codeGen( CodeGenContext& context )
 
    Assignment assn( id, getAssignment(), location );
    auto val = assn.codeGen( context );
-   assert( val != nullptr );
+   if( val == nullptr ) {
+      Node::printError( location, " Assignment to '" + id->getName() + "' is empty" );
+      return nullptr;
+   }
 
    context.setVarType( "var", id->getName() );
 

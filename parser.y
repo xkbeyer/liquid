@@ -66,7 +66,7 @@
 %start program
 /* %debug */
 /* %verbose */
-%locations
+%locations /* track locations: @n of component N; @$ of entire range */
 
 %%
 
@@ -131,8 +131,8 @@ literals : TINTEGER { $$ = new liquid::Integer(atol($1->c_str())); delete $1; }
          ;
 
 
-return :  TRETURN expr { $$ = new liquid::Return($2); }
-       | TRETURN_SIMPLE { $$ = new liquid::Return(); }
+return :  TRETURN expr { $$ = new liquid::Return(@$, $2); }
+       | TRETURN_SIMPLE { $$ = new liquid::Return(@$); }
        ;
 
 expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @1); }
@@ -145,12 +145,12 @@ expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @1); }
      | TLPAREN expr TRPAREN { $$ = $2; }
      ;
 /* have to write it explecity to have the right operator precedence */
-binop_expr : expr TAND expr { $$ = new liquid::BinaryOp($1, $2, $3); }
-           | expr TOR expr { $$ = new liquid::BinaryOp($1, $2, $3); }
-           | expr TPLUS expr { $$ = new liquid::BinaryOp($1, $2, $3); }
-           | expr TMINUS expr { $$ = new liquid::BinaryOp($1, $2, $3); }
-           | expr TMUL expr { $$ = new liquid::BinaryOp($1, $2, $3); }
-           | expr TDIV expr { $$ = new liquid::BinaryOp($1, $2, $3); }
+binop_expr : expr TAND expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
+           | expr TOR expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
+           | expr TPLUS expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
+           | expr TMINUS expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
+           | expr TMUL expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
+           | expr TDIV expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
            ;
 
 unaryop_expr : TNOT expr { $$ = new liquid::UnaryOperator($1, $2); }

@@ -159,8 +159,9 @@ class BinaryOp : public Expression {
     int op;
     Expression* lhs;
     Expression* rhs;
+    YYLTYPE location;
 public:
-    BinaryOp(Expression* lhs, int op, Expression* rhs) : op(op), lhs(lhs), rhs(rhs) {}
+    BinaryOp(Expression* lhs, int op, Expression* rhs, YYLTYPE loc) : op(op), lhs(lhs), rhs(rhs), location(loc) {}
     virtual ~BinaryOp()
     {
         delete lhs;
@@ -191,24 +192,24 @@ public:
 
 class Block : public Expression {
 public:
-    StatementList statements;
-    Block() {}
+   StatementList statements;
+   
+   Block() {}
     virtual ~Block()
     {
-        for(StatementList::iterator i = statements.begin() ; i != statements.end() ; ++i) {
-            delete *i;
+        for(auto i : statements) {
+            delete i;
         }
         statements.clear();
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
-    virtual void toString() {
+    virtual void toString() 
+    {
         std::cout << "Creating block " << std::endl;
-        std::for_each(std::begin(statements), std::end(statements),
-                      [] (Statement* s) {
-                          s->toString();
-                      }
-        );
+        for( auto stmt : statements) {
+           stmt->toString();
+        }
         std::cout << "End block " << std::endl;
     }
 };
@@ -346,8 +347,9 @@ public:
 class Return : public Statement
 {
     Expression* retExpr;
+    YYLTYPE location;
 public:
-    Return(Expression* expr = NULL) : retExpr(expr) {}
+   Return( YYLTYPE loc, Expression* expr = nullptr ) : location(loc), retExpr( expr ) {}
     virtual ~Return() {delete retExpr;}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
