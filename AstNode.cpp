@@ -167,22 +167,28 @@ Value* UnaryOperator::codeGen(CodeGenContext& context)
 
 Value* BinaryOp::codeGen(CodeGenContext& context)
 {
-    Instruction::BinaryOps instr;
 
-    switch (op) {
-        case TPLUS: instr = Instruction::Add; break;
-        case TMINUS:instr = Instruction::Sub; break;
-        case TMUL:  instr = Instruction::Mul; break;
-        case TDIV:  instr = Instruction::SDiv; break;
-        case TAND:  instr = Instruction::And; break;
-        case TOR:  instr = Instruction::Or; break;
-        default: return nullptr;
-    }
-    Value* rhsValue = rhs->codeGen(context);
-    Value* lhsValue = lhs->codeGen(context);
+    Value* rhsValue = rhs->codeGen( context );
+    Value* lhsValue = lhs->codeGen( context );
     if( rhsValue->getType() != lhsValue->getType() ) {
-        std::cout << "Binary operation of incompatible types. Is a cast missing? \n";
-        return nullptr;
+       Node::printError( location, "Binary operation of incompatible types. Is a cast missing?" );
+       return nullptr;
+    }
+    bool isDoubleTy = rhsValue->getType()->isFloatingPointTy();
+    if( isDoubleTy && (op == TAND || op == TOR) ) {
+       Node::printError( location, "Binary operation (AND,OR) on floating point value is not supported. Is a cast missing?" );
+       return nullptr;
+    }
+
+    Instruction::BinaryOps instr;
+    switch( op ) {
+       case TPLUS: isDoubleTy ? instr = Instruction::FAdd : instr = Instruction::Add; break;
+       case TMINUS:isDoubleTy ? instr = Instruction::FSub : instr = Instruction::Sub; break;
+       case TMUL:  isDoubleTy ? instr = Instruction::FMul : instr = Instruction::Mul; break;
+       case TDIV:  isDoubleTy ? instr = Instruction::FDiv : instr = Instruction::SDiv; break;
+       case TAND:  instr = Instruction::And; break;
+       case TOR:   instr = Instruction::Or; break;
+       default: return nullptr;
     }
     return BinaryOperator::Create(instr, lhsValue, rhsValue, "mathtmp", context.currentBlock());
 }

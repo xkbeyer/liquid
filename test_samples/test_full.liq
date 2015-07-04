@@ -211,3 +211,10 @@ displayln("ps.get returns %d should be 5", ps.get())
 import test_var.liq
 
 test_var()
+
+#Test bin ops on floating point numbers
+var af = 1.5 + 2.5
+var bf = 1.5 - 2.5
+var cf = 1.5 * 2.5
+var df = 1.5 / 2.5
+displayln("Test FP BinOps (+,-,*,/) %lf %lf %lf %lf", af,bf,cf,df);
