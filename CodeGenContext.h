@@ -136,6 +136,7 @@ public:
     void addKlassInitCode( std::string name, Assignment* assign );
     KlassInitCodeAssign& getKlassInitCode( std::string name );
     llvm::Type* getGenericIntegerType();
+    void visitSomething( class Block& root );
 };
 
 }

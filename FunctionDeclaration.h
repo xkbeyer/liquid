@@ -23,6 +23,10 @@ public:
     NodeType getType() { return NodeType::function; }
     Identifier* getId() { return id; }
     virtual void toString();
+    virtual void Accept( Visitor& v ) { v.VisitFunctionDeclaration( this ); }
+
+    Block* getBody() { return block; }
+    YYLTYPE getlocation() { return location; }
 };
 
 }

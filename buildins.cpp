@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <iostream>
+#include <cstring>
 
 #include "buildins.h"
 

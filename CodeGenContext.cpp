@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include "buildins.h"
+#include "VisitorSyntaxCheck.h"
 
 using namespace std;
 using namespace llvm;
@@ -344,6 +345,12 @@ llvm::Type* CodeGenContext::getGenericIntegerType()
 #else
     return Type::getInt32Ty( getGlobalContext() );
 #endif
+}
+
+void CodeGenContext::visitSomething( Block& root )
+{
+   VisitorSyntaxCheck visitor;
+   root.Accept( visitor );
 }
 
 

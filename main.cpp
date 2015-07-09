@@ -29,11 +29,17 @@ int main(int argc, char **argv)
     }
     
     yyparse();
-    assert(programBlock);
-    liquid::CodeGenContext context;
-    context.printCodeGeneration(*programBlock);
-    context.generateCode(*programBlock);
-    context.runCode();
+
+    if( programBlock == nullptr ) {
+       std::cout << "Parsing " << fileName << "failed. Abort" << std::endl;
+    } else {
+       liquid::CodeGenContext context;
+       context.printCodeGeneration( *programBlock );
+       context.visitSomething( *programBlock );
+       context.generateCode( *programBlock );
+       context.runCode();
+    }
+
 
     fclose(yyin);
     delete programBlock;
