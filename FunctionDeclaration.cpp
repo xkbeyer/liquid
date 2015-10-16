@@ -142,7 +142,7 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
 
 void FunctionDeclaration::toString()
 {
-    std::cout << "  Creating function: " << id->getName() << std::endl;
+    std::cout << "function: " << id->getName() << std::endl;
     std::cout << "  Parameters : " << std::endl;
     std::for_each( std::begin( *arguments ), std::end( *arguments ),
                    [] ( VariableDeclaration* decl ) {
