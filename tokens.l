@@ -162,6 +162,6 @@ import             BEGIN(incl);
 "*"                     return TOKEN(TMUL);
 "/"                     return TOKEN(TDIV);
 ":"                     return TOKEN(TCOLON);
-.                       printf("line %d, len %d Unknown token %s !\n", yylineno, yyleng, yytext); yyterminate();
+.                       printf("line %d, len %zd Unknown token %s !\n", yylineno, yyleng, yytext); yyterminate();
 
 %%
