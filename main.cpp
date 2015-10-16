@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     } else {
        liquid::CodeGenContext context;
        context.printCodeGeneration( *programBlock );
-       if( context.visitSomething( *programBlock ) ) {
+       if( context.preProcessing( *programBlock ) ) {
           context.generateCode( *programBlock );
           context.runCode();
        }

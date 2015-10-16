@@ -347,7 +347,7 @@ llvm::Type* CodeGenContext::getGenericIntegerType()
 #endif
 }
 
-bool CodeGenContext::visitSomething( Block& root )
+bool CodeGenContext::preProcessing( Block& root )
 {
    VisitorSyntaxCheck visitor;
    root.Accept( visitor );
