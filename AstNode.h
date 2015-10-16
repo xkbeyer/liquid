@@ -378,12 +378,13 @@ class Return : public Statement
     Expression* retExpr;
     YYLTYPE location;
 public:
-   Return( YYLTYPE loc, Expression* expr = nullptr ) : retExpr( expr ), location( loc ) {}
+    Return( YYLTYPE loc, Expression* expr = nullptr ) : retExpr( expr ), location( loc ) {}
     virtual ~Return() {delete retExpr;}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
     virtual void toString() {std::cout << "  Creating return statement " << std::endl;}
     virtual void Accept( Visitor& v ) { v.VisitReturnStatement( this ); }
+    YYLTYPE& getLocation() { return location; }
 };
 
 }

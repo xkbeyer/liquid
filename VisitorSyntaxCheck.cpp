@@ -18,7 +18,8 @@ void VisitorSyntaxCheck::VisitStatement( Statement* stmt )
 
 void VisitorSyntaxCheck::VisitReturnStatement( Return* retstmt )
 {
-   std::cout << "Visiting "; retstmt->toString(); 
+   std::cout << "Visiting "; retstmt->toString();
+   ReturnStatementLocations.push_back( retstmt->getLocation() );
    ++returnStatements;
 }
 
@@ -26,13 +27,18 @@ void VisitorSyntaxCheck::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
 {
    std::cout << "Visiting "; fndecl->toString(); 
    returnStatements = 0;
+   ReturnStatementLocations.clear();
+
    auto body = fndecl->getBody();
    for( auto stmt : body->statements ) {
       stmt->Accept( *this );
    }
 
    if( returnStatements > 1 ) {
-      Node::printError( fndecl->getlocation(), " Too many return statement in function '" + fndecl->getId()->getName() + "()' for return type deduction.");
+      Node::printError( fndecl->getlocation(), " Too many return statement in function '" + fndecl->getId()->getName() + "()' for return type deduction.\nThe possible statements are:");
+      for( auto loc : ReturnStatementLocations ) {
+         Node::printError( loc, " return ..." );
+      }
       syntaxErrors++;
    }
 }

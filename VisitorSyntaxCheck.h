@@ -1,13 +1,18 @@
 #ifndef VisitorSyntaxCheck_h__
 #define VisitorSyntaxCheck_h__
 #include <iostream>
+#include <vector>
+
 #include "Visitor.h"
+struct YYLTYPE;
+
 namespace liquid {
 
 class VisitorSyntaxCheck : public Visitor
 {
    int returnStatements;
    int syntaxErrors;
+   std::vector<YYLTYPE> ReturnStatementLocations;
 public:
    VisitorSyntaxCheck() : returnStatements(0), syntaxErrors(0) {}
    virtual ~VisitorSyntaxCheck() {}
