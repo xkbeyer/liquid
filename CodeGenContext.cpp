@@ -347,10 +347,11 @@ llvm::Type* CodeGenContext::getGenericIntegerType()
 #endif
 }
 
-void CodeGenContext::visitSomething( Block& root )
+bool CodeGenContext::visitSomething( Block& root )
 {
    VisitorSyntaxCheck visitor;
    root.Accept( visitor );
+   return !visitor.hasErrors();
 }
 
 

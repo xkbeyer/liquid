@@ -33,6 +33,7 @@ void VisitorSyntaxCheck::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
 
    if( returnStatements > 1 ) {
       Node::printError( fndecl->getlocation(), " Too many return statement in function '" + fndecl->getId()->getName() + "()' for return type deduction.");
+      syntaxErrors++;
    }
 }
 

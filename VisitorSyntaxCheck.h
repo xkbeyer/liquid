@@ -7,8 +7,9 @@ namespace liquid {
 class VisitorSyntaxCheck : public Visitor
 {
    int returnStatements;
+   int syntaxErrors;
 public:
-   VisitorSyntaxCheck() : returnStatements(0) {}
+   VisitorSyntaxCheck() : returnStatements(0), syntaxErrors(0) {}
    virtual ~VisitorSyntaxCheck() {}
    void VisitExpression(Expression* expr);
    void VisitInteger( Integer* expr );
@@ -32,6 +33,8 @@ public:
    void VisitConditional(Conditional* expr);
    void VisitWhileLoop(WhileLoop* expr);
    void VisitClassDeclaration(ClassDeclaration* expr);
+
+   bool hasErrors() { return syntaxErrors != 0 ; }
 };
 
 }

@@ -35,9 +35,10 @@ int main(int argc, char **argv)
     } else {
        liquid::CodeGenContext context;
        context.printCodeGeneration( *programBlock );
-       context.visitSomething( *programBlock );
-       context.generateCode( *programBlock );
-       context.runCode();
+       if( context.visitSomething( *programBlock ) ) {
+          context.generateCode( *programBlock );
+          context.runCode();
+       }
     }
 
 
