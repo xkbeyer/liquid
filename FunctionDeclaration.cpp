@@ -12,8 +12,8 @@ namespace liquid {
 
 FunctionDeclaration::~FunctionDeclaration()
 {
-    for( VariableList::iterator i = arguments->begin(); i != arguments->end(); ++i ) {
-        delete *i;
+    for( auto i : *arguments ) {
+        delete i;
     }
     delete type;
     delete id;
@@ -144,12 +144,10 @@ void FunctionDeclaration::toString()
 {
     std::cout << "function: " << id->getName() << std::endl;
     std::cout << "  Parameters : " << std::endl;
-    std::for_each( std::begin( *arguments ), std::end( *arguments ),
-                   [] ( VariableDeclaration* decl ) {
+    for( auto decl : *arguments ) {
         std::cout << "      " << decl->getVariablenTypeName() << ", " << decl->getVariablenName() << std::endl;
         decl->toString();
     }
-    );
 }
 
 }

@@ -8,11 +8,13 @@
 using namespace std;
 using namespace llvm;
 
+extern std::string g_str;
 
 namespace liquid {
 
 Value* Integer::codeGen(CodeGenContext& context)
 {
+   std::cout << g_str;
     return ConstantInt::get(context.getGenericIntegerType(), value, true);
 }
 

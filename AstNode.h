@@ -70,7 +70,7 @@ public:
 
 class Expression : public Node {
 public:
-    virtual ~Expression() {}
+   virtual ~Expression() {}
     virtual void toString() {std::cout << "Expression\n" ;}
     virtual void Accept( Visitor& v ) { v.VisitExpression( this ); }
 };
