@@ -28,7 +28,6 @@ public:
    void VisitBlock( Block* expr );
    void VisitStatement( Statement* stmt );
    void VisitReturnStatement( Return* retstmt );
-   void VisitCompareStatement( Conditional* cmp ) ;
    void VisitFunctionDeclaration( FunctionDeclaration* fndecl );
    void VisitExpressionStatement(ExpressionStatement* expr);
    void VisitAssigment(Assignment* expr);

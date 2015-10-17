@@ -43,7 +43,7 @@ void VisitorSyntaxCheck::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
    }
 }
 
-void VisitorSyntaxCheck::VisitCompareStatement( Conditional* cmp )
+void VisitorSyntaxCheck::VisitConditional( Conditional* cmp )
 {
    std::cout << "Visiting " << cmp->toString() << std::endl;
    if( cmp->getThen() ) {
@@ -124,11 +124,6 @@ void VisitorSyntaxCheck::VisitVariablenDeclaration( VariableDeclaration* expr )
 }
 
 void VisitorSyntaxCheck::VisitVariablenDeclarationDeduce( VariableDeclarationDeduce* expr )
-{
-   std::cout << "Visiting "<< expr->toString() << std::endl; 
-}
-
-void VisitorSyntaxCheck::VisitConditional( Conditional* expr )
 {
    std::cout << "Visiting "<< expr->toString() << std::endl; 
 }

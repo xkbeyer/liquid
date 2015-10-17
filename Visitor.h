@@ -40,7 +40,6 @@ public:
    virtual void VisitBlock( Block* expr ) = 0;
    virtual void VisitStatement( Statement* stmt ) = 0;
    virtual void VisitReturnStatement( Return* retstmt ) = 0;
-   virtual void VisitCompareStatement( Conditional* cmp ) = 0;
    virtual void VisitFunctionDeclaration( FunctionDeclaration* fndecl ) = 0;
    virtual void VisitExpressionStatement( ExpressionStatement* expr ) = 0;
    virtual void VisitAssigment( Assignment* expr ) = 0;

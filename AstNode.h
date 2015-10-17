@@ -358,7 +358,7 @@ public:
    virtual llvm::Value* codeGen(CodeGenContext& context);
    NodeType getType() { return NodeType::expression; }
    virtual std::string toString() { return "conditional "; }
-   virtual void Accept(Visitor& v) { v.VisitCompareStatement(this); }
+   virtual void Accept(Visitor& v) { v.VisitConditional(this); }
 
    virtual Expression* getThen() { return thenExpr; }
    virtual Expression* getElse() { return elseExpr; }

@@ -37,7 +37,7 @@ void VisitorPrettyPrint::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
    --indent;
 }
 
-void VisitorPrettyPrint::VisitCompareStatement( Conditional* cmp )
+void VisitorPrettyPrint::VisitConditional( Conditional* cmp )
 {
    std::cout << indent_spaces(indent) << "Create " << cmp->toString() << std::endl;
    if( cmp->getThen() ) {
@@ -151,11 +151,6 @@ void VisitorPrettyPrint::VisitVariablenDeclarationDeduce( VariableDeclarationDed
       expr->getAssignment()->Accept(*this);
       --indent;
    }
-}
-
-void VisitorPrettyPrint::VisitConditional( Conditional* expr )
-{
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
 }
 
 void VisitorPrettyPrint::VisitWhileLoop( WhileLoop* expr )
