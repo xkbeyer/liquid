@@ -40,12 +40,15 @@ void VisitorPrettyPrint::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
 void VisitorPrettyPrint::VisitConditional( Conditional* cmp )
 {
    std::cout << indent_spaces(indent) << "Create " << cmp->toString() << std::endl;
+   ++indent;
+   cmp->getCompOperator()->Accept(*this);
    if( cmp->getThen() ) {
       cmp->getThen()->Accept( *this );
    }
    if( cmp->getElse() ) {
       cmp->getElse()->Accept( *this );
    }
+   --indent;
 }
 
 void VisitorPrettyPrint::VisitInteger( Integer* expr )
@@ -93,6 +96,8 @@ void VisitorPrettyPrint::VisitBinaryOp( BinaryOp* expr )
 void VisitorPrettyPrint::VisitCompOperator( CompOperator* expr )
 {
    std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   expr->getLHS()->Accept(*this);
+   expr->getRHS()->Accept(*this);
 }
 
 void VisitorPrettyPrint::VisitBlock( Block* expr )

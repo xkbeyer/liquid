@@ -216,6 +216,8 @@ public:
    int getOperator() const { return op; }
    virtual llvm::Value* codeGen(CodeGenContext& context);
    NodeType getType() { return NodeType::expression; }
+   Expression* getLHS() { return lhs; }
+   Expression* getRHS() { return rhs; }
    virtual std::string toString();
    virtual void Accept(Visitor& v) { v.VisitCompOperator(this); }
 };
@@ -360,6 +362,7 @@ public:
    virtual std::string toString() { return "conditional "; }
    virtual void Accept(Visitor& v) { v.VisitConditional(this); }
 
+   virtual CompOperator* getCompOperator() { return cmpOp; }
    virtual Expression* getThen() { return thenExpr; }
    virtual Expression* getElse() { return elseExpr; }
 };
