@@ -18,6 +18,7 @@
 
 #include "buildins.h"
 #include "VisitorSyntaxCheck.h"
+#include "VisitorPrettyPrint.h"
 
 using namespace std;
 using namespace llvm;
@@ -165,7 +166,8 @@ GenericValue CodeGenContext::runCode() {
 
 void CodeGenContext::printCodeGeneration(class Block& root)
 {
-    root.toString();
+   VisitorPrettyPrint visitor;
+   root.Accept(visitor);
 }
 
 /*! Runs the optimizer over all function */

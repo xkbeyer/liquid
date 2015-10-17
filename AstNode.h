@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <sstream>
 
 
 #if defined(_MSC_VER)
@@ -56,7 +57,7 @@ public:
     virtual ~Node() {}
     virtual llvm::Value* codeGen(CodeGenContext& context) = 0 ;
     virtual NodeType getType() = 0 ;
-    virtual void toString() {std::cout << "node\n" ;}
+    virtual std::string toString() { return "node\n" ;}
     virtual void Accept( Visitor& v ) = 0;
     static void printError(YYLTYPE location, std::string msg) {
         std::cerr
@@ -71,7 +72,7 @@ public:
 class Expression : public Node {
 public:
    virtual ~Expression() {}
-    virtual void toString() {std::cout << "Expression\n" ;}
+    virtual std::string toString() {return "Expression\n" ;}
     virtual void Accept( Visitor& v ) { v.VisitExpression( this ); }
 };
 
@@ -79,7 +80,7 @@ class Statement : public Expression {
 public:
     virtual ~Statement() {}
     NodeType getType() {return NodeType::expression;}
-    virtual void toString() {std::cout << "Statement\n" ;}
+    virtual std::string toString() {return "Statement\n" ;}
     virtual void Accept( Visitor& v ) { v.VisitStatement( this ); }
 };
 
@@ -90,7 +91,7 @@ public:
     virtual ~Integer() {}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::integer;}
-    virtual void toString() {std::cout << "integer: " << value << std::endl;}
+    virtual std::string toString() { std::stringstream s; s << "integer: " << value; return s.str(); }
     virtual void Accept( Visitor& v ) {v.VisitInteger(this);}
 };
 
@@ -101,7 +102,7 @@ public:
     virtual ~Double() {}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::decimal;}
-    virtual void toString() {std::cout << "double: " << value << std::endl;}
+    virtual std::string toString() { std::stringstream s; s << "double: " << value; return s.str(); }
     virtual void Accept( Visitor& v ) { v.VisitDouble( this ); }
 };
 
@@ -112,7 +113,7 @@ public:
     virtual ~String() { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::string;}
-    virtual void toString() {std::cout << "string: " << value << std::endl;}
+    virtual std::string toString() { std::stringstream s; s << "string: " << value; return s.str(); }
     virtual void Accept( Visitor& v ) { v.VisitString( this ); }
 };
 
@@ -127,7 +128,7 @@ public:
     virtual ~Boolean() {}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::boolean;}
-    virtual void toString() {std::cout << "boolean: " << value << std::endl;}
+    virtual std::string toString() {std::stringstream s; s << "boolean: " << value ; return s.str();}
     virtual void Accept( Visitor& v ) { v.VisitBoolean( this ); }
 };
 
@@ -145,7 +146,7 @@ public:
     YYLTYPE getLocation() const { return location; }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::identifier;}
-    virtual void toString() {std::cout << "identifier reference: " << structName << "::" << name << std::endl;}
+    virtual std::string toString() {std::stringstream s; s << "identifier reference: " << structName << "::" << name ; return s.str();}
     virtual void Accept( Visitor& v ) { v.VisitIdentifier( this ); }
 };
 
@@ -161,7 +162,7 @@ public:
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
-    virtual void toString() {std::cout << "unary operation " << op << std::endl;}
+    virtual std::string toString() { std::stringstream s; s << "unary operation " << op;  return s.str(); }
     virtual void Accept( Visitor& v ) { v.VisitUnaryOperator( this ); }
 };
 
@@ -181,7 +182,7 @@ public:
     int getOperator() const {return op;}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
-    virtual void toString() {std::cout << "binary operation " << op << std::endl;}
+    virtual std::string toString() { std::stringstream s; s << "binary operation " << op;  return s.str(); }
     virtual void Accept( Visitor& v ) { v.VisitBinaryOp( this ); }
 };
 
@@ -199,7 +200,7 @@ public:
     int getOperator() const {return op;}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
-    virtual void toString() {std::cout << "compare operation " << op << std::endl;}
+    virtual std::string toString() { std::stringstream s; s << "compare operation " << op; return s.str(); }
     virtual void Accept( Visitor& v ) { v.VisitCompOperator( this ); }
 };
 
@@ -217,19 +218,10 @@ public:
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
-    virtual void toString() 
-    {
-        std::cout << "block " << std::endl;
-        for( auto stmt : statements) {
-           stmt->toString();
-        }
-        std::cout << "End block " << std::endl;
-    }
+    virtual std::string toString() { std::stringstream s; s <<"block " ; return s.str(); }
     void Accept( Visitor& v )
     {
-       for( auto stmt : statements ) {
-          stmt->Accept( v );
-       }
+       v.VisitBlock(this);
     }
 };
 
@@ -241,7 +233,7 @@ public:
     virtual ~ExpressionStatement() { delete expression; }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
-    virtual void toString() {/*std::cout << "expression statement " << std::endl;*/}
+    virtual std::string toString() { return "expression statement " ;}
     virtual void Accept( Visitor& v ) { v.VisitExpressionStatement( this ); }
 };
 
@@ -255,7 +247,7 @@ public:
     virtual ~Assignment() { delete lhs; delete rhs; }
     virtual llvm::Value* codeGen( CodeGenContext& context );
     NodeType getType() { return NodeType::expression; }
-    virtual void toString() { std::cout << "assignment for " << lhs->getStructName() << "::" << lhs->getName() << std::endl; }
+    virtual std::string toString() { std::stringstream s; s << "assignment for " << lhs->getStructName() << "::" << lhs->getName();  return s.str(); }
     virtual void Accept( Visitor& v ) { v.VisitAssigment( this ); }
 };
 
@@ -278,7 +270,7 @@ public:
     }
     virtual llvm::Value* codeGen( CodeGenContext& context );
     NodeType getType() { return NodeType::expression; }
-    virtual void toString() { std::cout << "method call: " << id->getStructName() << "." << id->getName() << std::endl; }
+    virtual std::string toString() { std::stringstream s; s << "method call: " << id->getStructName() << "." << id->getName();  return s.str(); }
     virtual void Accept( Visitor& v ) { v.VisitMethodCall( this ); }
 private:
     std::string getTypeNameOfFirstArg( CodeGenContext& context );
@@ -310,7 +302,7 @@ public:
     bool hasAssignmentExpr() {return assignmentExpr != nullptr;}
     Expression* getAssignment() { return assignmentExpr; }
     YYLTYPE& getLocation() {return location;} 
-    virtual void toString() {std::cout << "variable declaration for " << id->getName() << " of type " << (type ? type->getName() : "TBD") << std::endl;}
+    virtual std::string toString() { std::stringstream s; s << "variable declaration for " << id->getName() << " of type " << (type ? type->getName() : "TBD");  return s.str();}
     virtual void Accept( Visitor& v ) { v.VisitVariablenDeclaration( this ); }
 };
 
@@ -329,7 +321,7 @@ public:
     bool hasAssignmentExpr() { return assignmentExpr != nullptr; }
     Expression* getAssignment() { return assignmentExpr; }
     YYLTYPE& getLocation() { return location; }
-    virtual void toString() { std::cout << "variable declaration for " << id->getName() << " of unknown type " << std::endl; }
+    virtual std::string toString() { std::stringstream s; s << "variable declaration for " << id->getName() << " of unknown type "; return s.str();}
     virtual void Accept( Visitor& v ) { v.VisitVariablenDeclarationDeduce( this ); }
 };
 
@@ -347,7 +339,7 @@ public:
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
-    virtual void toString() {std::cout << "conditional " << std::endl;}
+    virtual std::string toString() {return "conditional ";}
     virtual void Accept( Visitor& v ) { v.VisitCompareStatement( this ); }
 
     virtual Expression* getThen() { return thenExpr; }
@@ -368,7 +360,7 @@ public:
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
-    virtual void toString() {std::cout << "while loop " << std::endl;}
+    virtual std::string toString() {return "while loop ";}
     virtual void Accept( Visitor& v ) { v.VisitWhileLoop( this ); }
 };
 
@@ -382,7 +374,7 @@ public:
     virtual ~Return() {delete retExpr;}
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::expression;}
-    virtual void toString() {std::cout << "return statement " << std::endl;}
+    virtual std::string toString() {return "return statement ";}
     virtual void Accept( Visitor& v ) { v.VisitReturnStatement( this ); }
     YYLTYPE& getLocation() { return location; }
 };

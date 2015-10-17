@@ -140,14 +140,15 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
     return function;
 }
 
-void FunctionDeclaration::toString()
+std::string FunctionDeclaration::toString()
 {
-    std::cout << "function: " << id->getName() << std::endl;
-    std::cout << "  Parameters : " << std::endl;
-    for( auto decl : *arguments ) {
-        std::cout << "      " << decl->getVariablenTypeName() << ", " << decl->getVariablenName() << std::endl;
-        decl->toString();
-    }
+   std::stringstream s;
+   s << "function declaration: " << id->getName() << std::endl;
+   s << "  Parameters : " << std::endl;
+   for( auto decl : *arguments ) {
+      s << "      " << decl->getVariablenTypeName() << " " << decl->getVariablenName() << std::endl;
+   }
+   return s.str();
 }
 
 }

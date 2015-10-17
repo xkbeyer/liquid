@@ -51,6 +51,7 @@ set(SOURCES_COMMON
             ClassDeclaration.cpp
             CodeGenContext.cpp
             VisitorSyntaxCheck.cpp
+            VisitorPrettyPrint.cpp
             ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
             ${CMAKE_CURRENT_BINARY_DIR}/tokens.cpp
             tokens.l
@@ -64,6 +65,7 @@ set(HEADER_COMMON
             ClassDeclaration.h
             CodeGenContext.h
             VisitorSyntaxCheck.h
+            VisitorPrettyPrint.h
    )
 
 if(MSVC)

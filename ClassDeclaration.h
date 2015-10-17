@@ -1,5 +1,9 @@
 #ifndef ClassDeclaration_h__
 #define ClassDeclaration_h__
+
+#include <string>
+#include <sstream>
+
 #include "AstNode.h"
 
 namespace liquid 
@@ -19,12 +23,10 @@ public:
     }
     virtual llvm::Value* codeGen(CodeGenContext& context);
     NodeType getType() {return NodeType::klass;}
-    virtual void toString() {
-        std::cout << "  Creating Class: " << id->getName() << std::endl;
-        std::for_each(std::begin(block->statements), std::end(block->statements),
-            [] (Statement* s) {
-                s->toString();
-            });
+    virtual std::string toString() {
+       std::stringstream s;
+       s << "Class: " << id->getName();
+       return s.str();
     }
 private:
     void removeVarDeclStatements();
