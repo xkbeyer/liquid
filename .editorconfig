@@ -1,0 +1,23 @@
+# top-most EditorConfig file
+root = true
+
+# newline ending every file
+[*]
+insert_final_newline = true
+
+# tab indentation
+[*.cpp]
+indent_style = space
+indent_size = 3
+
+[*.h]
+indent_style = space
+indent_size = 3
+
+[*.y]
+indent_style = space
+indent_size = 4
+
+[*.l]
+indent_style = space
+indent_size = 4
