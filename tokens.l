@@ -32,9 +32,8 @@ int yycolumn = 1;
 #define YY_USER_ACTION \
     if( yylloc.last_line < yylineno ) yycolumn = 1 ; \
     yylloc.first_line = yylloc.last_line = yylineno; \
-    yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
-    yycolumn += yyleng; 
-//    printf("fl=%d fc=%d lc=%d l=%d c=%d t=%s\n",yylloc.first_line, yylloc.last_line,yylloc.first_column,yylloc.last_column,yyleng,yycolumn, yytext);
+    yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + (int)yyleng - 1; \
+    yycolumn += (int)yyleng; 
 
 %}
 
