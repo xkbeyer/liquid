@@ -76,11 +76,18 @@ void VisitorPrettyPrint::VisitIdentifier( Identifier* expr )
 void VisitorPrettyPrint::VisitUnaryOperator( UnaryOperator* expr )
 {
    std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   ++indent;
+   expr->getRHS()->Accept(*this);
+   --indent;
 }
 
 void VisitorPrettyPrint::VisitBinaryOp( BinaryOp* expr )
 {
    std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   ++indent;
+   expr->getLHS()->Accept(*this);
+   expr->getRHS()->Accept(*this);
+   --indent;
 }
 
 void VisitorPrettyPrint::VisitCompOperator( CompOperator* expr )
@@ -102,6 +109,9 @@ void VisitorPrettyPrint::VisitBlock( Block* expr )
 void VisitorPrettyPrint::VisitExpressionStatement( ExpressionStatement* expr )
 {
    std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   ++indent;
+   expr->getExpression()->Accept(*this);
+   --indent;
 }
 
 void VisitorPrettyPrint::VisitAssigment( Assignment* expr )
@@ -112,16 +122,35 @@ void VisitorPrettyPrint::VisitAssigment( Assignment* expr )
 void VisitorPrettyPrint::VisitMethodCall( MethodCall* expr )
 {
    std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   ++indent;
+   auto args = expr->getArguments();
+   if(args->size()) {
+      std::cout << indent_spaces(indent) << "Arguments are:\n";
+      for(auto arg : *args) {
+         arg->Accept(*this);
+      }
+   }
+   --indent;
 }
 
 void VisitorPrettyPrint::VisitVariablenDeclaration( VariableDeclaration* expr )
 {
    std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   if(expr->hasAssignmentExpr()) {
+      ++indent;
+      expr->getAssignment()->Accept(*this);
+      --indent;
+   }
 }
 
 void VisitorPrettyPrint::VisitVariablenDeclarationDeduce( VariableDeclarationDeduce* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   std::cout << indent_spaces(indent) << "Create " << expr->toString() << " with type deduction" << std::endl;
+   if(expr->hasAssignmentExpr()) {
+      ++indent;
+      expr->getAssignment()->Accept(*this);
+      --indent;
+   }
 }
 
 void VisitorPrettyPrint::VisitConditional( Conditional* expr )

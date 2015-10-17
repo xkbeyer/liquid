@@ -164,6 +164,18 @@ Value* UnaryOperator::codeGen(CodeGenContext& context)
     return BinaryOperator::Create(instr, lhsValue, rhsValue, "unarytmp", context.currentBlock());
 }
 
+std::string UnaryOperator::toString() 
+{ 
+   std::stringstream s; 
+   s << "unary operation ";
+   switch(op) {
+      case TNOT: s << "not"; break;
+      default: // TODO user defined operator
+         s << "unknown";
+   }
+   return s.str();
+}
+
 Value* BinaryOp::codeGen(CodeGenContext& context)
 {
 
@@ -197,6 +209,22 @@ Value* BinaryOp::codeGen(CodeGenContext& context)
     return BinaryOperator::Create(instr, lhsValue, rhsValue, "mathtmp", context.currentBlock());
 }
 
+std::string BinaryOp::toString() 
+{ 
+   std::stringstream s; 
+   s << "binary operation " ;  
+   switch(op) {
+      case TPLUS: s << "+"; break;
+      case TMINUS:s << "-"; break;
+      case TMUL:  s << "*"; break;
+      case TDIV:  s << "/"; break;
+      case TAND:  s << "and"; break;
+      case TOR:   s << "or"; break;
+      default: s << "unknown";
+   }
+   return s.str();
+}
+
 Value* CompOperator::codeGen(CodeGenContext& context)
 {
     Value * rhsVal = rhs->codeGen(context);
@@ -220,11 +248,27 @@ Value* CompOperator::codeGen(CodeGenContext& context)
         case TCLT:  predicate = isDouble ? CmpInst::FCMP_OLT : CmpInst::ICMP_SLT;break;
         case TCLE:  predicate = isDouble ? CmpInst::FCMP_OLE : CmpInst::ICMP_SLE;break;
         case TCEQ:  predicate = isDouble ? CmpInst::FCMP_OEQ : CmpInst::ICMP_EQ ;break;
+        case TCNE: // FIXME missing implementation.
         default: return nullptr;
     }
 
     return CmpInst::Create(oinstr, predicate, lhsVal, rhsVal, "cmptmp", context.currentBlock());
 }
+
+std::string CompOperator::toString() 
+{ 
+   std::stringstream s; 
+   s << "compare operation " ; 
+   switch(op) {
+      case TCGE: s << ">="; break;
+      case TCGT: s << ">" ; break;
+      case TCLT: s << "<" ; break;
+      case TCLE: s << "<="; break;
+      case TCEQ: s << "=="; break;
+      case TCNE: s << "!="; break;
+      default: s << "unknown";
+   }
+   return s.str(); }
 
 Value* Assignment::codeGen(CodeGenContext& context)
 {
