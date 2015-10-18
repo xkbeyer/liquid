@@ -182,6 +182,12 @@ void VisitorPrettyPrint::VisitWhileLoop( WhileLoop* expr )
 void VisitorPrettyPrint::VisitClassDeclaration( ClassDeclaration* expr )
 {
    std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   ++indent;
+   auto block = expr->getBlock();
+   if(block) {
+      block->Accept(*this);
+   }
+   --indent;
 }
 
 }
