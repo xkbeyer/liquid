@@ -70,6 +70,10 @@ public:
          << location.last_column << ":"
          << msg << std::endl;
    }
+   static void printError(std::string msg)
+   {
+      std::cerr << msg << std::endl;
+   }
 };
 
 class Expression : public Node 
