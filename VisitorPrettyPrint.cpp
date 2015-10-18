@@ -24,6 +24,9 @@ void VisitorPrettyPrint::VisitStatement( Statement* stmt )
 void VisitorPrettyPrint::VisitReturnStatement( Return* retstmt )
 {
    std::cout << indent_spaces(indent) << "Create " << retstmt->toString() << std::endl;
+   ++indent;
+   retstmt->getRetExpression()->Accept(*this);
+   --indent;
 }
 
 void VisitorPrettyPrint::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
@@ -122,6 +125,9 @@ void VisitorPrettyPrint::VisitExpressionStatement( ExpressionStatement* expr )
 void VisitorPrettyPrint::VisitAssigment( Assignment* expr )
 {
    std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   ++indent;
+   expr->getExpression()->Accept(*this);
+   --indent;
 }
 
 void VisitorPrettyPrint::VisitMethodCall( MethodCall* expr )
@@ -161,6 +167,16 @@ void VisitorPrettyPrint::VisitVariablenDeclarationDeduce( VariableDeclarationDed
 void VisitorPrettyPrint::VisitWhileLoop( WhileLoop* expr )
 {
    std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   ++indent;
+   expr->getCondition()->Accept(*this);
+   std::cout << indent_spaces(indent) << "Create Loop Body" << std::endl;
+   expr->getLoopBlock()->Accept(*this);
+   auto elseBlock = expr->getElseBlock();
+   if(elseBlock) {
+      std::cout << indent_spaces(indent) << "Create Else Body" << std::endl;
+      elseBlock->Accept(*this);
+   }
+   --indent;
 }
 
 void VisitorPrettyPrint::VisitClassDeclaration( ClassDeclaration* expr )

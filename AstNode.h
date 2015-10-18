@@ -268,6 +268,7 @@ public:
    virtual llvm::Value* codeGen(CodeGenContext& context);
    NodeType getType() { return NodeType::expression; }
    virtual std::string toString() { std::stringstream s; s << "assignment for " << lhs->getStructName() << "::" << lhs->getName();  return s.str(); }
+   virtual Expression* getExpression() { return rhs; }
    virtual void Accept(Visitor& v) { v.VisitAssigment(this); }
 };
 
@@ -382,6 +383,9 @@ public:
    virtual llvm::Value* codeGen(CodeGenContext& context);
    NodeType getType() { return NodeType::expression; }
    virtual std::string toString() { return "while loop "; }
+   virtual Expression* getCondition() { return condition; }
+   virtual Block* getLoopBlock() { return loopBlock; }
+   virtual Block* getElseBlock() { return elseBlock; }
    virtual void Accept(Visitor& v) { v.VisitWhileLoop(this); }
 };
 
@@ -396,6 +400,7 @@ public:
    virtual llvm::Value* codeGen(CodeGenContext& context);
    NodeType getType() { return NodeType::expression; }
    virtual std::string toString() { return "return statement "; }
+   virtual Expression* getRetExpression() { return retExpr; }
    virtual void Accept(Visitor& v) { v.VisitReturnStatement(this); }
    YYLTYPE& getLocation() { return location; }
 };
