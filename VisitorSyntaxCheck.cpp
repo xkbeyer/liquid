@@ -30,10 +30,12 @@ void VisitorSyntaxCheck::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
    }
 
    if( returnStatements > 1 ) {
-      Node::printError( fndecl->getlocation(), " Too many return statement in function '" + fndecl->getId()->getName() + "()' for return type deduction.\nThe possible statements are:");
+      Node::printError( fndecl->getlocation(), "Too many return statement in function '" + fndecl->getId()->getName() + "()' for return type deduction.\nThe possible statements are:");
+      std::stringstream s;
       for( auto loc : ReturnStatementLocations ) {
-         Node::printError( loc, " return ..." );
+         s << "    " << loc.first_line << ":" << loc.first_column << " return ...\n";
       }
+      Node::printError(s.str());
       syntaxErrors++;
    }
 }
