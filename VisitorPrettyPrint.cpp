@@ -33,6 +33,16 @@ void VisitorPrettyPrint::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
 {
    std::cout << indent_spaces(indent) << "Create " << fndecl->toString() << std::endl;
    ++indent;
+   auto parameter = fndecl->getParameter();
+   if(parameter->size()) {
+      std::cout << indent_spaces(indent) << "Parameters :" << std::endl;
+      ++indent;
+      for(auto decl : *parameter) {
+         std::cout << indent_spaces(indent) << decl->getVariablenTypeName() << " " << decl->getVariablenName() << std::endl;
+      }
+      --indent;
+   }
+
    auto body = fndecl->getBody();
    for( auto stmt : body->statements ) {
       stmt->Accept( *this );

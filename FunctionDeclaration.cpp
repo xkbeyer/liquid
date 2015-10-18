@@ -143,11 +143,7 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
 std::string FunctionDeclaration::toString()
 {
    std::stringstream s;
-   s << "function declaration: " << id->getName() << std::endl;
-   s << "  Parameters : " << std::endl;
-   for( auto decl : *arguments ) {
-      s << "      " << decl->getVariablenTypeName() << " " << decl->getVariablenName() << std::endl;
-   }
+   s << "function declaration: " << id->getName();
    return s.str();
 }
 

@@ -24,8 +24,8 @@ public:
     Identifier* getId() { return id; }
     virtual std::string toString();
     virtual void Accept( Visitor& v ) { v.VisitFunctionDeclaration( this ); }
-
-    Block* getBody() { return block; }
+    virtual VariableList* getParameter() { return arguments; }
+    virtual Block* getBody() { return block; }
     YYLTYPE getlocation() { return location; }
 };
 
