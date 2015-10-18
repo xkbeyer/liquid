@@ -12,18 +12,18 @@ static inline std::string indent_spaces(int indent)
 
 void VisitorPrettyPrint::VisitExpression( Expression* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
 }  
 
 void VisitorPrettyPrint::VisitStatement( Statement* stmt )
 {
-   std::cout << indent_spaces(indent) << "Create " << stmt->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << stmt->toString() << std::endl;
 
 }
 
 void VisitorPrettyPrint::VisitReturnStatement( Return* retstmt )
 {
-   std::cout << indent_spaces(indent) << "Create " << retstmt->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << retstmt->toString() << std::endl;
    ++indent;
    retstmt->getRetExpression()->Accept(*this);
    --indent;
@@ -31,14 +31,14 @@ void VisitorPrettyPrint::VisitReturnStatement( Return* retstmt )
 
 void VisitorPrettyPrint::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
 {
-   std::cout << indent_spaces(indent) << "Create " << fndecl->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << fndecl->toString() << std::endl;
    ++indent;
    auto parameter = fndecl->getParameter();
    if(parameter->size()) {
-      std::cout << indent_spaces(indent) << "Parameters :" << std::endl;
+      out << indent_spaces(indent) << "Parameters :" << std::endl;
       ++indent;
       for(auto decl : *parameter) {
-         std::cout << indent_spaces(indent) << decl->getVariablenTypeName() << " " << decl->getVariablenName() << std::endl;
+         out << indent_spaces(indent) << decl->getVariablenTypeName() << " " << decl->getVariablenName() << std::endl;
       }
       --indent;
    }
@@ -52,7 +52,7 @@ void VisitorPrettyPrint::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
 
 void VisitorPrettyPrint::VisitConditional( Conditional* cmp )
 {
-   std::cout << indent_spaces(indent) << "Create " << cmp->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << cmp->toString() << std::endl;
    ++indent;
    cmp->getCompOperator()->Accept(*this);
    if( cmp->getThen() ) {
@@ -66,32 +66,32 @@ void VisitorPrettyPrint::VisitConditional( Conditional* cmp )
 
 void VisitorPrettyPrint::VisitInteger( Integer* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
 }
 
 void VisitorPrettyPrint::VisitDouble( Double* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
 }
 
 void VisitorPrettyPrint::VisitString( String* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
 }
 
 void VisitorPrettyPrint::VisitBoolean( Boolean* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
 }
 
 void VisitorPrettyPrint::VisitIdentifier( Identifier* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
 }
 
 void VisitorPrettyPrint::VisitUnaryOperator( UnaryOperator* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    ++indent;
    expr->getRHS()->Accept(*this);
    --indent;
@@ -99,7 +99,7 @@ void VisitorPrettyPrint::VisitUnaryOperator( UnaryOperator* expr )
 
 void VisitorPrettyPrint::VisitBinaryOp( BinaryOp* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    ++indent;
    expr->getLHS()->Accept(*this);
    expr->getRHS()->Accept(*this);
@@ -108,25 +108,25 @@ void VisitorPrettyPrint::VisitBinaryOp( BinaryOp* expr )
 
 void VisitorPrettyPrint::VisitCompOperator( CompOperator* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    expr->getLHS()->Accept(*this);
    expr->getRHS()->Accept(*this);
 }
 
 void VisitorPrettyPrint::VisitBlock( Block* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    ++indent;
    for(auto stmt : expr->statements) {
       stmt->Accept( *this );
    }
    --indent;
-   std::cout << indent_spaces(indent) << "End " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "End " << expr->toString() << std::endl;
 }
 
 void VisitorPrettyPrint::VisitExpressionStatement( ExpressionStatement* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    ++indent;
    expr->getExpression()->Accept(*this);
    --indent;
@@ -134,7 +134,7 @@ void VisitorPrettyPrint::VisitExpressionStatement( ExpressionStatement* expr )
 
 void VisitorPrettyPrint::VisitAssigment( Assignment* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    ++indent;
    expr->getExpression()->Accept(*this);
    --indent;
@@ -142,11 +142,11 @@ void VisitorPrettyPrint::VisitAssigment( Assignment* expr )
 
 void VisitorPrettyPrint::VisitMethodCall( MethodCall* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    ++indent;
    auto args = expr->getArguments();
    if(args->size()) {
-      std::cout << indent_spaces(indent) << "Arguments are:\n";
+      out << indent_spaces(indent) << "Arguments are:\n";
       for(auto arg : *args) {
          arg->Accept(*this);
       }
@@ -156,7 +156,7 @@ void VisitorPrettyPrint::VisitMethodCall( MethodCall* expr )
 
 void VisitorPrettyPrint::VisitVariablenDeclaration( VariableDeclaration* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    if(expr->hasAssignmentExpr()) {
       ++indent;
       expr->getAssignment()->Accept(*this);
@@ -166,7 +166,7 @@ void VisitorPrettyPrint::VisitVariablenDeclaration( VariableDeclaration* expr )
 
 void VisitorPrettyPrint::VisitVariablenDeclarationDeduce( VariableDeclarationDeduce* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << " with type deduction" << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << " with type deduction" << std::endl;
    if(expr->hasAssignmentExpr()) {
       ++indent;
       expr->getAssignment()->Accept(*this);
@@ -176,14 +176,14 @@ void VisitorPrettyPrint::VisitVariablenDeclarationDeduce( VariableDeclarationDed
 
 void VisitorPrettyPrint::VisitWhileLoop( WhileLoop* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    ++indent;
    expr->getCondition()->Accept(*this);
-   std::cout << indent_spaces(indent) << "Create Loop Body" << std::endl;
+   out << indent_spaces(indent) << "Create Loop Body" << std::endl;
    expr->getLoopBlock()->Accept(*this);
    auto elseBlock = expr->getElseBlock();
    if(elseBlock) {
-      std::cout << indent_spaces(indent) << "Create Else Body" << std::endl;
+      out << indent_spaces(indent) << "Create Else Body" << std::endl;
       elseBlock->Accept(*this);
    }
    --indent;
@@ -191,7 +191,7 @@ void VisitorPrettyPrint::VisitWhileLoop( WhileLoop* expr )
 
 void VisitorPrettyPrint::VisitClassDeclaration( ClassDeclaration* expr )
 {
-   std::cout << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    ++indent;
    auto block = expr->getBlock();
    if(block) {

@@ -119,7 +119,7 @@ public:
     llvm::BasicBlock* getInsertPoint() {return currentBlock();}
     void generateCode(class Block& root);
     llvm::GenericValue runCode();
-    void printCodeGeneration(class Block& root);
+    void printCodeGeneration(class Block& root, std::ostream& outs);
     ValueNames& locals() { return codeBlocks.front()->getValueNames(); }
     void setVarType(std::string varType, std::string varName) {codeBlocks.front()->getTypeMap()[varName] = varType;}
     std::string getType(std::string varName) ;

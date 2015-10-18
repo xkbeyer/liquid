@@ -164,9 +164,9 @@ GenericValue CodeGenContext::runCode() {
     return v;
 }
 
-void CodeGenContext::printCodeGeneration(class Block& root)
+void CodeGenContext::printCodeGeneration(class Block& root, std::ostream& outs)
 {
-   VisitorPrettyPrint visitor;
+   VisitorPrettyPrint visitor(outs);
    root.Accept(visitor);
 }
 

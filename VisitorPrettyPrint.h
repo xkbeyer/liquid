@@ -10,8 +10,9 @@ namespace liquid {
 class VisitorPrettyPrint : public Visitor
 {
    int indent = 0;
+   std::ostream&  out;
 public:
-   VisitorPrettyPrint()  {}
+   VisitorPrettyPrint(std::ostream& outs) : out(outs) {}
    virtual ~VisitorPrettyPrint() {}
    void VisitExpression(Expression* expr);
    void VisitInteger( Integer* expr );

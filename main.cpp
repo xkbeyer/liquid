@@ -34,7 +34,7 @@ int main(int argc, char **argv)
        std::cout << "Parsing " << fileName << "failed. Abort" << std::endl;
     } else {
        liquid::CodeGenContext context;
-       context.printCodeGeneration( *programBlock );
+       context.printCodeGeneration( *programBlock, std::cout );
        if( context.preProcessing( *programBlock ) ) {
           context.generateCode( *programBlock );
           context.runCode();
