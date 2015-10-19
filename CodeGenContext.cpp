@@ -54,7 +54,7 @@ CodeGenContext::CodeGenContext()
     llvm::InitializeNativeTargetAsmParser();
     llvm::InitializeNativeTargetAsmPrinter();
 #endif
-    module = new llvm::Module("myl", llvmContext);
+    module = new llvm::Module("liquid", llvmContext);
 }
 
 /*! Setup up the built in function:
