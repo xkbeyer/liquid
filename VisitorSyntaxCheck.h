@@ -10,11 +10,10 @@ namespace liquid {
 
 class VisitorSyntaxCheck : public Visitor
 {
-   int returnStatements;
    int syntaxErrors;
    std::vector<YYLTYPE> ReturnStatementLocations;
 public:
-   VisitorSyntaxCheck() : returnStatements(0), syntaxErrors(0) {}
+   VisitorSyntaxCheck() : syntaxErrors(0) {}
    virtual ~VisitorSyntaxCheck() {}
    void VisitExpression(Expression* expr);
    void VisitInteger( Integer* expr );

@@ -26,6 +26,7 @@ public:
     virtual void Accept( Visitor& v ) { v.VisitFunctionDeclaration( this ); }
     virtual VariableList* getParameter() { return arguments; }
     virtual Block* getBody() { return block; }
+    virtual Identifier* getRetType() { return type; }
     YYLTYPE getlocation() { return location; }
 };
 

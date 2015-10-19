@@ -16,20 +16,18 @@ void VisitorSyntaxCheck::VisitStatement( Statement* stmt )
 void VisitorSyntaxCheck::VisitReturnStatement( Return* retstmt )
 {
    ReturnStatementLocations.push_back( retstmt->getLocation() );
-   ++returnStatements;
 }
 
 void VisitorSyntaxCheck::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
 {
-   returnStatements = 0;
    ReturnStatementLocations.clear();
 
    auto body = fndecl->getBody();
    for( auto stmt : body->statements ) {
       stmt->Accept( *this );
    }
-
-   if( returnStatements > 1 ) {
+   auto retType = fndecl->getRetType();
+   if(ReturnStatementLocations.size() && retType->getName() == "var" ) {
       Node::printError( fndecl->getlocation(), "Too many return statement in function '" + fndecl->getId()->getName() + "()' for return type deduction.\nThe possible statements are:");
       std::stringstream s;
       for( auto loc : ReturnStatementLocations ) {
