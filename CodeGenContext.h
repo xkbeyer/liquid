@@ -117,7 +117,7 @@ public:
     ScopeType getScopeType() { return currentScopeType;}
     void setInsertPoint(llvm::BasicBlock* bblock) {setCurrentBlock(bblock);}
     llvm::BasicBlock* getInsertPoint() {return currentBlock();}
-    void generateCode(class Block& root);
+    bool generateCode(class Block& root);
     llvm::GenericValue runCode();
     void printCodeGeneration(class Block& root, std::ostream& outs);
     ValueNames& locals() { return codeBlocks.front()->getValueNames(); }

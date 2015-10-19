@@ -106,7 +106,7 @@ void CodeGenContext::setupBuiltIns()
 }
 
 /*! Compile the AST into a module */
-void CodeGenContext::generateCode(Block& root)
+bool CodeGenContext::generateCode(Block& root)
 {
     std::cout << "Generating code...\n";
 
@@ -118,7 +118,11 @@ void CodeGenContext::generateCode(Block& root)
     setupBuiltIns();
     /* Push a new variable/block context */
     newScope(bblock);
-    root.codeGen(*this); /* emit byte code for the top level block */
+    auto ret = root.codeGen(*this); /* emit byte code for the top level block */
+    if(ret == nullptr) {
+       std::cout << "Compilation error(s). Abort.\n";
+       return false;
+    }
     if( currentBlock()->getTerminator() == nullptr ) {
         ReturnInst::Create(getGlobalContext(),0, currentBlock());
     }
@@ -135,13 +139,14 @@ void CodeGenContext::generateCode(Block& root)
     std::cout << "verifying... ";
     if( verifyModule(*getModule()) ) {
        std::cout << ": Error constructing function!\n";
-       return ;
+       return false;
     }
     std::cout << "done.\n";
 
 #if !defined(_DEBUG)
     optimize();
 #endif
+    return true;
 }
 
 /*! Executes the AST by running the main function */

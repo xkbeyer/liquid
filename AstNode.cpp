@@ -335,9 +335,10 @@ Value* Assignment::codeGen(CodeGenContext& context)
 Value* Block::codeGen(CodeGenContext& context)
 {
     Value *last = nullptr;
-    for ( auto s : statements)
-    {
+    for ( auto s : statements) {
         last = s->codeGen(context);
+        if(last == nullptr)
+           break;
     }
     return last;
 }

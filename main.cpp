@@ -36,8 +36,9 @@ int main(int argc, char **argv)
        liquid::CodeGenContext context;
        context.printCodeGeneration( *programBlock, std::cout );
        if( context.preProcessing( *programBlock ) ) {
-          context.generateCode( *programBlock );
-          context.runCode();
+          if(context.generateCode(*programBlock)) {
+             context.runCode();
+          }
        }
     }
 
