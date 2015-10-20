@@ -243,12 +243,12 @@ Value* CompOperator::codeGen(CodeGenContext& context)
     unsigned short predicate;
     switch ( op )
     {
-        case TCGE:  predicate = isDouble ? CmpInst::FCMP_OGE : CmpInst::ICMP_SGE;break;
-        case TCGT:  predicate = isDouble ? CmpInst::FCMP_OGT : CmpInst::ICMP_SGT;break;
-        case TCLT:  predicate = isDouble ? CmpInst::FCMP_OLT : CmpInst::ICMP_SLT;break;
-        case TCLE:  predicate = isDouble ? CmpInst::FCMP_OLE : CmpInst::ICMP_SLE;break;
-        case TCEQ:  predicate = isDouble ? CmpInst::FCMP_OEQ : CmpInst::ICMP_EQ ;break;
-        case TCNE: // FIXME missing implementation.
+        case TCGE: predicate = isDouble ? CmpInst::FCMP_OGE : CmpInst::ICMP_SGE;break;
+        case TCGT: predicate = isDouble ? CmpInst::FCMP_OGT : CmpInst::ICMP_SGT;break;
+        case TCLT: predicate = isDouble ? CmpInst::FCMP_OLT : CmpInst::ICMP_SLT;break;
+        case TCLE: predicate = isDouble ? CmpInst::FCMP_OLE : CmpInst::ICMP_SLE;break;
+        case TCEQ: predicate = isDouble ? CmpInst::FCMP_OEQ : CmpInst::ICMP_EQ ;break;
+        case TCNE: predicate = isDouble ? CmpInst::FCMP_ONE : CmpInst::ICMP_NE; break;
         default: return nullptr;
     }
 
