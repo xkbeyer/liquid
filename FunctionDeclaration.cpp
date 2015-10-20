@@ -106,6 +106,7 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
         if( retTy->isLabelTy() || retTy->isMetadataTy() ) {
             context.endScope();
             Node::printError( location, " Function w/ var return type and multiple return statements are not supported: " + id->getName() + "(...)" );
+            context.addError();
             return nullptr;
         }
         // Now create the a new function (the real one) since we know the return type now.

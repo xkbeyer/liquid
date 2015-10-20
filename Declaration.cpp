@@ -14,6 +14,7 @@ Value* VariableDeclaration::codeGen(CodeGenContext& context)
     Value* val = nullptr;
     if( context.findVariable(id->getName()) ) {
         Node::printError(location, " variable '" + id->getName()  + "' already exist\n");
+        context.addError();
         return nullptr;
     }
 
@@ -74,11 +75,13 @@ Value* VariableDeclarationDeduce::codeGen( CodeGenContext& context )
 {
    if( context.findVariable( id->getName() ) ) {
       Node::printError( location, " variable '" + id->getName() + "' already exist\n" );
+      context.addError();
       return nullptr;
    }
 
    if( !hasAssignmentExpr() ) {
        Node::printError( location, " var statements for '" + id->getName() + "' w/o assignment\n" );
+       context.addError();
        return nullptr;
    }
 
@@ -86,6 +89,7 @@ Value* VariableDeclarationDeduce::codeGen( CodeGenContext& context )
    auto val = assn.codeGen( context );
    if( val == nullptr ) {
       Node::printError( location, " Assignment to '" + id->getName() + "' is empty" );
+      context.addError();
       return nullptr;
    }
 

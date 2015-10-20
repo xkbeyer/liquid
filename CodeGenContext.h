@@ -98,7 +98,7 @@ class CodeGenContext {
     llvm::LLVMContext llvmContext;          ///< and context
     KlassAttributes classAttributes;        ///< List of attributes for the current class being processed
     KlassInitCode classInitCode;
-
+    int errors = 0;                         ///< Count of errors while code gen.
     ScopeType currentScopeType;
     void setCurrentBlock(llvm::BasicBlock *block) {
         codeBlocks.front()->setCodeBlock(block);
@@ -137,6 +137,7 @@ public:
     KlassInitCodeAssign& getKlassInitCode( std::string name );
     llvm::Type* getGenericIntegerType();
     bool preProcessing( class Block& root );
+    void addError() { ++errors; }
 };
 
 }

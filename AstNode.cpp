@@ -74,6 +74,7 @@ Value* Identifier::codeGen(CodeGenContext& context)
         }
     }
     Node::printError(location, "undeclared variable " + structName + "::" + name );
+    context.addError();
     return nullptr;
 }
 
@@ -98,6 +99,7 @@ Value* MethodCall::codeGen(CodeGenContext& context)
 
             if( function == nullptr ) {
                 Node::printError(location," no such function '" + id->getName() + "'" );
+                context.addError();
                 return nullptr;
             }
         }
@@ -154,12 +156,17 @@ Value* UnaryOperator::codeGen(CodeGenContext& context)
     switch(op) {
         case TNOT: instr = Instruction::Xor; break;
         default: // TODO user defined operator
-            return nullptr;
+           Node::printError("Unknown uni operator.");
+           context.addError();
+           return nullptr;
     }
 
     Value* rhsValue = rhs->codeGen(context);
-    if( !rhsValue->getType()->isIntegerTy() )
-        return nullptr;
+    if(!rhsValue->getType()->isIntegerTy()) {
+       Node::printError("Right hand side of uni operator must be an integer type.");
+       context.addError();
+       return nullptr;
+    }
     Value* lhsValue = ConstantInt::get(IntegerType::get(context.getGlobalContext(),context.getGenericIntegerType()->getIntegerBitWidth()), StringRef("-1"),10);
     return BinaryOperator::Create(instr, lhsValue, rhsValue, "unarytmp", context.currentBlock());
 }
@@ -193,6 +200,7 @@ Value* BinaryOp::codeGen(CodeGenContext& context)
     bool isDoubleTy = rhsValue->getType()->isFloatingPointTy();
     if( isDoubleTy && (op == TAND || op == TOR) ) {
        Node::printError( location, "Binary operation (AND,OR) on floating point value is not supported. Is a cast missing?" );
+       context.addError();
        return nullptr;
     }
 
@@ -204,7 +212,10 @@ Value* BinaryOp::codeGen(CodeGenContext& context)
        case TDIV:  isDoubleTy ? instr = Instruction::FDiv : instr = Instruction::SDiv; break;
        case TAND:  instr = Instruction::And; break;
        case TOR:   instr = Instruction::Or; break;
-       default: return nullptr;
+       default: 
+          Node::printError(location, "Unknown binary operator.");
+          context.addError();
+          return nullptr;
     }
     return BinaryOperator::Create(instr, lhsValue, rhsValue, "mathtmp", context.currentBlock());
 }
@@ -249,7 +260,10 @@ Value* CompOperator::codeGen(CodeGenContext& context)
         case TCLE: predicate = isDouble ? CmpInst::FCMP_OLE : CmpInst::ICMP_SLE;break;
         case TCEQ: predicate = isDouble ? CmpInst::FCMP_OEQ : CmpInst::ICMP_EQ ;break;
         case TCNE: predicate = isDouble ? CmpInst::FCMP_ONE : CmpInst::ICMP_NE; break;
-        default: return nullptr;
+        default: 
+           Node::printError("Unknown compare operator.");
+           context.addError();
+           return nullptr;
     }
 
     return CmpInst::Create(oinstr, predicate, lhsVal, rhsVal, "cmptmp", context.currentBlock());
@@ -275,6 +289,7 @@ Value* Assignment::codeGen(CodeGenContext& context)
     Value* value = rhs->codeGen(context);
     if( value == nullptr ) {
         Node::printError(location," Assignment expression results in nothing");
+        context.addError();
         return nullptr;
     }
 
@@ -295,12 +310,14 @@ Value* Assignment::codeGen(CodeGenContext& context)
             if ( context.varStruct == nullptr)
             {
                 Node::printError( location, "undeclared variable '" + lhs->getName() + "'" );
+                context.addError();
                 return nullptr;
             }
             varStruct = dyn_cast<AllocaInst>(context.varStruct);
             if ( varStruct == nullptr )
             {
                 Node::printError( location, "undeclared class of variable '" + lhs->getStructName() + "." + lhs->getName() + "'" );
+                context.addError();
                 return nullptr;
             }
             std::string klassName = lhs->getStructName() ;
@@ -326,6 +343,7 @@ Value* Assignment::codeGen(CodeGenContext& context)
                   << value->getType()->getTypeID()
                   << "(" << value->getType()->getScalarSizeInBits() << "). Is a cast missing? ";
         Node::printError(location, msg.str());
+        context.addError();
         return nullptr;
     }
 
@@ -337,8 +355,6 @@ Value* Block::codeGen(CodeGenContext& context)
     Value *last = nullptr;
     for ( auto s : statements) {
         last = s->codeGen(context);
-        if(last == nullptr)
-           break;
     }
     return last;
 }
@@ -351,7 +367,11 @@ Value* ExpressionStatement::codeGen(CodeGenContext& context)
 Value* Conditional::codeGen(CodeGenContext& context)
 {
     Value* comp = cmpOp->codeGen(context);
-    if( comp == nullptr ) return nullptr;
+    if(comp == nullptr) {
+       Node::printError("Code generation for compare operator of the conditional statement failed.");
+       context.addError();
+       return nullptr;
+    }
 
     Function* function = context.currentBlock()->getParent();
     BasicBlock* thenBlock = BasicBlock::Create(context.getGlobalContext(), "then",function);
@@ -362,7 +382,11 @@ Value* Conditional::codeGen(CodeGenContext& context)
     bool needMergeBlock = false;
     context.setInsertPoint(thenBlock);
     Value* thenValue = thenExpr->codeGen(context);
-    if( thenValue == nullptr ) return nullptr;
+    if(thenValue == nullptr) {
+       Node::printError("Missing else block of the conditional statement.");
+       context.addError();
+       return nullptr;
+    }
     if( context.currentBlock()->getTerminator() == nullptr) {
         BranchInst::Create(mergeBlock,context.currentBlock());
         needMergeBlock = true;
@@ -400,26 +424,42 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
 
     context.setInsertPoint(firstCondBlock);
     Value* firstCondValue = this->condition->codeGen(context);
-    if( firstCondValue == nullptr ) return nullptr;
+    if(firstCondValue == nullptr) {
+       Node::printError("Missing condition in while loop.");
+       context.addError();
+       return nullptr;
+    }
     BranchInst::Create(loopBlock,elseBlock,firstCondValue,context.currentBlock());
 
     function->getBasicBlockList().push_back(condBlock);
     context.setInsertPoint(condBlock);
     Value* condValue = this->condition->codeGen(context);
-    if( condValue == nullptr ) return nullptr;
+    if(condValue == nullptr) {
+       Node::printError("Code gen for condition expression in while loop failed.");
+       context.addError();
+       return nullptr;
+    }
     BranchInst::Create(loopBlock,mergeBlock,condValue,context.currentBlock());
 
     function->getBasicBlockList().push_back(loopBlock);
     context.setInsertPoint(loopBlock);
     Value* loopValue = this->loopBlock->codeGen(context);
-    if( loopValue == nullptr ) return nullptr;
+    if(loopValue == nullptr) {
+       Node::printError("Code gen for loop value in while loop failed.");
+       context.addError();
+       return nullptr;
+    }
     BranchInst::Create(condBlock,context.currentBlock());
 
     function->getBasicBlockList().push_back(elseBlock);
     context.setInsertPoint(elseBlock);
     if( this->elseBlock != nullptr ) {
         Value* elseValue = this->elseBlock->codeGen(context);
-        if( elseValue == nullptr ) return nullptr;
+        if(elseValue == nullptr) {
+           Node::printError("Code gen for else block in while loop failed.");
+           context.addError();
+           return nullptr;
+        }
     }
     BranchInst::Create(mergeBlock,context.currentBlock());
     function->getBasicBlockList().push_back(mergeBlock);

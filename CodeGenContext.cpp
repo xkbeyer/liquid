@@ -118,8 +118,8 @@ bool CodeGenContext::generateCode(Block& root)
     setupBuiltIns();
     /* Push a new variable/block context */
     newScope(bblock);
-    auto ret = root.codeGen(*this); /* emit byte code for the top level block */
-    if(ret == nullptr) {
+    root.codeGen(*this); /* emit byte code for the top level block */
+    if(errors) {
        std::cout << "Compilation error(s). Abort.\n";
        return false;
     }
