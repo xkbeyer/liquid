@@ -2,6 +2,7 @@
 #define VisitorSyntaxCheck_h__
 #include <iostream>
 #include <vector>
+#include <unordered_set>
 
 #include "Visitor.h"
 struct YYLTYPE;
@@ -12,8 +13,9 @@ class VisitorSyntaxCheck : public Visitor
 {
    int syntaxErrors;
    std::vector<YYLTYPE> ReturnStatementLocations;
+   std::unordered_set<std::string> TypeNames{ "int","double","string","boolean","var" };
 public:
-   VisitorSyntaxCheck() : syntaxErrors(0) {}
+   VisitorSyntaxCheck();
    virtual ~VisitorSyntaxCheck() {}
    void VisitExpression(Expression* expr);
    void VisitInteger( Integer* expr );

@@ -20,6 +20,7 @@ public:
     NodeType getType() {return NodeType::klass;}
     virtual std::string toString() { std::stringstream s; s << "Class: " << id->getName(); return s.str(); }
     virtual Block* getBlock() { return block; }
+    virtual Identifier* getIdentifier() { return id; }
     virtual void Accept(Visitor& v) { v.VisitClassDeclaration(this); }
 private:
     void removeVarDeclStatements();
