@@ -65,7 +65,8 @@ public:
    static void printError(YYLTYPE location, std::string msg)
    {
       std::cerr
-         << "line "
+         << location.file_name
+         << ": line "
          << location.first_line << " column "
          << location.first_column << "-"
          << location.last_column << ":"
