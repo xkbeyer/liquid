@@ -128,11 +128,11 @@ var_decl : ident ident { $$ = new liquid::VariableDeclaration($1, $2, @$); }
          | ident ident TEQUAL expr { $$ = new liquid::VariableDeclaration($1, $2, $4, @$); }
          ;
 
-var_decl_deduce : TVAR ident TEQUAL expr { $$ = new liquid::VariableDeclarationDeduce($2, $4, @2); }
+var_decl_deduce : TVAR ident TEQUAL expr { $$ = new liquid::VariableDeclarationDeduce($2, $4, @$); }
          ;
 
-func_decl : TDEF ident TLPAREN func_decl_args TRPAREN TCOLON ident block { $$ = new liquid::FunctionDeclaration($7, $2, $4, $8, @2); }
-          | TDEF ident TLPAREN func_decl_args TRPAREN block { $$ = new liquid::FunctionDeclaration($2, $4, $6, @2); }
+func_decl : TDEF ident TLPAREN func_decl_args TRPAREN TCOLON ident block { $$ = new liquid::FunctionDeclaration($7, $2, $4, $8, @$); }
+          | TDEF ident TLPAREN func_decl_args TRPAREN block { $$ = new liquid::FunctionDeclaration($2, $4, $6, @$); }
           ;
 
 func_decl_args : /*blank*/  { $$ = new liquid::VariableList(); }
@@ -144,7 +144,7 @@ class_decl: TDEF ident block {$$ = new liquid::ClassDeclaration($2, $3); }
           ;
 
 ident : TIDENTIFIER { $$ = new liquid::Identifier(*$1, @1); delete $1; }
-      | TIDENTIFIER TDOT TIDENTIFIER { $$ = new liquid::Identifier(*$1,*$3, @1); delete $1; delete $3;}
+      | TIDENTIFIER TDOT TIDENTIFIER { $$ = new liquid::Identifier(*$1,*$3, @$); delete $1; delete $3;}
       ;
 
 literals : TINTEGER { $$ = new liquid::Integer(atol($1->c_str())); delete $1; }
@@ -158,8 +158,8 @@ return :  TRETURN expr { $$ = new liquid::Return(@$, $2); }
        | TRETURN_SIMPLE { $$ = new liquid::Return(@$); }
        ;
 
-expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @1); }
-     | ident TLPAREN call_args TRPAREN { $$ = new liquid::MethodCall($1, $3, @1);  }
+expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
+     | ident TLPAREN call_args TRPAREN { $$ = new liquid::MethodCall($1, $3, @$);  }
      | ident { $<ident>$ = $1; }
      | literals
      | boolean_expr 
