@@ -15,6 +15,29 @@
     int yyerror(char const * s );
     #define YYERROR_VERBOSE
     /*#define YYDEBUG 1*/
+
+    extern std::stack<std::string> fileNames;
+
+    # define YYLLOC_DEFAULT(Current, Rhs, N)                                \
+    do                                                                  \
+      if (N)                                                            \
+        {                                                               \
+          (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;        \
+          (Current).first_column = YYRHSLOC (Rhs, 1).first_column;      \
+          (Current).last_line    = YYRHSLOC (Rhs, N).last_line;         \
+          (Current).last_column  = YYRHSLOC (Rhs, N).last_column;       \
+          (Current).file_name = fileNames.top();            \
+        }                                                               \
+      else                                                              \
+        {                                                               \
+          (Current).first_line   = (Current).last_line   =              \
+            YYRHSLOC (Rhs, 0).last_line;                                \
+          (Current).first_column = (Current).last_column =              \
+            YYRHSLOC (Rhs, 0).last_column;                              \
+          (Current).file_name = fileNames.top();            \
+        }                                                               \
+    while (0)
+
 %}
 
 /* Represents the many different ways we can access our data */
@@ -101,8 +124,8 @@ while : TWHILE expr block TELSE block {$$ = new liquid::WhileLoop($2,$3,$5);}
       | TWHILE expr block {$$ = new liquid::WhileLoop($2,$3);}
       ; 
 
-var_decl : ident ident { $$ = new liquid::VariableDeclaration($1, $2, @2); }
-         | ident ident TEQUAL expr { $$ = new liquid::VariableDeclaration($1, $2, $4, @2); }
+var_decl : ident ident { $$ = new liquid::VariableDeclaration($1, $2, @$); }
+         | ident ident TEQUAL expr { $$ = new liquid::VariableDeclaration($1, $2, $4, @$); }
          ;
 
 var_decl_deduce : TVAR ident TEQUAL expr { $$ = new liquid::VariableDeclarationDeduce($2, $4, @2); }

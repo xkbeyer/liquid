@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <string>
 #include <sstream>
-
+#include <stack>
 
 #if defined(_MSC_VER)
 #pragma warning( push , 0 )
@@ -30,6 +30,7 @@ typedef struct YYLTYPE
    int first_column;
    int last_line;
    int last_column;
+   std::string file_name;
 } YYLTYPE;
 
 namespace liquid {

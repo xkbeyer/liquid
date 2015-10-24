@@ -10,6 +10,7 @@ extern int yyparse();
 extern int yylex_destroy();
 extern FILE* yyin;
 extern liquid::Block* programBlock;
+extern std::stack<std::string> fileNames;
 
 
 int main(int argc, char **argv)
@@ -27,7 +28,8 @@ int main(int argc, char **argv)
        std::cout << "File "<< fileName << "not found. Abort" << std::endl;
        return -1;
     }
-    
+    fileNames.push(""); // Add the empty file name after last EOF.
+    fileNames.push(fileName); // Add the top level file name.
     yyparse();
 
     if( programBlock == nullptr ) {

@@ -29,11 +29,16 @@ int first_time = 1 ;
 
 int yycolumn = 1;
 
-#define YY_USER_ACTION \
+std::stack<std::string> fileNames;
+std::stack<int> lineNo;
+
+#define YY_USER_ACTION do { \
     if( yylloc.last_line < yylineno ) yycolumn = 1 ; \
     yylloc.first_line = yylloc.last_line = yylineno; \
     yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + (int)yyleng - 1; \
-    yycolumn += (int)yyleng; 
+    yycolumn += (int)yyleng; \
+    yylloc.file_name = fileNames.top(); \
+    } while(0) ;
 
 %}
 
@@ -49,6 +54,7 @@ int yycolumn = 1;
             if( first_time ) {
                 first_time = 0;
                 curr_indents.push(0);
+                lineNo.push(yylineno);
                 BEGIN indent;
             }
 
@@ -61,6 +67,10 @@ import             BEGIN(incl);
                     if ( ! yyin ) {
                        yyerror( "Failed to load import." );
                     } else {
+                       fileNames.push(yytext);
+                       lineNo.push(yylineno);
+                       yylineno = yycolumn = 1;
+                       yylloc.first_line = yylloc.first_column =  yylloc.last_line = yylloc.last_column = 1;
                        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
                     }
                     BEGIN(normal);
@@ -114,14 +124,17 @@ import             BEGIN(incl);
                  }
 
 <normal>"\n"     { current_line_indent = 0; BEGIN( indent); yycolumn = 1; }
-<<EOF>>          { if( curr_indents.size() > 1 ) {
+<<EOF>>          { 
+                   yypop_buffer_state();
+                   fileNames.pop();
+                   yylineno = lineNo.top();
+                   lineNo.pop();
+                   if( !YY_CURRENT_BUFFER ) {
+                        yyterminate();
+                   }
+                   if( curr_indents.size() > 1 ) {
                         curr_indents.pop();
                         return TOKEN(UNINDENT);
-                   }
-     		   yypop_buffer_state();
-     
-                   if ( !YY_CURRENT_BUFFER ) {
-                        yyterminate();
                    }
                  }
                   
