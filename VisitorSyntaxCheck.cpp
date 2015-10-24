@@ -6,11 +6,11 @@
 namespace liquid {
 VisitorSyntaxCheck::VisitorSyntaxCheck() : syntaxErrors(0) 
 {
-   //TypeNames = { "int","double","string","boolean","var" };
 }
+
 void VisitorSyntaxCheck::VisitExpression( Expression* expr )
 {
-}  
+}
 
 void VisitorSyntaxCheck::VisitStatement( Statement* stmt )
 {
@@ -34,7 +34,7 @@ void VisitorSyntaxCheck::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
       Node::printError( fndecl->getlocation(), "Too many return statement in function '" + fndecl->getId()->getName() + "()' for return type deduction.\nThe possible statements are:");
       std::stringstream s;
       for( auto loc : ReturnStatementLocations ) {
-         s << "    " << loc.first_line << ":" << loc.first_column << " return ...\n";
+         s << "    " << loc.file_name << ":" << loc.first_line << ":" << loc.first_column << " return ...\n";
       }
       Node::printError(s.str());
       syntaxErrors++;
