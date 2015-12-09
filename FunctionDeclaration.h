@@ -16,7 +16,7 @@ public:
         : type( type ), id( id ), arguments( arguments ), block( block ), location( loc )
     {}
     FunctionDeclaration( Identifier* id, VariableList* arguments, Block* block, YYLTYPE loc )
-        : type( new Identifier( "var", location ) ), id( id ), arguments( arguments ), block( block ), location( loc )
+       : type(new Identifier("var", loc)), id(id), arguments(arguments), block(block), location(loc)
     {}
     virtual ~FunctionDeclaration();
     virtual llvm::Value* codeGen( CodeGenContext& context );
