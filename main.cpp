@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <cassert>
+#include "config.h"
 #include "CodeGenContext.h"
 #include "AstNode.h"
 
@@ -16,7 +17,7 @@ extern std::stack<std::string> fileNames;
 int main(int argc, char **argv)
 {
     std::string fileName;
-    
+    std::cout << "liquid version " << MAJOR_VER << "." << MINOR_VER << "." << REVISION_VER << "\n";
     if( argc == 2 ) {
         fileName = argv[1] ;
     } else {

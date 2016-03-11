@@ -167,11 +167,14 @@ else()
     endif()
 endif()
 
+set(VER_MAJ 0)
+set(VER_MIN 1)
+set(VER_REV 0)
+
+configure_file(config.in ${liquid_SOURCE_DIR}/config.h)
 
 # The compiling process. #
 ##########################
-
-configure_file(config.in ${liquid_SOURCE_DIR}/config.h)
 
 # Add additional include search directories.
 include_directories(${liquid_SOURCE_DIR})

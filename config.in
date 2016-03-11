@@ -1,5 +1,7 @@
 #if !defined(CONFIG_H)
 #define CONFIG_H
 
-
+#define MAJOR_VER       ${VER_MAJ}
+#define MINOR_VER       ${VER_MIN}
+#define REVISION_VER    ${VER_REV}
 #endif
