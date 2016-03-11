@@ -7,11 +7,7 @@
 #include "llvm/Analysis/Passes.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/ExecutionEngine/Interpreter.h"
-#if defined(LLVM37) || defined(LLVM36)
 #include "llvm/ExecutionEngine/MCJIT.h"
-#else
-#include "llvm/ExecutionEngine/JIT.h"
-#endif
 #include <stdarg.h>
 #include <stdio.h>
 #include <algorithm>
@@ -50,10 +46,8 @@ CodeGenContext::CodeGenContext()
 , varStruct(nullptr)
 {
     llvm::InitializeNativeTarget();
-#if defined(LLVM36) || defined(LLVM37)
     llvm::InitializeNativeTargetAsmParser();
     llvm::InitializeNativeTargetAsmPrinter();
-#endif
     module = new llvm::Module("liquid", llvmContext);
 }
 
@@ -153,15 +147,9 @@ bool CodeGenContext::generateCode(Block& root)
 GenericValue CodeGenContext::runCode() {
     std::cout << "Running code...\n";
     std::string err;
-#if defined(LLVM37) || defined(LLVM36)
     ExecutionEngine *ee = EngineBuilder( std::unique_ptr<Module>( module ) ).setErrorStr( &err ).setEngineKind( EngineKind::JIT ).create();
-#else
-    ExecutionEngine *ee = EngineBuilder(module).setErrorStr(&err).setEngineKind(EngineKind::JIT).create();
-#endif
     assert(ee);
-#if defined(LLVM37) || defined(LLVM36)
     ee->finalizeObject();
-#endif
     vector<GenericValue> noargs;
     GenericValue v = ee->runFunction(mainFunction, noargs);
     std::cout << "Code was run.\n";
@@ -178,8 +166,7 @@ void CodeGenContext::printCodeGeneration(class Block& root, std::ostream& outs)
 /*! Runs the optimizer over all function */
 void CodeGenContext::optimize()
 {
-#if defined(LLVM37)
-#else
+#if 0 
     FunctionPassManager fpm(getModule());
     fpm.add(createBasicAliasAnalysisPass());
     fpm.add(createPromoteMemoryToRegisterPass());
@@ -279,17 +266,9 @@ Instruction * CodeGenContext::getKlassVarAccessInst(std::string klass, std::stri
     if( this_ptr->getType()->getElementType()->isPointerTy() ) {
         // since the alloc is a ptr to ptr 
         Value * val = new LoadInst(this_ptr, "", false, currentBlock());
-#if defined(LLVM37)
         return GetElementPtrInst::Create( val->getType()->getPointerElementType(), val, ptr_indices, "", currentBlock() );
-#else
-        return GetElementPtrInst::Create(val, ptr_indices, "", currentBlock());
-#endif
     }
-#if defined(LLVM37)
     Instruction* ptr = GetElementPtrInst::Create( this_ptr->getType()->getElementType(), this_ptr, ptr_indices, "", currentBlock() );
-#else
-    Instruction* ptr = GetElementPtrInst::Create(this_ptr, ptr_indices, "", currentBlock());
-#endif
     return ptr;
 }
 
@@ -347,7 +326,7 @@ KlassInitCodeAssign& CodeGenContext::getKlassInitCode( std::string name )
 
 llvm::Type* CodeGenContext::getGenericIntegerType()
 {
-#if defined(UseInt64) && defined(LLVM37)
+#if defined(UseInt64)
     return Type::getInt64Ty( getGlobalContext() );
 #else
     return Type::getInt32Ty( getGlobalContext() );

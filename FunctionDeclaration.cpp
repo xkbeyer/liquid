@@ -56,12 +56,13 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
     // First check if a elf ptr has to be put as first argument.
     if( !context.getKlassName().empty() ) {
         actualArgs->setName( "this" );
-        Value* ptr_this = actualArgs++;
+        //Value* ptr_this = actualArgs++;
         Type* self_ty = context.typeOf( context.getKlassName() );
         Type* self_ptr_ty = PointerType::get( self_ty, 0 );
         AllocaInst* alloca = new AllocaInst( self_ptr_ty, "self_addr", context.currentBlock() );
-        new StoreInst( ptr_this, alloca, context.currentBlock() );
+        new StoreInst( &(*actualArgs) /*ptr_this*/, alloca, context.currentBlock() );
         context.locals()["self"] = alloca;
+        ++actualArgs;
     }
     // Now the remaining arguments
     for( auto varDecl : *arguments ) {
@@ -73,7 +74,7 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
                 valName += "_addr";
             }
             actualArgs->setName( valName );
-            new StoreInst( actualArgs, alloca, context.currentBlock() );
+            new StoreInst( &(*actualArgs), alloca, context.currentBlock() );
         }
         ++actualArgs;
     }
@@ -124,7 +125,7 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
 
         for( Function::const_arg_iterator J = function->arg_begin(); J != function->arg_end(); ++J ) {
             DestI->setName( J->getName() ); // Copy name of argument to the argument of the new function.
-            VMap[J] = DestI++; // Map the value 
+            VMap[&*J] = &*DestI++; // Map the value 
         }
 
         // Clone the function to the new (real) function w/ the correct return type.

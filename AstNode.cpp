@@ -42,11 +42,7 @@ Value* String::codeGen(CodeGenContext& context)
     ConstantInt* const_int = ConstantInt::get(context.getGlobalContext(), APInt(64, StringRef("0"), 10));
     const_ptr_8_indices.push_back(const_int);
     const_ptr_8_indices.push_back(const_int);
-#if defined(LLVM37)
     Constant* const_ptr_8 = ConstantExpr::getGetElementPtr(ArrayTy_0, gvar_array__str, const_ptr_8_indices);
-#else
-    Constant* const_ptr_8 = ConstantExpr::getGetElementPtr(gvar_array__str, const_ptr_8_indices);
-#endif
     return const_ptr_8;
 }
 
@@ -251,7 +247,7 @@ Value* CompOperator::codeGen(CodeGenContext& context)
     bool isDouble = rhsVal->getType() == Type::getDoubleTy( context.getGlobalContext() );
     Instruction::OtherOps oinstr = isDouble ? Instruction::FCmp : Instruction::ICmp;
 
-    unsigned short predicate;
+    CmpInst::Predicate predicate;
     switch ( op )
     {
         case TCGE: predicate = isDouble ? CmpInst::FCMP_OGE : CmpInst::ICMP_SGE;break;

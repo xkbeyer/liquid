@@ -18,11 +18,7 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/LLVMContext.h"
-#if defined(LLVM37)
 #include "llvm/IR/LegacyPassManager.h"
-#else
-#include "llvm/PassManager.h"
-#endif
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/CallingConv.h"
 #include "llvm/Bitcode/ReaderWriter.h"
