@@ -28,6 +28,7 @@ std::stack<int> curr_indents;
 int first_time = 1 ;
 
 int yycolumn = 1;
+int parsing_error = 0;
 
 std::stack<std::string> fileNames;
 std::stack<int> lineNo;
@@ -70,7 +71,9 @@ import             BEGIN(incl);
                             break;
                     }
                     if ( ! yyin ) {
-                       yyerror( "Failed to load import." );
+                       printf( "%s in %s line %d\n", (std::string("Failed to load import file ") + fileName).c_str(), fileNames.top().c_str(), yylineno );
+                       parsing_error = 1;
+                       yyterminate();
                     } else {
                        fileNames.push(yytext);
                        lineNo.push(yylineno);

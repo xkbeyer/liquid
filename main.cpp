@@ -15,6 +15,7 @@ extern FILE* yyin;
 extern liquid::Block* programBlock;
 extern std::stack<std::string> fileNames;
 extern std::vector<std::string> libPaths;
+extern int parsing_error;
 
 void usage();
 
@@ -63,7 +64,10 @@ int main(int argc, char **argv)
 
     fileNames.push(""); // Add the empty file name after last EOF.
     fileNames.push(fileName); // Add the top level file name.
-    yyparse();
+    if( yyparse() || parsing_error) {
+       yylex_destroy();
+       return 1;
+    }
 
     if( programBlock == nullptr ) {
        std::cout << "Parsing " << fileName << "failed. Abort" << std::endl;
@@ -77,8 +81,8 @@ int main(int argc, char **argv)
        }
     }
 
-
-    fclose(yyin);
+    if( yyin != nullptr )
+      fclose(yyin);
     delete programBlock;
     yylex_destroy();
     return 0;
