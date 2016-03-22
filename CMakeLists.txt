@@ -56,6 +56,7 @@ set(SOURCES_COMMON
             ${CMAKE_CURRENT_BINARY_DIR}/tokens.cpp
             tokens.l
             parser.y
+            GetOpt.cpp
    )
 
 set(HEADER_COMMON
@@ -66,6 +67,7 @@ set(HEADER_COMMON
             CodeGenContext.h
             VisitorSyntaxCheck.h
             VisitorPrettyPrint.h
+            GetOpt.h
    )
 
 if(MSVC)
