@@ -31,6 +31,7 @@ int yycolumn = 1;
 
 std::stack<std::string> fileNames;
 std::stack<int> lineNo;
+std::vector<std::string> libPaths;
 
 #define YY_USER_ACTION do { \
     if( yylloc.last_line < yylineno ) yycolumn = 1 ; \
@@ -62,8 +63,12 @@ import             BEGIN(incl);
 
 <incl>[ \t]*      /* eat the whitespace */
 <incl>[^ \t\n\r]+   { /* got the include file name */
-                    yyin = fopen( yytext, "r" );
-     
+                    std::string fileName = yytext;
+                    for( auto libpath : libPaths ) {
+                        yyin = fopen( (libpath + fileName).c_str() , "r" );
+                        if( yyin )
+                            break;
+                    }
                     if ( ! yyin ) {
                        yyerror( "Failed to load import." );
                     } else {
