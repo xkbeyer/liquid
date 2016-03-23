@@ -164,7 +164,7 @@ import             BEGIN(incl);
 #.*                     /* comments one line til nl */
 [ \t\n]                 /* ignore */;
 [a-zA-Z_][a-zA-Z0-9_&%\$\?\-]*  SAVE_TOKEN; return TIDENTIFIER;
--?[0-9]+\.[0-9]*        SAVE_TOKEN; return TDOUBLE;
+-?[0-9]*\.[0-9]*(e[+-]?[0-9]*)?        SAVE_TOKEN; return TDOUBLE;
 -?[0-9]+                SAVE_TOKEN; return TINTEGER;
 "="                     return TOKEN(TEQUAL);
 "=="                    return TOKEN(TCEQ);

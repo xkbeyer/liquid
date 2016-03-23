@@ -78,7 +78,6 @@ line string."
 ## Numbers ##
 Simple Integer numbers, decimal numbers.
 Currently no binary and hex format is supported.
-Also the support for writing a floating point number containing an exponent is missing.
 ```
 5
 230
@@ -87,6 +86,9 @@ Also the support for writing a floating point number containing an exponent is m
 0.345
 .1
 -1234.56
+1.2e2
+1.2e+2
+1.2e-2
 ```
 
 ## Boolean ##
