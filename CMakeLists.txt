@@ -143,7 +143,7 @@ link_directories( ${LLVM_ROOT}/lib )
 
 # Let's suppose we want to build a JIT compiler with support for
 # binary code :
-llvm_map_components_to_libnames(REQ_LLVM_LIBRARIES mcjit interpreter native)
+llvm_map_components_to_libnames(REQ_LLVM_LIBRARIES mcjit interpreter native ipo)
 
 
 if(NOT LLVM_ENABLE_RTTI)

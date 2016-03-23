@@ -5,7 +5,9 @@
 #include "parser.hpp"
 #include "llvm/Support/DynamicLibrary.h"
 #include "llvm/Analysis/Passes.h"
+#include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/ExecutionEngine/Interpreter.h"
 #include "llvm/ExecutionEngine/MCJIT.h"
 #include <stdarg.h>
@@ -139,9 +141,11 @@ bool CodeGenContext::generateCode(Block& root)
     }
     outs << "done.\n";
 
-#if !defined(_DEBUG)
-    optimize();
-#endif
+    if( !debug ) {
+       optimize();
+       if( verbose )
+          module->dump();
+    }
     return true;
 }
 
@@ -168,21 +172,15 @@ void CodeGenContext::printCodeGeneration(class Block& root, std::ostream& outs)
 /*! Runs the optimizer over all function */
 void CodeGenContext::optimize()
 {
-#if 0 
-    FunctionPassManager fpm(getModule());
-    fpm.add(createBasicAliasAnalysisPass());
-    fpm.add(createPromoteMemoryToRegisterPass());
-    fpm.add(createCFGSimplificationPass());
-    fpm.add(createInstructionCombiningPass());
-    fpm.add(createGVNPass());
-    fpm.add(createReassociatePass());
-    fpm.doInitialization();
+    legacy::FunctionPassManager fpm(getModule());
+    PassManagerBuilder builder;
+    builder.OptLevel = 3;
+    builder.populateFunctionPassManager(fpm);
     for ( auto& fn : getModule()->getFunctionList() )
     {
         fpm.run( fn );
     }
     fpm.run(*mainFunction);
-#endif
 }
 
 void CodeGenContext::newScope(BasicBlock* bb, ScopeType scopeType)

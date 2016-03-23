@@ -29,7 +29,8 @@ int main(int argc, char **argv)
     libPaths.push_back("./"); // current path
     bool verbose = false;
     bool quiet = false;
-    GetOpt getopt(argc, argv, "hi:vq");
+    bool debug = false;
+    GetOpt getopt(argc, argv, "hi:vqd");
     for( auto opt : getopt ) {
        switch( opt ) {
           case 'i':
@@ -49,6 +50,9 @@ int main(int argc, char **argv)
              break;
           case 'q':
              quiet = true;
+             break;
+          case 'd':
+             debug = true;
              break;
           case 'h':
              usage();
@@ -86,6 +90,7 @@ int main(int argc, char **argv)
        std::ostringstream devNull;
        liquid::CodeGenContext context(quiet ? devNull : std::cout);
        context.verbose = verbose;
+       context.debug = debug;
        if( verbose )
          context.printCodeGeneration( *programBlock, std::cout );
        if( context.preProcessing( *programBlock ) ) {
@@ -105,8 +110,9 @@ int main(int argc, char **argv)
 void usage()
 {
    std::cout << "Usage:\n";
-   std::cout << "liq filename -h -v -q -i path1;path2\n";
+   std::cout << "liq filename -h -d -v -q -i path1;path2\n";
    std::cout << "\t-h this help text.\n";
+   std::cout << "\t-d debug code generation. Disables the code optimizer pass.\n";
    std::cout << "\t-v be more verbose.\n";
    std::cout << "\t-q be quiet.\n";
    std::cout << "\t-i semicolon separated list of import paths where additional liquid files are located.\n";

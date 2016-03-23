@@ -104,6 +104,7 @@ class CodeGenContext {
 public:
     llvm::Value* varStruct;  ///< Hold the alloc of the struct variable (class object). TODO move it to a better place.
     bool verbose = false;
+    bool debug = false;
 
     CodeGenContext(std::ostream& outs);
     ~CodeGenContext() { llvm::llvm_shutdown(); }

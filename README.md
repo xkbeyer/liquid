@@ -41,10 +41,11 @@ After cmake was run the solution file is in the build directory. Start Visual St
 
 # Usage #
 ```
-liquid script-file -h -v -q -ipath1;path2...;pathn
+liquid script-file -h -d -v -q -ipath1;path2...;pathn
 ```
 where
 - h help: shows the usage.
+- d debug: Disables the code optimizer. 
 - v verbose: print a lot of information.
 - q quiet: don't show any output. 
 - i defines a list of additional path to look for files to import.
