@@ -22,14 +22,14 @@ void usage();
 int main(int argc, char **argv)
 {
     std::string fileName;
-    std::cout << "liquid version " << MAJOR_VER << "." << MINOR_VER << "." << REVISION_VER << "\n";
     if( argc == 1 ) {
         fileName = "./test_full.liq";
     }
 
     libPaths.push_back("./"); // current path
-
-    GetOpt getopt(argc, argv, "hi:");
+    bool verbose = false;
+    bool quiet = false;
+    GetOpt getopt(argc, argv, "hi:vq");
     for( auto opt : getopt ) {
        switch( opt ) {
           case 'i':
@@ -44,13 +44,24 @@ int main(int argc, char **argv)
              }
           }
              break;
+          case 'v':
+             verbose = true;
+             break;
+          case 'q':
+             quiet = true;
+             break;
           case 'h':
+             usage();
+             return 1;
           default:
+             std::cout << getopt.error() << "\n";
              usage();
              return 1;
        }
     }
-    
+    if( !quiet )
+      std::cout << "liquid version " << MAJOR_VER << "." << MINOR_VER << "." << REVISION_VER << "\n";
+
     auto files = getopt.getRemainingArguments();
     assert(files.size() == 1);
     fileName = files[0]; // Currently only one file is supported.
@@ -72,8 +83,11 @@ int main(int argc, char **argv)
     if( programBlock == nullptr ) {
        std::cout << "Parsing " << fileName << "failed. Abort" << std::endl;
     } else {
-       liquid::CodeGenContext context;
-       context.printCodeGeneration( *programBlock, std::cout );
+       std::ostringstream devNull;
+       liquid::CodeGenContext context(quiet ? devNull : std::cout);
+       context.verbose = verbose;
+       if( verbose )
+         context.printCodeGeneration( *programBlock, std::cout );
        if( context.preProcessing( *programBlock ) ) {
           if(context.generateCode(*programBlock)) {
              context.runCode();
@@ -91,6 +105,9 @@ int main(int argc, char **argv)
 void usage()
 {
    std::cout << "Usage:\n";
-   std::cout << "liq filename -i path1;path2\n";
+   std::cout << "liq filename -h -v -q -i path1;path2\n";
+   std::cout << "\t-h this help text.\n";
+   std::cout << "\t-v be more verbose.\n";
+   std::cout << "\t-q be quiet.\n";
    std::cout << "\t-i semicolon separated list of import paths where additional liquid files are located.\n";
 }

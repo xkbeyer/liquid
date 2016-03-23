@@ -96,14 +96,16 @@ class CodeGenContext {
     KlassInitCode classInitCode;
     int errors = 0;                         ///< Count of errors while code gen.
     ScopeType currentScopeType;
+    std::ostream& outs;
     void setCurrentBlock(llvm::BasicBlock *block) {
         codeBlocks.front()->setCodeBlock(block);
     }
     void setupBuiltIns();
 public:
     llvm::Value* varStruct;  ///< Hold the alloc of the struct variable (class object). TODO move it to a better place.
+    bool verbose = false;
 
-    CodeGenContext();
+    CodeGenContext(std::ostream& outs);
     ~CodeGenContext() { llvm::llvm_shutdown(); }
         
     llvm::Module * getModule() {return module;}

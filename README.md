@@ -1,13 +1,10 @@
-Liquid
-======
+# Liquid #
 Liquid is a scripting language.
 
-Why
-===
-The project was born at the time I read an article about LLVM and how easy it is to create a DSL with it. I can't remember the article itself. That was something I would give it a try. I started with some simple programming language constructs (and with no real concept of what the language should be). Additionally I would also figure out how usable flex and bison are, since I didn't want to develop my own parser and lexer. All things which I had in my mind for a long time but never took the time to do it. But with LLVM it seams to be an feasible task. Just combining flex/bison with LLVM, voilà, that would be simple, or? However, while defining the syntax, more and more ideas came up of language elements that would be nice to have (thanks to @lucas for the inspiring discussions). It results in a mix of some popular languages like python (at least the block formatting), ruby, some functional aspects and may be others. It turned out that it took more time and effort than I thought. But it is still fun to work on it. 
+# Why #
+The project was born at the time I read an article about LLVM and how easy it is to create a DSL with it. I can't remember the article itself. That was something I would give it a try. I started with some simple programming language constructs (and with no real concept of what the language should be). Additionally I would also figure out how usable flex and bison are, since I didn't want to develop my own parser and lexer. All things which I had in my mind for a long time but never took the time to do it. But with LLVM it seams to be an feasible task. Just combining flex/bison with LLVM, voilà, that would be simple, or? However, while defining the syntax, more and more ideas came up of language elements that would be nice to have (thanks to @lucasb-eyer for the inspiring discussions). It results in a mix of some popular languages like python (at least the block formatting), ruby, some functional aspects and may be others. It turned out that it took more time and effort than I thought. But it is still fun to work on it. 
 
-Installation
-============
+# Installation #
 
 ## Prerequisite ##
 - LLVM 3.8 
@@ -42,18 +39,19 @@ make install
 ### Windows ###
 After cmake was run the solution file is in the build directory. Start Visual Studio and you are ready to compile it.
 
-Usage
-=====
+# Usage #
 ```
-liquid script-file -ipath1;path2...;pathn
+liquid script-file -h -v -q -ipath1;path2...;pathn
 ```
-where -i defines a list of additional path to look for files to import.
+where
+- h help: shows the usage.
+- v verbose: print a lot of information.
+- q quiet: don't show any output. 
+- i defines a list of additional path to look for files to import.
 
 Liquid does parse the file, generates the code in memory and runs it.
 
-Language Syntax
-===============
-
+# Language Syntax #
 ## Literals ##
 Can be any literal word including -_%$? and digits.
 It must start with a letter or an underscore.

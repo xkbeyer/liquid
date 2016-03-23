@@ -217,4 +217,4 @@ var af = 1.5 + 2.5
 var bf = 1.5 - 2.5
 var cf = 1.5 * 2.5
 var df = 1.5 / 2.5
-displayln("Test FP BinOps (+,-,*,/) %lf %lf %lf %lf", af,bf,cf,df);
+displayln("Test FP BinOps (+,-,*,/) %lf %lf %lf %lf", af,bf,cf,df)

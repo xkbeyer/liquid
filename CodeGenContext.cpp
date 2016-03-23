@@ -39,11 +39,12 @@ using namespace llvm;
 
 namespace liquid {
 
-CodeGenContext::CodeGenContext()
+CodeGenContext::CodeGenContext(std::ostream& outs)
 : self(nullptr)
 , mainFunction(nullptr)
 , module(nullptr)
 , varStruct(nullptr)
+, outs(outs)
 {
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmParser();
@@ -102,7 +103,7 @@ void CodeGenContext::setupBuiltIns()
 /*! Compile the AST into a module */
 bool CodeGenContext::generateCode(Block& root)
 {
-    std::cout << "Generating code...\n";
+    outs << "Generating code...\n";
 
     /* Create the top level interpreter function to call as entry */
     vector<Type*> argTypes;
@@ -114,7 +115,7 @@ bool CodeGenContext::generateCode(Block& root)
     newScope(bblock);
     root.codeGen(*this); /* emit byte code for the top level block */
     if(errors) {
-       std::cout << "Compilation error(s). Abort.\n";
+       outs << "Compilation error(s). Abort.\n";
        return false;
     }
     if( currentBlock()->getTerminator() == nullptr ) {
@@ -122,20 +123,21 @@ bool CodeGenContext::generateCode(Block& root)
     }
     endScope();
 
-    std::cout << "Code is generated.\n";
+    outs << "Code is generated.\n";
 #if defined(_DEBUG)
     /* Print the byte code in a human-readable format
     *     to see if our program compiled properly
     */
-    module->dump();
+    if( verbose )
+      module->dump();
 #endif
 
-    std::cout << "verifying... ";
+    outs << "verifying... ";
     if( verifyModule(*getModule()) ) {
-       std::cout << ": Error constructing function!\n";
+       outs << ": Error constructing function!\n";
        return false;
     }
-    std::cout << "done.\n";
+    outs << "done.\n";
 
 #if !defined(_DEBUG)
     optimize();
@@ -145,14 +147,14 @@ bool CodeGenContext::generateCode(Block& root)
 
 /*! Executes the AST by running the main function */
 GenericValue CodeGenContext::runCode() {
-    std::cout << "Running code...\n";
+    outs << "Running code...\n";
     std::string err;
     ExecutionEngine *ee = EngineBuilder( std::unique_ptr<Module>( module ) ).setErrorStr( &err ).setEngineKind( EngineKind::JIT ).create();
     assert(ee);
     ee->finalizeObject();
     vector<GenericValue> noargs;
     GenericValue v = ee->runFunction(mainFunction, noargs);
-    std::cout << "Code was run.\n";
+    outs << "Code was run.\n";
     delete ee;
     return v;
 }
