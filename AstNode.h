@@ -51,7 +51,8 @@ enum class NodeType
     decimal,
     string,
     boolean,
-    identifier
+    identifier,
+    list
 };
 
 class Node 
@@ -226,6 +227,20 @@ public:
    Expression* getRHS() { return rhs; }
    virtual std::string toString();
    virtual void Accept(Visitor& v) { v.VisitCompOperator(this); }
+};
+
+class List : public Expression
+{
+   ExpressionList* exprList = nullptr;
+   YYLTYPE location;
+public:
+   List(YYLTYPE loc) : location(loc) {}
+   List(ExpressionList* exprs, YYLTYPE loc) : exprList(exprs), location(loc) {}
+   ~List() {}
+   virtual llvm::Value* codeGen(CodeGenContext& context) { return nullptr; }
+   virtual NodeType getType() { return NodeType::list; }
+   virtual std::string toString() { return "list\n"; }
+   virtual void Accept(Visitor& v) {}
 };
 
 class Block : public Expression 

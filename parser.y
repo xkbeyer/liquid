@@ -14,7 +14,7 @@
     extern int yylex();
     int yyerror(char const * s );
     #define YYERROR_VERBOSE
-    /*#define YYDEBUG 1*/
+    #define YYDEBUG 1
 
     extern std::stack<std::string> fileNames;
 
@@ -61,7 +61,7 @@
  */
 %token <string> TIDENTIFIER TINTEGER TDOUBLE TSTR TBOOL
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
-%token <token> TLPAREN TRPAREN TCOMMA TDOT TCOLON
+%token <token> TLPAREN TRPAREN TCOMMA TDOT TCOLON TLBRACKET TRBRACKET
 %token <token> TPLUS TMINUS TMUL TDIV
 %token <token> TNOT TAND TOR
 %token <token> TIF TELSE TWHILE
@@ -74,9 +74,9 @@
    calling an (Identifier*). It makes the compiler happy.
  */
 %type <ident> ident
-%type <expr> literals expr boolean_expr binop_expr unaryop_expr
+%type <expr> literals expr boolean_expr binop_expr unaryop_expr list_expr
 %type <varvec> func_decl_args
-%type <exprvec> call_args
+%type <exprvec> call_args list_elemets_expr 
 %type <block> program stmts block
 %type <stmt> stmt var_decl var_decl_deduce func_decl conditional return while class_decl
 %type <token> comparison 
@@ -87,8 +87,8 @@
 %left TAND TNOT
 
 %start program
-/* %debug */
-/* %verbose */
+%debug 
+%verbose 
 %locations /* track locations: @n of component N; @$ of entire range */
 
 %%
@@ -166,6 +166,7 @@ expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
      | binop_expr
      | unaryop_expr
      | TLPAREN expr TRPAREN { $$ = $2; }
+     | list_expr
      ;
 /* have to write it explecity to have the right operator precedence */
 binop_expr : expr TAND expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
@@ -189,5 +190,13 @@ call_args : /*blank*/  { $$ = new liquid::ExpressionList(); }
  
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE
            ;
-
+          
+list_elemets_expr: /* blank */ {$$ = new liquid::ExpressionList(); }
+                 | expr {$$ = new liquid::ExpressionList(); $$->push_back($1);}
+                 | list_elemets_expr TCOMMA expr {$$->push_back($3); }
+                 ; 
+                 
+list_expr : TLBRACKET list_elemets_expr TRBRACKET {$$ = new liquid::List($2, @$);}
+          ;
+          
 %%
