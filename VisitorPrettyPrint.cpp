@@ -200,4 +200,13 @@ void VisitorPrettyPrint::VisitClassDeclaration( ClassDeclaration* expr )
    --indent;
 }
 
+void VisitorPrettyPrint::VisitList(List* expr)
+{
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   ++indent;
+   for( auto e : *expr->getExpressions() ) {
+      e->Accept(*this);
+   }
+}
+
 }

@@ -24,6 +24,7 @@ namespace liquid {
    class Conditional;
    class WhileLoop;
    class ClassDeclaration;
+   class List;
 
 class Visitor
 {
@@ -49,7 +50,7 @@ public:
    virtual void VisitConditional( Conditional* expr ) = 0;
    virtual void VisitWhileLoop( WhileLoop* expr ) = 0;
    virtual void VisitClassDeclaration( ClassDeclaration* expr ) = 0 ;
-
+   virtual void VisitList(List* expr) = 0;
 };
 
 }

@@ -122,5 +122,7 @@ void VisitorSyntaxCheck::VisitClassDeclaration( ClassDeclaration* expr )
 {
    TypeNames.emplace(expr->getIdentifier()->getName());
 }
+void VisitorSyntaxCheck::VisitList(List* expr)
+{}
 
 }

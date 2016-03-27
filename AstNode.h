@@ -83,7 +83,7 @@ class Expression : public Node
 {
 public:
    virtual ~Expression() {}
-   virtual std::string toString() { return "Expression\n"; }
+   virtual std::string toString() { return "Expression"; }
    virtual void Accept(Visitor& v) { v.VisitExpression(this); }
 };
 
@@ -92,7 +92,7 @@ class Statement : public Expression
 public:
    virtual ~Statement() {}
    NodeType getType() { return NodeType::expression; }
-   virtual std::string toString() { return "Statement\n"; }
+   virtual std::string toString() { return "Statement"; }
    virtual void Accept(Visitor& v) { v.VisitStatement(this); }
 };
 
@@ -237,10 +237,13 @@ public:
    List(YYLTYPE loc) : location(loc) {}
    List(ExpressionList* exprs, YYLTYPE loc) : exprList(exprs), location(loc) {}
    ~List() {}
-   virtual llvm::Value* codeGen(CodeGenContext& context) { return nullptr; }
+   virtual llvm::Value* codeGen(CodeGenContext& context);
    virtual NodeType getType() { return NodeType::list; }
-   virtual std::string toString() { return "list\n"; }
-   virtual void Accept(Visitor& v) {}
+   virtual std::string toString() { return "list"; }
+   virtual void Accept(Visitor& v) { v.VisitList(this); }
+
+   YYLTYPE getLocation() const { return location; }
+   ExpressionList* getExpressions() const { return exprList; }
 };
 
 class Block : public Expression 
