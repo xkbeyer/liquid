@@ -74,7 +74,7 @@
    calling an (Identifier*). It makes the compiler happy.
  */
 %type <ident> ident
-%type <expr> literals expr boolean_expr binop_expr unaryop_expr list_expr
+%type <expr> literals expr boolean_expr binop_expr unaryop_expr list_expr list_access
 %type <varvec> func_decl_args
 %type <exprvec> call_args list_elemets_expr 
 %type <block> program stmts block
@@ -167,6 +167,7 @@ expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
      | unaryop_expr
      | TLPAREN expr TRPAREN { $$ = $2; }
      | list_expr
+     | list_access
      ;
 /* have to write it explecity to have the right operator precedence */
 binop_expr : expr TAND expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
@@ -198,5 +199,7 @@ list_elemets_expr: /* blank */ {$$ = new liquid::ExpressionList(); }
                  
 list_expr : TLBRACKET list_elemets_expr TRBRACKET {$$ = new liquid::List($2, @$);}
           ;
-          
+
+list_access: ident TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
+
 %%

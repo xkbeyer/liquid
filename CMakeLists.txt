@@ -57,6 +57,7 @@ set(SOURCES_COMMON
             tokens.l
             parser.y
             GetOpt.cpp
+            List.cpp
    )
 
 set(HEADER_COMMON

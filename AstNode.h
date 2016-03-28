@@ -246,6 +246,22 @@ public:
    ExpressionList* getExpressions() const { return exprList; }
 };
 
+class ListAccess : public Expression
+{
+   Identifier* variable = nullptr;
+   long long index = 0;
+   YYLTYPE location;
+public:
+   ListAccess(Identifier* id, long long index, YYLTYPE loc) : variable(id), index(index), location(loc) {}
+   ~ListAccess() {}
+   virtual llvm::Value* codeGen(CodeGenContext& context);
+   virtual NodeType getType() { return NodeType::list; }
+   virtual std::string toString() { return "list-element-access"; }
+   virtual void Accept(Visitor& v) { /*v.VisitList(this);*/ }
+
+   YYLTYPE getLocation() const { return location; }
+};
+
 class Block : public Expression 
 {
 public:
