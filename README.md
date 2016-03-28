@@ -94,6 +94,13 @@ Currently no binary and hex format is supported.
 ## Boolean ##
 A boolean can take the symbol `true` or `false`. 
 
+## Lists ##
+A list is like an array.
+```
+var array = [1,2,3,4]
+```
+_Hint:_ Currently only valid with a `var` declaration and assigment.
+
 ## Comments ##
 ### One Line ##
 One line comment starts with `#`. All characters after that symbol are ignored until the end of line symbol.
