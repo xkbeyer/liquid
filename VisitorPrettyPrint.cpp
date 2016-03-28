@@ -207,6 +207,7 @@ void VisitorPrettyPrint::VisitList(List* expr)
    for( auto e : *expr->getExpressions() ) {
       e->Accept(*this);
    }
+   --indent;
 }
 
 }
