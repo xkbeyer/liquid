@@ -251,8 +251,10 @@ class ListAccess : public Expression
    Identifier* variable = nullptr;
    long long index = 0;
    YYLTYPE location;
+   Expression* other = nullptr;
 public:
    ListAccess(Identifier* id, long long index, YYLTYPE loc) : variable(id), index(index), location(loc) {}
+   ListAccess(Expression* id, long long index, YYLTYPE loc) : other(id), index(index), location(loc) {}
    ~ListAccess() {}
    virtual llvm::Value* codeGen(CodeGenContext& context);
    virtual NodeType getType() { return NodeType::list; }

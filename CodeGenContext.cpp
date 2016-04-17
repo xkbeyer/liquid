@@ -143,8 +143,6 @@ bool CodeGenContext::generateCode(Block& root)
 
     if( !debug ) {
        optimize();
-       if( verbose )
-          module->dump();
     }
     return true;
 }

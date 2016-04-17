@@ -201,5 +201,6 @@ list_expr : TLBRACKET list_elemets_expr TRBRACKET {$$ = new liquid::List($2, @$)
           ;
 
 list_access: ident TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
+            | list_access TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
 
 %%
