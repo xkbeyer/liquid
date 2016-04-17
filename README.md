@@ -99,7 +99,11 @@ A list is like an array.
 ```
 var array = [1,2,3,4]
 ```
-_Hint:_ Currently only valid with a `var` declaration and assigment.
+The elements don't have to be of the same type.
+```
+var list = [1+2, 'Otto', true]
+```
+_Hint:_ Currently only valid with a `var` declaration and an assigment.
 
 ## Comments ##
 ### One Line ##
@@ -129,8 +133,8 @@ string text = 'This is a string.'
 ```
 The `var` keyword is used to auto deduce the type of a variable.
 ```
-var abc = 1  @deduce to int
-var s = "Hello" @deduce to string.
+var abc = 1  #deduce to int
+var s = "Hello" #deduce to string.
 ```
 
 ## Program ##
@@ -221,6 +225,7 @@ def classname
 	def method
 		method-body
 ```
+_Hint:_ The keyword `var` can't be used to declare an instance variable.
 
 Creating an object of a class
 ```
@@ -238,7 +243,7 @@ def simple
 
 simple p
 
-int i = p.get
+int i = p.get()
 ```
 
 ## Miscellaneous ##
