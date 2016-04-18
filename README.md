@@ -105,6 +105,11 @@ var list = [1+2, 'Otto', true]
 ```
 _Hint:_ Currently only valid with a `var` declaration and an assigment.
 
+Two list can be concatenated.
+```
+var other = array + list
+```
+
 ## Comments ##
 ### One Line ##
 One line comment starts with `#`. All characters after that symbol are ignored until the end of line symbol.

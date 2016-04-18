@@ -206,6 +206,8 @@ public:
    Expression* getRHS() { return rhs; }
    virtual std::string toString();
    virtual void Accept(Visitor& v) { v.VisitBinaryOp(this); }
+private:
+   llvm::Value* codeGenAddList(llvm::Value* rhsValue, llvm::Value* lhsValue, CodeGenContext& context);
 };
 
 class CompOperator : public Expression 
