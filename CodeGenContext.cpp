@@ -126,13 +126,6 @@ bool CodeGenContext::generateCode(Block& root)
     endScope();
 
     outs << "Code is generated.\n";
-#if defined(_DEBUG)
-    /* Print the byte code in a human-readable format
-    *     to see if our program compiled properly
-    */
-    if( verbose )
-      module->dump();
-#endif
 
     outs << "verifying... ";
     if( verifyModule(*getModule()) ) {
@@ -144,6 +137,11 @@ bool CodeGenContext::generateCode(Block& root)
     if( !debug ) {
        optimize();
     }
+    /* Print the byte code in a human-readable format
+     *     to see if our program compiled properly
+     */
+    if( verbose )
+       module->dump();
     return true;
 }
 
@@ -170,7 +168,8 @@ void CodeGenContext::printCodeGeneration(class Block& root, std::ostream& outs)
 /*! Runs the optimizer over all function */
 void CodeGenContext::optimize()
 {
-    legacy::FunctionPassManager fpm(getModule());
+   outs << "Optimize code...\n";
+   legacy::FunctionPassManager fpm(getModule());
     PassManagerBuilder builder;
     builder.OptLevel = 3;
     builder.populateFunctionPassManager(fpm);
