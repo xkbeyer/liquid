@@ -123,6 +123,19 @@ void VisitorSyntaxCheck::VisitClassDeclaration( ClassDeclaration* expr )
    TypeNames.emplace(expr->getIdentifier()->getName());
 }
 void VisitorSyntaxCheck::VisitList(List* expr)
-{}
+{
+   auto listexprs = expr->getExpressions();
+   
+   for( auto exp : *listexprs ) {
+      exp->Accept(*this);
+   }
+}
+
+void VisitorSyntaxCheck::VisitListAccess(ListAccess* expr)
+{
+   if( expr->other != nullptr ) {
+      expr->other->Accept(*this);
+   }
+}
 
 }

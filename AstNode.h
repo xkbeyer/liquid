@@ -254,6 +254,8 @@ class ListAccess : public Expression
    long long index = 0;
    YYLTYPE location;
    Expression* other = nullptr;
+   friend class VisitorSyntaxCheck;
+   friend class VisitorPrettyPrint;
 public:
    ListAccess(Identifier* id, long long index, YYLTYPE loc) : variable(id), index(index), location(loc) {}
    ListAccess(Expression* id, long long index, YYLTYPE loc) : other(id), index(index), location(loc) {}
@@ -261,7 +263,7 @@ public:
    virtual llvm::Value* codeGen(CodeGenContext& context);
    virtual NodeType getType() { return NodeType::list; }
    virtual std::string toString() { return "list-element-access"; }
-   virtual void Accept(Visitor& v) { /*v.VisitList(this);*/ }
+   virtual void Accept(Visitor& v) { v.VisitListAccess(this); }
 
    YYLTYPE getLocation() const { return location; }
 };

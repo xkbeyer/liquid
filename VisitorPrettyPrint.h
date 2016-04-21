@@ -36,6 +36,7 @@ public:
    void VisitWhileLoop(WhileLoop* expr);
    void VisitClassDeclaration(ClassDeclaration* expr);
    void VisitList(List* expr);
+   void VisitListAccess(ListAccess* expr);
 };
 
 }

@@ -25,6 +25,7 @@ namespace liquid {
    class WhileLoop;
    class ClassDeclaration;
    class List;
+   class ListAccess;
 
 class Visitor
 {
@@ -51,6 +52,7 @@ public:
    virtual void VisitWhileLoop( WhileLoop* expr ) = 0;
    virtual void VisitClassDeclaration( ClassDeclaration* expr ) = 0 ;
    virtual void VisitList(List* expr) = 0;
+   virtual void VisitListAccess(ListAccess* expr) = 0;
 };
 
 }
