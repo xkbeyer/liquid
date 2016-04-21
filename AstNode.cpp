@@ -383,8 +383,10 @@ Value* Assignment::codeGen(CodeGenContext& context)
 
     if(value->getType()->getTypeID() == varType->getTypeID()) {
         // same type but different bit size.
-        if( value->getType()->getScalarSizeInBits() != varType->getScalarSizeInBits() ) {
+        if( value->getType()->getScalarSizeInBits() > varType->getScalarSizeInBits() ) {
             value = CastInst::CreateTruncOrBitCast(value, varType, "cast", context.currentBlock());
+        } else if( value->getType()->getScalarSizeInBits() < varType->getScalarSizeInBits() ) {
+           value = CastInst::CreateZExtOrBitCast(value, varType, "cast", context.currentBlock());
         }
     } else if ( value->getType() != varType ) {
         std::stringstream msg ;
