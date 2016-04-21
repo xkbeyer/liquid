@@ -8,10 +8,7 @@ displayln("%d,%d,%d,%d", myarray[0],myarray[1],myarray[2],myarray[3])
 
 # Test list of elemts with different types
 var dinge = [ 1+2, "Otto", true ]
-string b = "false"
-if dinge[2] 
-    b = "true"
-displayln("%d, %s, %s", dinge[0], dinge[1], b )
+displayln("%d, %s, %d", dinge[0], dinge[1], dinge[2] )
 
 # Test list in list access.
 var andere_dinge = [dinge, 5,6]
@@ -25,8 +22,5 @@ printvalue(abc) # => 3
 #Test concatenate two lists.
 var sachen = [2+3, "karl", 5.5]
 var concatenate = dinge + sachen
-b = "false"
-if concatenate[2] 
-    b = "true"
-displayln("%d,%s,%s,%d,%s,%lf", concatenate[0],concatenate[1],b ,concatenate[3],concatenate[4],concatenate[5])
-@{concatenate[2]@}
+displayln("%d,%s,%d,%d,%s,%lf", concatenate[0],concatenate[1],concatenate[2] ,concatenate[3],concatenate[4],concatenate[5])
+
