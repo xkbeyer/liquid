@@ -1,8 +1,16 @@
 #include <typeinfo>
+
+#if defined(_MSC_VER)
+#pragma warning( push , 0 )
+#endif
+#include "llvm/Transforms/Utils/Cloning.h"
+#if defined(_MSC_VER)
+#pragma warning( pop )
+#endif
+
 #include "AstNode.h"
 #include "CodeGenContext.h"
 #include "parser.hpp"
-#include "llvm/Transforms/Utils/Cloning.h"
 #include "ClassDeclaration.h"
 
 using namespace std;
