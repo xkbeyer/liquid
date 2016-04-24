@@ -15,7 +15,7 @@ extern "C" int yywrap() { return 1; }
 #define YYERROR_VERBOSE 1
 int yyerror(char const * s )
 {
-    printf("ERROR %s in %s at line %d, col ??\n", s, yytext, yylineno);
+    printf("ERROR %s in '%s' at line %d\n", s, yytext, yylineno);
     return 1;
 }
 
@@ -51,6 +51,12 @@ std::vector<std::string> libPaths;
 %x str qstr
 %x comment
 %x incl
+
+dig     [0-9]
+num1    [-+]?{dig}+\.([eE][-+]?{dig}+)?
+num2    [-+]?{dig}*\.{dig}+([eE][-+]?{dig}+)?
+number  {num1}|{num2}
+
 %%
 
             if( first_time ) {
@@ -164,7 +170,7 @@ import             BEGIN(incl);
 #.*                     /* comments one line til nl */
 [ \t\n]                 /* ignore */;
 [a-zA-Z_][a-zA-Z0-9_&%\$\?\-]*  SAVE_TOKEN; return TIDENTIFIER;
--?([0-9]|[ ])+\.[0-9]*(e[+-]?[0-9]*)?        SAVE_TOKEN; return TDOUBLE;
+{number}                SAVE_TOKEN; return TDOUBLE;
 -?[0-9]+                SAVE_TOKEN; return TINTEGER;
 "="                     return TOKEN(TEQUAL);
 "=="                    return TOKEN(TCEQ);
