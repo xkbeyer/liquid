@@ -71,6 +71,10 @@ import             BEGIN(incl);
 <incl>[ \t]*      /* eat the whitespace */
 <incl>[^ \t\n\r]+   { /* got the include file name */
                     std::string fileName = yytext;
+                    std::size_t pos = fileName.find(".liq");
+                    if( pos == std::string::npos ) {
+                        fileName += ".liq";
+                    }
                     for( auto libpath : libPaths ) {
                         yyin = fopen( (libpath + fileName).c_str() , "r" );
                         if( yyin )
