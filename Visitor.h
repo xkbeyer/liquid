@@ -26,6 +26,7 @@ namespace liquid {
    class ClassDeclaration;
    class List;
    class ListAccess;
+   class Range;
 
 class Visitor
 {
@@ -53,6 +54,7 @@ public:
    virtual void VisitClassDeclaration( ClassDeclaration* expr ) = 0 ;
    virtual void VisitList(List* expr) = 0;
    virtual void VisitListAccess(ListAccess* expr) = 0;
+   virtual void VisitRange(Range* expr) = 0;
 };
 
 }

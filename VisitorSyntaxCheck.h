@@ -40,6 +40,7 @@ public:
    void VisitClassDeclaration(ClassDeclaration* expr);
    void VisitList(List* expr);
    void VisitListAccess(ListAccess* expr);
+   void VisitRange(Range* expr);
 
    bool hasErrors() { return syntaxErrors != 0 ; }
 };

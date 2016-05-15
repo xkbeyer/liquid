@@ -61,10 +61,11 @@
  */
 %token <string> TIDENTIFIER TINTEGER TDOUBLE TSTR TBOOL
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
-%token <token> TLPAREN TRPAREN TCOMMA TDOT TCOLON TLBRACKET TRBRACKET
+%token <token> TCOMMA TDOT TCOLON
+%token <token> TLPAREN TRPAREN TLBRACKET TRBRACKET
 %token <token> TPLUS TMINUS TMUL TDIV
 %token <token> TNOT TAND TOR
-%token <token> TIF TELSE TWHILE
+%token <token> TIF TELSE TWHILE TTO 
 %token <token> TSQUOTE TDEF TRETURN TRETURN_SIMPLE TVAR IS
 %token <token> INDENT UNINDENT 
 
@@ -74,7 +75,7 @@
    calling an (Identifier*). It makes the compiler happy.
  */
 %type <ident> ident
-%type <expr> literals expr boolean_expr binop_expr unaryop_expr list_expr list_access
+%type <expr> literals expr boolean_expr binop_expr unaryop_expr list_expr list_access range_expr
 %type <varvec> func_decl_args
 %type <exprvec> call_args list_elemets_expr 
 %type <block> program stmts block
@@ -154,7 +155,7 @@ literals : TINTEGER { $$ = new liquid::Integer(atol($1->c_str())); delete $1; }
          ;
 
 
-return :  TRETURN expr { $$ = new liquid::Return(@$, $2); }
+return : TRETURN expr { $$ = new liquid::Return(@$, $2); }
        | TRETURN_SIMPLE { $$ = new liquid::Return(@$); }
        ;
 
@@ -166,6 +167,7 @@ expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
      | binop_expr
      | unaryop_expr
      | TLPAREN expr TRPAREN { $$ = $2; }
+     | range_expr
      | list_expr
      | list_access
      ;
@@ -201,6 +203,10 @@ list_expr : TLBRACKET list_elemets_expr TRBRACKET {$$ = new liquid::List($2, @$)
           ;
 
 list_access: ident TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
-            | list_access TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
+           | list_access TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
+           ;
+           
+range_expr : TLBRACKET expr TTO expr TRBRACKET {$$ = new liquid::Range($2, $4, @$);}
+           ;
 
 %%

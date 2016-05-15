@@ -138,4 +138,45 @@ void VisitorSyntaxCheck::VisitListAccess(ListAccess* expr)
    }
 }
 
+void VisitorSyntaxCheck::VisitRange(Range* expr)
+{
+   switch( expr->begin->getType() ) {
+      case NodeType::decimal:
+         break;
+      case NodeType::integer:
+         break;
+      case NodeType::expression:
+         break;
+      case NodeType::list:
+         break;
+      case NodeType::variable:
+         break;
+      default:
+         Node::printError("Expression " + expr->begin->toString() + " not allowed in a range definition.");
+         ++syntaxErrors;
+   }
+   switch( expr->end->getType() ) {
+      case NodeType::decimal:
+         break;
+      case NodeType::integer:
+         break;
+      case NodeType::expression:
+         break;
+      case NodeType::list:
+         break;
+      case NodeType::variable:
+         break;
+      default:
+         Node::printError("Expression " + expr->begin->toString() + " not allowed in a range definition.");
+         ++syntaxErrors;
+   }
+
+   if( expr->begin != nullptr ) {
+      expr->begin->Accept(*this);
+   }
+   if( expr->end != nullptr ) {
+      expr->end->Accept(*this);
+   }
+}
+
 }

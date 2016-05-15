@@ -66,9 +66,9 @@ number  {num1}|{num2}
                 BEGIN indent;
             }
 
-import             BEGIN(incl);
-
-<incl>[ \t]*      /* eat the whitespace */
+            
+import              BEGIN(incl);
+<incl>[ \t]*        /* eat the whitespace */
 <incl>[^ \t\n\r]+   { /* got the include file name */
                     std::string fileName = yytext;
                     std::size_t pos = fileName.find(".liq");
@@ -92,13 +92,13 @@ import             BEGIN(incl);
                        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
                     }
                     BEGIN(normal);
-                  }
+                    }
      
 
-\@\{             BEGIN(comment);
-<comment>\@\}.*    BEGIN(normal);
-<comment>.*  ;/* eat everything */
-<comment>\n  ;/* eat everything */
+\@\{                BEGIN(comment);
+<comment>\@\}.*     BEGIN(normal);
+<comment>.*         ;/* eat everything */
+<comment>\n         ;/* eat everything */
 
 \"      g_str = ""; BEGIN(str);
 '       g_str = ""; BEGIN(qstr);
@@ -171,11 +171,12 @@ import             BEGIN(incl);
 "is"                    return TOKEN(IS);
 "true"                  SAVE_TOKEN; return TBOOL;
 "false"                 SAVE_TOKEN; return TBOOL;
+"to"                    return TOKEN(TTO);
 #.*                     /* comments one line til nl */
 [ \t\n]                 /* ignore */;
 [a-zA-Z_][a-zA-Z0-9_&%\$\?\-]*  SAVE_TOKEN; return TIDENTIFIER;
-{number}                SAVE_TOKEN; return TDOUBLE;
 -?[0-9]+                SAVE_TOKEN; return TINTEGER;
+{number}                SAVE_TOKEN; return TDOUBLE;
 "="                     return TOKEN(TEQUAL);
 "=="                    return TOKEN(TCEQ);
 "!="                    return TOKEN(TCNE);

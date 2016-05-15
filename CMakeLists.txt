@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.2)
 
 project(liquid)
@@ -58,6 +57,7 @@ set(SOURCES_COMMON
             parser.y
             GetOpt.cpp
             List.cpp
+            Range.cpp
    )
 
 set(HEADER_COMMON

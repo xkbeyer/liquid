@@ -219,4 +219,18 @@ void VisitorPrettyPrint::VisitListAccess(ListAccess* expr)
    }
    --indent;
 }
+
+void VisitorPrettyPrint::VisitRange(Range* expr)
+{
+   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   ++indent;
+   if( expr->begin != nullptr ) {
+      expr->begin->Accept(*this);
+   }
+   if( expr->end != nullptr ) {
+      expr->end->Accept(*this);
+   }
+   --indent;
+}
+
 }

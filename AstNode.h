@@ -52,7 +52,8 @@ enum class NodeType
     string,
     boolean,
     identifier,
-    list
+    list,
+    range
 };
 
 class Node 
@@ -264,6 +265,23 @@ public:
    virtual NodeType getType() { return NodeType::list; }
    virtual std::string toString() { return "list-element-access"; }
    virtual void Accept(Visitor& v) { v.VisitListAccess(this); }
+
+   YYLTYPE getLocation() const { return location; }
+};
+
+class Range : public Expression
+{
+   Expression* begin = nullptr;
+   Expression* end = nullptr;
+   YYLTYPE location;
+   friend class VisitorSyntaxCheck;
+   friend class VisitorPrettyPrint;
+public:
+   Range(Expression* begin, Expression* end, YYLTYPE loc) : begin(begin), end(end), location(loc) {}
+   virtual llvm::Value* codeGen(CodeGenContext& context);
+   virtual NodeType getType() { return NodeType::range; }
+   virtual std::string toString() { return "range"; }
+   virtual void Accept(Visitor& v) { v.VisitRange(this); }
 
    YYLTYPE getLocation() const { return location; }
 };
