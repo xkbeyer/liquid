@@ -30,7 +30,7 @@ void VisitorSyntaxCheck::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
       stmt->Accept( *this );
    }
    auto retType = fndecl->getRetType();
-   if(ReturnStatementLocations.size() && retType->getName() == "var" ) {
+   if(ReturnStatementLocations.size() > 1 && retType->getName() == "var" ) {
       Node::printError( fndecl->getlocation(), "Too many return statement in function '" + fndecl->getId()->getName() + "()' for return type deduction.\nThe possible statements are:");
       std::stringstream s;
       for( auto loc : ReturnStatementLocations ) {
