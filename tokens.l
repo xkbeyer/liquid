@@ -177,6 +177,8 @@ import              BEGIN(incl);
 [a-zA-Z_][a-zA-Z0-9_&%\$\?\-]*  SAVE_TOKEN; return TIDENTIFIER;
 -?[0-9]+                SAVE_TOKEN; return TINTEGER;
 {number}                SAVE_TOKEN; return TDOUBLE;
+"->"                    return TOKEN(TRANGE);
+"::"                    return TOKEN(TRANGE);
 "="                     return TOKEN(TEQUAL);
 "=="                    return TOKEN(TCEQ);
 "!="                    return TOKEN(TCNE);

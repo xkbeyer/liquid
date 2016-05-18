@@ -61,7 +61,7 @@
  */
 %token <string> TIDENTIFIER TINTEGER TDOUBLE TSTR TBOOL
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
-%token <token> TCOMMA TDOT TCOLON
+%token <token> TCOMMA TDOT TCOLON TRANGE
 %token <token> TLPAREN TRPAREN TLBRACKET TRBRACKET
 %token <token> TPLUS TMINUS TMUL TDIV
 %token <token> TNOT TAND TOR
@@ -206,7 +206,7 @@ list_access: ident TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1
            | list_access TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
            ;
            
-range_expr : TLBRACKET expr TTO expr TRBRACKET {$$ = new liquid::Range($2, $4, @$);}
+range_expr : TLBRACKET expr TRANGE expr TRBRACKET {$$ = new liquid::Range($2, $4, @$);}
            ;
 
 %%
