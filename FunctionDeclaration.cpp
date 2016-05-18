@@ -91,6 +91,11 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
 
     // Generate the function body.
     auto blockValue = block->codeGen( context );
+    if( blockValue == nullptr ) {
+       Node::printError(location, " " + id->getStructName() + "::" + id->getName() + "(): Function block returns nothing");
+       context.addError();
+       return nullptr;
+    }
     auto retTy = blockValue->getType();
 
     // If the function doesn't have a return type and doesn't have a return statement, make a ret void.
