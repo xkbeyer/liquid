@@ -65,7 +65,7 @@ llvm::Value* ListAccess::codeGen(CodeGenContext& context)
       return nullptr;
    }
    if( var_struct_type->getNumContainedTypes() <= index ) {
-      Node::printError(location, variable->getName() + ": index out of range (with index = " + std::to_string(index) + " and size = " + std::to_string(var_type->getNumContainedTypes()) + ")");
+      Node::printError(location, variable->getName() + " : index out of range (with index(zero based) = " + std::to_string(index) + " and size = " + std::to_string(var_struct_type->getNumContainedTypes()) + ")");
       context.addError();
       return nullptr;
    }
@@ -77,6 +77,37 @@ llvm::Value* ListAccess::codeGen(CodeGenContext& context)
    auto val = new LoadInst(var, "load_var", context.currentBlock());
    Instruction* ptr = GetElementPtrInst::Create(var_struct_type, val, ptr_indices, "get_struct_element", context.currentBlock());
    auto value = new LoadInst(ptr, "load_ptr_struct", context.currentBlock());
+   return value;
+}
+
+llvm::Value* ListAddElement::codeGen(CodeGenContext& context)
+{
+   YYLTYPE loc = { 0,0,0,0 };
+   Block tmp_code;
+   ExpressionList members;
+   auto orgVarType = context.getType(ident->getName());
+   auto tmpVarName = ident->getName() + "_tmp";
+   context.renameVariable(ident->getName(), tmpVarName);
+   auto var = context.findVariable(tmpVarName);
+   if( var == nullptr ) {
+      Node::printError(location, "unknown variable " + ident->getName());
+      return nullptr;
+   }
+   auto var_type = var->getAllocatedType();
+   auto var_struct_type = var_type->getContainedType(0);
+   auto count = var_struct_type->getNumContainedTypes();
+   Identifier tmpIdent(tmpVarName, loc);
+   for( decltype(count) i = 0; i < count; ++i ) {
+      members.push_back(new ListAccess(&tmpIdent, i, loc));
+   }
+   members.push_back(this->getExpression());
+   auto newList = new List(&members, loc);
+   // Restore type name, since the rename has destroyed it and the assign doesn't set it.
+   // The type name is only set while declaration.
+   context.setVarType(orgVarType, ident->getName()); 
+   Assignment assgn(ident, newList, loc);
+   auto value = assgn.codeGen(context);
+   context.deleteVariable(tmpVarName);
    return value;
 }
 

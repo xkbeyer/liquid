@@ -182,6 +182,7 @@ import              BEGIN(incl);
 "="                     return TOKEN(TEQUAL);
 "=="                    return TOKEN(TCEQ);
 "!="                    return TOKEN(TCNE);
+"<<"                    return TOKEN(TLTLT);
 "<"                     return TOKEN(TCLT);
 "<="                    return TOKEN(TCLE);
 ">"                     return TOKEN(TCGT);

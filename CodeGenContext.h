@@ -102,7 +102,7 @@ class CodeGenContext {
     }
     void setupBuiltIns();
 public:
-    llvm::Value* varStruct;  ///< Hold the alloc of the struct variable (class object). TODO move it to a better place.
+    llvm::Value* varStruct = nullptr;  ///< Hold the alloc of the struct variable (class object). TODO move it to a better place.
     bool verbose = false;
     bool debug = false;
 
@@ -123,6 +123,9 @@ public:
     void setVarType(std::string varType, std::string varName) {codeBlocks.front()->getTypeMap()[varName] = varType;}
     std::string getType(std::string varName) ;
     llvm::AllocaInst* findVariable(std::string varName);
+    void deleteVariable(std::string varName);
+    void renameVariable(std::string oldVarName, std::string newVarName);
+
     llvm::BasicBlock *currentBlock() { return codeBlocks.front()->currentBlock(); }
     void optimize();
     void newKlass(std::string name);

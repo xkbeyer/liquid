@@ -37,7 +37,8 @@ public:
    void VisitClassDeclaration(ClassDeclaration* expr);
    void VisitList(List* expr);
    void VisitListAccess(ListAccess* expr);
-   virtual void VisitRange(Range* expr);
+   void VisitListAddElement(ListAddElement* expr);
+   void VisitRange(Range* expr);
 };
 
 }

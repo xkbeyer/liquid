@@ -212,10 +212,20 @@ void VisitorPrettyPrint::VisitList(List* expr)
 
 void VisitorPrettyPrint::VisitListAccess(ListAccess* expr)
 {
-   out << indent_spaces(indent) << "Create " << expr->toString() << "to element " << expr->index << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << " to element " << expr->index << std::endl;
    ++indent;
    if( expr->other != nullptr ) {
       expr->other->Accept(*this);
+   }
+   --indent;
+}
+
+void VisitorPrettyPrint::VisitListAddElement(ListAddElement* expr)
+{
+   out << indent_spaces(indent) << "Create " << expr->toString() << " of " << expr->getExpression()->toString() << " to list " << expr->ident->getName() << std::endl;
+   ++indent;
+   if( expr->getExpression() ) {
+      expr->getExpression()->Accept(*this);
    }
    --indent;
 }

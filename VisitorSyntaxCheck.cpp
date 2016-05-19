@@ -138,6 +138,11 @@ void VisitorSyntaxCheck::VisitListAccess(ListAccess* expr)
    }
 }
 
+void VisitorSyntaxCheck::VisitListAddElement(ListAddElement* expr)
+{
+
+}
+
 void VisitorSyntaxCheck::VisitRange(Range* expr)
 {
    switch( expr->begin->getType() ) {

@@ -269,6 +269,25 @@ public:
    YYLTYPE getLocation() const { return location; }
 };
 
+class ListAddElement : public Expression
+{
+   Expression* expr = nullptr;
+   Identifier* ident = nullptr;
+   YYLTYPE location;
+   friend class VisitorSyntaxCheck;
+   friend class VisitorPrettyPrint;
+public:
+   ListAddElement(Identifier* ident, Expression* expr, YYLTYPE loc) : ident(ident), expr(expr), location(loc) {}
+   ~ListAddElement() {}
+   virtual llvm::Value* codeGen(CodeGenContext& context);
+   virtual NodeType getType() { return NodeType::list; }
+   virtual std::string toString() { return "list add element"; }
+   virtual void Accept(Visitor& v) { v.VisitListAddElement(this); }
+
+   YYLTYPE getLocation() const { return location; }
+   Expression* getExpression() const { return expr; }
+};
+
 class Range : public Expression
 {
    Expression* begin = nullptr;

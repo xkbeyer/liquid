@@ -212,6 +212,43 @@ AllocaInst* CodeGenContext::findVariable(std::string varName)
     return nullptr;
 }
 
+/*! Deletes a variable name in all known locals of the current code block.
+ * 
+ * \param[in] varName variable name
+ */
+void CodeGenContext::deleteVariable(std::string varName)
+{
+   ValueNames& names = locals();
+   auto& typeMap = codeBlocks.front()->getTypeMap();
+   if( names.find(varName) != names.end() ) {
+      names.erase(varName);
+      if( typeMap.count(varName) ) {
+         typeMap.erase(varName);
+      }
+   }
+}
+
+/*! Renames a variable in all known locals of the current code block.
+ *
+ * \param[in] oldVarName The variable o rename
+ * \param[in] newVarName The new name fo the variable
+ */
+void CodeGenContext::renameVariable(std::string oldVarName, std::string newVarName)
+{
+   ValueNames& names = locals();
+   if( names.find(oldVarName) != names.end() ) {
+      auto value = names[oldVarName];
+      names.erase(oldVarName);
+      names[newVarName] = value;
+      auto& typeMap = codeBlocks.front()->getTypeMap();
+      if( typeMap.count(oldVarName) ) {
+         auto value = typeMap[oldVarName];
+         typeMap.erase(oldVarName);
+         typeMap[newVarName] = value;
+      }
+   }
+}
+
 /*! Creates a new class block scope. */
 void CodeGenContext::newKlass(std::string  name)
 {

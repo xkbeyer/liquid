@@ -60,7 +60,7 @@
    they represent.
  */
 %token <string> TIDENTIFIER TINTEGER TDOUBLE TSTR TBOOL
-%token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
+%token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL TLTLT
 %token <token> TCOMMA TDOT TCOLON TRANGE
 %token <token> TLPAREN TRPAREN TLBRACKET TRBRACKET
 %token <token> TPLUS TMINUS TMUL TDIV
@@ -75,7 +75,7 @@
    calling an (Identifier*). It makes the compiler happy.
  */
 %type <ident> ident
-%type <expr> literals expr boolean_expr binop_expr unaryop_expr list_expr list_access range_expr
+%type <expr> literals expr boolean_expr binop_expr unaryop_expr list_expr list_access list_add_element range_expr
 %type <varvec> func_decl_args
 %type <exprvec> call_args list_elemets_expr 
 %type <block> program stmts block
@@ -170,6 +170,7 @@ expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
      | range_expr
      | list_expr
      | list_access
+     | list_add_element
      ;
 /* have to write it explecity to have the right operator precedence */
 binop_expr : expr TAND expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
@@ -201,7 +202,10 @@ list_elemets_expr: /* blank */ {$$ = new liquid::ExpressionList(); }
                  
 list_expr : TLBRACKET list_elemets_expr TRBRACKET {$$ = new liquid::List($2, @$);}
           ;
-
+          
+list_add_element: ident TLTLT expr { $$ = new liquid::ListAddElement($1, $3, @$); }
+                ;
+                
 list_access: ident TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
            | list_access TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
            ;

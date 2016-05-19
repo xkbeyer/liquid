@@ -24,3 +24,5 @@ var sachen = [2+3, "karl", 5.5]
 var concatenate = dinge + sachen
 displayln("%d,%s,%d,%d,%s,%lf", concatenate[0],concatenate[1],concatenate[2] ,concatenate[3],concatenate[4],concatenate[5])
 
+myarray << 5
+printvalue(myarray[4])
