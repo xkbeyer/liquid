@@ -42,11 +42,7 @@ using namespace llvm;
 namespace liquid {
 
 CodeGenContext::CodeGenContext(std::ostream& outs)
-: self(nullptr)
-, mainFunction(nullptr)
-, module(nullptr)
-, varStruct(nullptr)
-, outs(outs)
+: outs(outs)
 {
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmParser();

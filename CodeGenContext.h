@@ -87,15 +87,15 @@ public:
 ///! The context of the current compiling process.
 class CodeGenContext {
     std::list<CodeGenBlock *> codeBlocks; ///< List of all code blocks
-    CodeGenBlock* self;                     ///< The current code block.
+    CodeGenBlock* self = nullptr;                     ///< The current code block.
     std::string klassName;                  ///< The current class definition block
-    llvm::Function *mainFunction;           ///< main function 
-    llvm::Module *module;                   ///< llvm module ...
+    llvm::Function *mainFunction = nullptr;           ///< main function 
+    llvm::Module *module = nullptr;                   ///< llvm module ...
     llvm::LLVMContext llvmContext;          ///< and context
     KlassAttributes classAttributes;        ///< List of attributes for the current class being processed
     KlassInitCode classInitCode;
     int errors = 0;                         ///< Count of errors while code gen.
-    ScopeType currentScopeType;
+    ScopeType currentScopeType = ScopeType::CodeBlock;
     std::ostream& outs;
     void setCurrentBlock(llvm::BasicBlock *block) {
         codeBlocks.front()->setCodeBlock(block);
