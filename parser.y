@@ -75,11 +75,11 @@
    calling an (Identifier*). It makes the compiler happy.
  */
 %type <ident> ident
-%type <expr> literals expr boolean_expr binop_expr unaryop_expr list_expr list_access list_add_element range_expr
+%type <expr> literals expr boolean_expr binop_expr unaryop_expr list_expr list_access  range_expr
 %type <varvec> func_decl_args
 %type <exprvec> call_args list_elemets_expr 
 %type <block> program stmts block
-%type <stmt> stmt var_decl var_decl_deduce func_decl conditional return while class_decl
+%type <stmt> stmt var_decl var_decl_deduce func_decl conditional return while class_decl list_add_element
 %type <token> comparison 
 
 /* Operator precedence for mathematical operators */
@@ -109,6 +109,7 @@ stmt : var_decl
      | conditional 
      | return
      | while
+     | list_add_element
      | expr { $$ = new liquid::ExpressionStatement($1); }
      ;
 
@@ -170,7 +171,6 @@ expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
      | range_expr
      | list_expr
      | list_access
-     | list_add_element
      ;
 /* have to write it explecity to have the right operator precedence */
 binop_expr : expr TAND expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
