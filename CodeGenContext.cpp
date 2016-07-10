@@ -126,6 +126,7 @@ bool CodeGenContext::generateCode(Block& root)
     outs << "verifying... ";
     if( verifyModule(*getModule()) ) {
        outs << ": Error constructing function!\n";
+       module->dump();
        return false;
     }
     outs << "done.\n";
