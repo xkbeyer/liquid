@@ -48,7 +48,7 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
         argTypes.push_back( ty );
     }
 
-    // TODO check return type if it is a struct type !!! May be it should be a ptr to the struct!
+    // TODO check return type if it is a structure type !!! May be it should be a ptr to the structure!
     FunctionType *ftype = FunctionType::get( context.typeOf( *type ), argTypes, false );
     std::string functionName = id->getName();
     if( type->getName() == "var" ) {

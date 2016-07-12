@@ -200,7 +200,7 @@ void VisitorPrettyPrint::VisitClassDeclaration( ClassDeclaration* expr )
    --indent;
 }
 
-void VisitorPrettyPrint::VisitList(List* expr)
+void VisitorPrettyPrint::VisitArray(Array* expr)
 {
    out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
    ++indent;
@@ -210,7 +210,7 @@ void VisitorPrettyPrint::VisitList(List* expr)
    --indent;
 }
 
-void VisitorPrettyPrint::VisitListAccess(ListAccess* expr)
+void VisitorPrettyPrint::VisitArrayAccess(ArrayAccess* expr)
 {
    out << indent_spaces(indent) << "Create " << expr->toString() << " to element " << expr->index << std::endl;
    ++indent;
@@ -220,7 +220,7 @@ void VisitorPrettyPrint::VisitListAccess(ListAccess* expr)
    --indent;
 }
 
-void VisitorPrettyPrint::VisitListAddElement(ListAddElement* expr)
+void VisitorPrettyPrint::VisitArrayAddElement(ArrayAddElement* expr)
 {
    out << indent_spaces(indent) << "Create " << expr->toString() << " of " << expr->getExpression()->toString() << " to list " << expr->ident->getName() << std::endl;
    ++indent;

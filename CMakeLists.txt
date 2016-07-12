@@ -15,7 +15,7 @@ macro(replace_flags flag newflag)
     ENDFOREACH(flag_var)
 endmacro()
 
-# Setup the make environement. #
+# Setup the make environment. #
 ################################
 
 SET(CMAKE_BUILD_TYPE Debug CACHE STRING "default to debug" FORCE)
@@ -23,7 +23,7 @@ SET(CMAKE_BUILD_TYPE Debug CACHE STRING "default to debug" FORCE)
 # Setup the cmake directory containing numerous cmake scripts and macros.
 set(CMAKE_MODULE_PATH "${liquid_SOURCE_DIR}/cmake")
 
-# Allow else() and endif() constructs (with empty paranthesis)
+# Allow else() and endif() constructs (with empty parentheses)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 # Activate very verbose makefiles.
@@ -39,7 +39,7 @@ if("${CURR_DIR}" STREQUAL "${liquid_SOURCE_DIR}\n")
     message(FATAL_ERROR "In-source-builds are not allowed to build the liquid. Please go into the \"build\" directory and type \"ccmake ..\" there.\nThank you.")
 endif()
 
-# Put all sourcefiles into one variable. #
+# Put all source files into one variable. #
 ##########################################
 set(SOURCES_COMMON
             main.cpp
@@ -56,7 +56,7 @@ set(SOURCES_COMMON
             tokens.l
             parser.y
             GetOpt.cpp
-            List.cpp
+            Array.cpp
             Range.cpp
    )
 
@@ -66,6 +66,7 @@ set(HEADER_COMMON
             FunctionDeclaration.h
             ClassDeclaration.h
             CodeGenContext.h
+            Visitor.h
             VisitorSyntaxCheck.h
             VisitorPrettyPrint.h
             GetOpt.h
@@ -79,14 +80,14 @@ endif()
 # Check for various language-stuff and compiler versions #
 ##########################################################
 
-# Compiler-dependent and build-dependend flags:
+# Compiler-dependent and build-depended flags:
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     add_compile_options(-Wall)
 elseif(MSVC)
     add_definitions(-DYY_NO_UNISTD_H)
     add_definitions(-D_SCL_SECURE_NO_WARNINGS)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    add_definitions(-D__STDC_VERSION__=199901L) #flexbison to avoid redefinition of int types.
+    add_definitions(-D__STDC_VERSION__=199901L) #flex/bison to avoid redefinition of int types.
 endif()
 
 # Debug or release ?

@@ -75,11 +75,11 @@
    calling an (Identifier*). It makes the compiler happy.
  */
 %type <ident> ident
-%type <expr> literals expr boolean_expr binop_expr unaryop_expr list_expr list_access  range_expr
+%type <expr> literals expr boolean_expr binop_expr unaryop_expr array_expr array_access  range_expr
 %type <varvec> func_decl_args
-%type <exprvec> call_args list_elemets_expr 
+%type <exprvec> call_args array_elemets_expr 
 %type <block> program stmts block
-%type <stmt> stmt var_decl var_decl_deduce func_decl conditional return while class_decl list_add_element
+%type <stmt> stmt var_decl var_decl_deduce func_decl conditional return while class_decl array_add_element
 %type <token> comparison 
 
 /* Operator precedence for mathematical operators */
@@ -109,7 +109,7 @@ stmt : var_decl
      | conditional 
      | return
      | while
-     | list_add_element
+     | array_add_element
      | expr { $$ = new liquid::ExpressionStatement($1); }
      ;
 
@@ -169,8 +169,8 @@ expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
      | unaryop_expr
      | TLPAREN expr TRPAREN { $$ = $2; }
      | range_expr
-     | list_expr
-     | list_access
+     | array_expr
+     | array_access
      ;
 /* have to write it explecity to have the right operator precedence */
 binop_expr : expr TAND expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
@@ -195,19 +195,19 @@ call_args : /*blank*/  { $$ = new liquid::ExpressionList(); }
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE
            ;
           
-list_elemets_expr: /* blank */ {$$ = new liquid::ExpressionList(); }
+array_elemets_expr: /* blank */ {$$ = new liquid::ExpressionList(); }
                  | expr {$$ = new liquid::ExpressionList(); $$->push_back($1);}
-                 | list_elemets_expr TCOMMA expr {$$->push_back($3); }
+                 | array_elemets_expr TCOMMA expr {$$->push_back($3); }
                  ; 
                  
-list_expr : TLBRACKET list_elemets_expr TRBRACKET {$$ = new liquid::List($2, @$);}
+array_expr : TLBRACKET array_elemets_expr TRBRACKET {$$ = new liquid::Array($2, @$);}
           ;
           
-list_add_element: ident TLTLT expr { $$ = new liquid::ListAddElement($1, $3, @$); }
+array_add_element: ident TLTLT expr { $$ = new liquid::ArrayAddElement($1, $3, @$); }
                 ;
                 
-list_access: ident TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
-           | list_access TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ListAccess($1,atol($3->c_str()), @$); delete $3;}
+array_access: ident TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ArrayAccess($1,atol($3->c_str()), @$); delete $3;}
+           | array_access TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ArrayAccess($1,atol($3->c_str()), @$); delete $3;}
            ;
            
 range_expr : TLBRACKET expr TRANGE expr TRBRACKET {$$ = new liquid::Range($2, $4, @$);}

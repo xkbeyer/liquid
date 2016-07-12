@@ -122,7 +122,7 @@ void VisitorSyntaxCheck::VisitClassDeclaration( ClassDeclaration* expr )
 {
    TypeNames.emplace(expr->getIdentifier()->getName());
 }
-void VisitorSyntaxCheck::VisitList(List* expr)
+void VisitorSyntaxCheck::VisitArray(Array* expr)
 {
    auto listexprs = expr->getExpressions();
    
@@ -131,14 +131,14 @@ void VisitorSyntaxCheck::VisitList(List* expr)
    }
 }
 
-void VisitorSyntaxCheck::VisitListAccess(ListAccess* expr)
+void VisitorSyntaxCheck::VisitArrayAccess(ArrayAccess* expr)
 {
    if( expr->other != nullptr ) {
       expr->other->Accept(*this);
    }
 }
 
-void VisitorSyntaxCheck::VisitListAddElement(ListAddElement* expr)
+void VisitorSyntaxCheck::VisitArrayAddElement(ArrayAddElement* expr)
 {
 
 }

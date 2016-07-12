@@ -273,15 +273,15 @@ llvm::Value * BinaryOp::codeGenAddList(llvm::Value * rhsValue, llvm::Value * lhs
    ExpressionList exprList;
    for( int i = 0; i < lhsCount; ++i ) {
       auto id = (Identifier*)this->getLHS();
-      ListAccess* access = new ListAccess(id, i, id->getLocation());
+      ArrayAccess* access = new ArrayAccess(id, i, id->getLocation());
       exprList.push_back(access);
    }
    for( int i = 0; i < rhsCount; ++i ) {
       auto id = (Identifier*)this->getRHS();
-      ListAccess* access = new ListAccess(id, i, id->getLocation());
+      ArrayAccess* access = new ArrayAccess(id, i, id->getLocation());
       exprList.push_back(access);
    }
-   auto list = new List(&exprList, location);
+   auto list = new Array(&exprList, location);
    auto newList = list->codeGen(context);
    return newList;
 }

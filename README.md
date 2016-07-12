@@ -94,8 +94,8 @@ Currently no binary and hex format is supported.
 ## Boolean ##
 A boolean can take the symbol `true` or `false`. 
 
-## Lists ##
-A list is like an array.
+## Array ##
+An array is a container which can hold elements of arbitary types.
 ```
 var array = [1,2,3,4]
 ```
@@ -105,10 +105,13 @@ var list = [1+2, 'Otto', true]
 ```
 _Hint:_ Currently only valid with a `var` declaration and an assigment.
 
-Two list can be concatenated.
+Adding an element to the array above
 ```
-var other = array + list
+list << 5
 ```
+results in `[3, 'Otto', true, 5]`
+
+_Note_ This featue is currently under construction and not stable.
 
 ## Comments ##
 ### One Line ##

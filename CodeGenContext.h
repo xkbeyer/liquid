@@ -1,6 +1,4 @@
-
-#ifndef _INC_CODEGENCONTEXT_H
-#define _INC_CODEGENCONTEXT_H
+#pragma once
 
 #include <stack>
 #include <map>
@@ -38,18 +36,6 @@
 
 namespace liquid {
     
-
-class VarDef
-{
-public:
-    VarDef(const std::string& name, const std::string& typeName, llvm::Value* value)
-    : name(name), tyName(typeName), value(value) {};
-private:
-    std::string name;
-    std::string tyName;
-    llvm::Value* value;
-};
-
 ///< Used to keep track the context of a code block.
 enum class ScopeType {
     Class,
@@ -102,7 +88,7 @@ class CodeGenContext {
     }
     void setupBuiltIns();
 public:
-    llvm::Value* varStruct = nullptr;  ///< Hold the alloc of the struct variable (class object). TODO move it to a better place.
+    llvm::Value* varStruct = nullptr;  ///< Hold the alloc of the structure variable (class object). TODO move it to a better place.
     bool verbose = false;
     bool debug = false;
 
@@ -143,5 +129,3 @@ public:
 };
 
 }
-
-#endif

@@ -232,24 +232,24 @@ public:
    virtual void Accept(Visitor& v) { v.VisitCompOperator(this); }
 };
 
-class List : public Expression
+class Array : public Expression
 {
    ExpressionList* exprList = nullptr;
    YYLTYPE location;
 public:
-   List(YYLTYPE loc) : location(loc) {}
-   List(ExpressionList* exprs, YYLTYPE loc) : exprList(exprs), location(loc) {}
-   ~List() {}
+   Array(YYLTYPE loc) : location(loc) {}
+   Array(ExpressionList* exprs, YYLTYPE loc) : exprList(exprs), location(loc) {}
+   ~Array() {}
    virtual llvm::Value* codeGen(CodeGenContext& context);
    virtual NodeType getType() { return NodeType::list; }
    virtual std::string toString() { return "list"; }
-   virtual void Accept(Visitor& v) { v.VisitList(this); }
+   virtual void Accept(Visitor& v) { v.VisitArray(this); }
 
    YYLTYPE getLocation() const { return location; }
    ExpressionList* getExpressions() const { return exprList; }
 };
 
-class ListAccess : public Expression
+class ArrayAccess : public Expression
 {
    Identifier* variable = nullptr;
    long long index = 0;
@@ -258,13 +258,13 @@ class ListAccess : public Expression
    friend class VisitorSyntaxCheck;
    friend class VisitorPrettyPrint;
 public:
-   ListAccess(Identifier* id, long long index, YYLTYPE loc) : variable(id), index(index), location(loc) {}
-   ListAccess(Expression* id, long long index, YYLTYPE loc) : other(id), index(index), location(loc) {}
-   ~ListAccess() {}
+   ArrayAccess(Identifier* id, long long index, YYLTYPE loc) : variable(id), index(index), location(loc) {}
+   ArrayAccess(Expression* id, long long index, YYLTYPE loc) : other(id), index(index), location(loc) {}
+   ~ArrayAccess() {}
    virtual llvm::Value* codeGen(CodeGenContext& context);
    virtual NodeType getType() { return NodeType::list; }
    virtual std::string toString() { return "list-element-access"; }
-   virtual void Accept(Visitor& v) { v.VisitListAccess(this); }
+   virtual void Accept(Visitor& v) { v.VisitArrayAccess(this); }
 
    YYLTYPE getLocation() const { return location; }
 };
@@ -321,7 +321,7 @@ public:
    virtual void Accept(Visitor& v) { v.VisitExpressionStatement(this); }
 };
 
-class ListAddElement : public Statement
+class ArrayAddElement : public Statement
 {
    Expression* expr = nullptr;
    Identifier* ident = nullptr;
@@ -329,12 +329,12 @@ class ListAddElement : public Statement
    friend class VisitorSyntaxCheck;
    friend class VisitorPrettyPrint;
 public:
-   ListAddElement(Identifier* ident, Expression* expr, YYLTYPE loc) : ident(ident), expr(expr), location(loc) {}
-   ~ListAddElement() {}
+   ArrayAddElement(Identifier* ident, Expression* expr, YYLTYPE loc) : ident(ident), expr(expr), location(loc) {}
+   ~ArrayAddElement() {}
    virtual llvm::Value* codeGen(CodeGenContext& context);
    virtual NodeType getType() { return NodeType::list; }
    virtual std::string toString() { return "list add element"; }
-   virtual void Accept(Visitor& v) { v.VisitListAddElement(this); }
+   virtual void Accept(Visitor& v) { v.VisitArrayAddElement(this); }
 
    YYLTYPE getLocation() const { return location; }
    Expression* getExpression() const { return expr; }

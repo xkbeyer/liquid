@@ -38,9 +38,9 @@ public:
    void VisitConditional(Conditional* expr);
    void VisitWhileLoop(WhileLoop* expr);
    void VisitClassDeclaration(ClassDeclaration* expr);
-   void VisitList(List* expr);
-   void VisitListAccess(ListAccess* expr);
-   void VisitListAddElement(ListAddElement* expr);
+   void VisitArray(Array* expr);
+   void VisitArrayAccess(ArrayAccess* expr);
+   void VisitArrayAddElement(ArrayAddElement* expr);
    void VisitRange(Range* expr);
 
    bool hasErrors() { return syntaxErrors != 0 ; }

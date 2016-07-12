@@ -24,9 +24,9 @@ namespace liquid {
    class Conditional;
    class WhileLoop;
    class ClassDeclaration;
-   class List;
-   class ListAccess;
-   class ListAddElement;
+   class Array;
+   class ArrayAccess;
+   class ArrayAddElement;
    class Range;
 
 class Visitor
@@ -53,9 +53,9 @@ public:
    virtual void VisitConditional( Conditional* expr ) = 0;
    virtual void VisitWhileLoop( WhileLoop* expr ) = 0;
    virtual void VisitClassDeclaration( ClassDeclaration* expr ) = 0 ;
-   virtual void VisitList(List* expr) = 0;
-   virtual void VisitListAccess(ListAccess* expr) = 0;
-   virtual void VisitListAddElement(ListAddElement* expr) = 0;
+   virtual void VisitArray(Array* expr) = 0;
+   virtual void VisitArrayAccess(ArrayAccess* expr) = 0;
+   virtual void VisitArrayAddElement(ArrayAddElement* expr) = 0;
    virtual void VisitRange(Range* expr) = 0;
 };
 

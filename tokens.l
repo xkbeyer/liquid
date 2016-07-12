@@ -12,10 +12,13 @@ int isatty(int) {return 0;};
 
 extern "C" int yywrap() { return 1; }
 
+int yycolumn = 1;
+
 #define YYERROR_VERBOSE 1
 int yyerror(char const * s )
 {
-    printf("ERROR %s in '%s' at line %d\n", s, yytext, yylineno);
+    printf("ERROR %s in '%s' at line %d col %d\n", s, yytext, yylineno, yycolumn);
+    printf("  parsed loc %d.%d-%d.%d\n", yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column);
     return 1;
 }
 
@@ -27,7 +30,6 @@ int indent_level = 0;          /* indentation level passed to the parser */
 std::stack<int> curr_indents;
 int first_time = 1 ;
 
-int yycolumn = 1;
 int parsing_error = 0;
 
 std::stack<std::string> fileNames;

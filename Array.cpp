@@ -8,7 +8,7 @@ using namespace llvm;
 
 namespace liquid {
 
-llvm::Value* List::codeGen(CodeGenContext& context) 
+llvm::Value* Array::codeGen(CodeGenContext& context) 
 {
    using ValueList = std::vector<Value*>;
    using TypeList = std::vector<Type*>;
@@ -34,7 +34,7 @@ llvm::Value* List::codeGen(CodeGenContext& context)
    return alloc_str; 
 }
 
-llvm::Value* ListAccess::codeGen(CodeGenContext& context)
+llvm::Value* ArrayAccess::codeGen(CodeGenContext& context)
 {
    AllocaInst* var = nullptr;
    Type* var_type = nullptr;
@@ -80,7 +80,7 @@ llvm::Value* ListAccess::codeGen(CodeGenContext& context)
    return value;
 }
 
-llvm::Value* ListAddElement::codeGen(CodeGenContext& context)
+llvm::Value* ArrayAddElement::codeGen(CodeGenContext& context)
 {
    YYLTYPE loc = { 0,0,0,0 };
    Block tmp_code;
@@ -98,10 +98,10 @@ llvm::Value* ListAddElement::codeGen(CodeGenContext& context)
    auto count = var_struct_type->getNumContainedTypes();
    Identifier tmpIdent(tmpVarName, loc);
    for( decltype(count) i = 0; i < count; ++i ) {
-      members.push_back(new ListAccess(&tmpIdent, i, loc));
+      members.push_back(new ArrayAccess(&tmpIdent, i, loc));
    }
    members.push_back(this->getExpression());
-   auto newList = new List(&members, loc);
+   auto newList = new Array(&members, loc);
    // Restore type name, since the rename has destroyed it and the assign doesn't set it.
    // The type name is only set while declaration.
    context.setVarType(orgVarType, ident->getName()); 
