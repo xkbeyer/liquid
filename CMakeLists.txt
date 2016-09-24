@@ -120,8 +120,18 @@ if( NOT EXISTS ${LLVM_ROOT}/include/llvm )
     message(FATAL_ERROR "LLVM_ROOT (${LLVM_ROOT}) is not a valid LLVM install")
 endif()
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LLVM_ROOT}/share/llvm/cmake")
+if( EXISTS ${LLVM_ROOT}/share/llvm/cmake )
+	# LLVM 3.8 uses this.
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LLVM_ROOT}/share/llvm/cmake")
+elseif( EXISTS ${LLVM_ROOT}/lib/cmake/llvm )
+	# LLVM 3.9 uses this.
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LLVM_ROOT}/lib/cmake/llvm")
+else()
+    message(FATAL_ERROR "LLVM: can't find the cmake support files. Abort!")
+endif()
+
 include(LLVMConfig)
+
 message(STATUS "Found LLVM Package Version:${LLVM_PACKAGE_VERSION}")
 
 string(REGEX MATCH "[0-9]+\\.[0-9]+" LLVM_VER ${LLVM_PACKAGE_VERSION} )
