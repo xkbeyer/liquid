@@ -19,7 +19,6 @@
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/CallingConv.h"
-#include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/IR/Verifier.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Support/TargetSelect.h"
