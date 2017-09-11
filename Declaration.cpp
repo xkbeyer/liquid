@@ -30,7 +30,7 @@ Value* VariableDeclaration::codeGen(CodeGenContext& context)
     Type* ty = context.typeOf(*type);
     if( ty->isStructTy() && context.getScopeType() != ScopeType::FunctionDeclaration ) {
         // It is really a declaration of a class type which we put always onto the heap.
-        AllocaInst* alloc = new AllocaInst(ty, id->getName().c_str(), context.currentBlock());
+        AllocaInst* alloc = new AllocaInst(ty, 0, id->getName().c_str(), context.currentBlock());
         context.locals()[id->getName()] = alloc;
         val = alloc;
         context.varStruct = val; // Indicates that a variable of a class is declared
@@ -42,7 +42,7 @@ Value* VariableDeclaration::codeGen(CodeGenContext& context)
             // Therefor a pointer reference is needed.
             ty = PointerType::get(ty,0);
         }
-        AllocaInst* alloc = new AllocaInst(ty, id->getName().c_str(), context.currentBlock());
+        AllocaInst* alloc = new AllocaInst(ty, 0, id->getName().c_str(), context.currentBlock());
         context.locals()[id->getName()] = alloc;
         val = alloc;
     }

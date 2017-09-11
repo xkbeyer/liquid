@@ -69,7 +69,7 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
         //Value* ptr_this = actualArgs++;
         Type* self_ty = context.typeOf( context.getKlassName() );
         Type* self_ptr_ty = PointerType::get( self_ty, 0 );
-        AllocaInst* alloca = new AllocaInst( self_ptr_ty, "self_addr", context.currentBlock() );
+        AllocaInst* alloca = new AllocaInst( self_ptr_ty, 0, "self_addr", context.currentBlock() );
         new StoreInst( &(*actualArgs) /*ptr_this*/, alloca, context.currentBlock() );
         context.locals()["self"] = alloca;
         ++actualArgs;

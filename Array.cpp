@@ -20,7 +20,7 @@ llvm::Value* Array::codeGen(CodeGenContext& context)
       types.push_back(code->getType());
    }
    StructType* str = StructType::create(context.getGlobalContext(), makeArrayRef(types), "list");
-   auto alloc_str = new AllocaInst(str, "alloc_list",context.currentBlock());
+   auto alloc_str = new AllocaInst(str, 0, "alloc_list",context.currentBlock());
    std::vector<Value*> ptr_indices;
    ConstantInt* const_int32_0 = ConstantInt::get(context.getModule()->getContext(), APInt(32, 0));
    for( int index = 0; index < values.size(); ++index ) {
@@ -41,7 +41,7 @@ llvm::Value* ArrayAccess::codeGen(CodeGenContext& context)
    Type* var_struct_type = nullptr;
    if( other != nullptr ) {
       auto tmp = other->codeGen(context);
-      var = new AllocaInst(tmp->getType(), "tmp_alloc_list_other", context.currentBlock());
+      var = new AllocaInst(tmp->getType(), 0, "tmp_alloc_list_other", context.currentBlock());
       new StoreInst(tmp, var, context.currentBlock());
       var_type = var->getAllocatedType();
       var_struct_type = var->getAllocatedType()->getContainedType(0);

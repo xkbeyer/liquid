@@ -349,7 +349,7 @@ Value* Assignment::codeGen(CodeGenContext& context)
         if( var == nullptr ) {
             /* In this case the type deductions takes place. This is an assignment with the var keyword. */
             Type* ty = value->getType();
-            var = new AllocaInst( ty, lhs->getName().c_str(), context.currentBlock() );
+            var = new AllocaInst( ty, 0, lhs->getName().c_str(), context.currentBlock() );
             context.locals()[lhs->getName()] = var;
         }
     } else {
