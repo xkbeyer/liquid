@@ -271,12 +271,12 @@ llvm::Value * BinaryOp::codeGenAddList(llvm::Value * rhsValue, llvm::Value * lhs
    auto lhsCount = lhsTy->getNumContainedTypes();
    auto totalCount = rhsCount + lhsCount;
    ExpressionList exprList;
-   for( int i = 0; i < lhsCount; ++i ) {
+   for( unsigned int i = 0; i < lhsCount; ++i ) {
       auto id = (Identifier*)this->getLHS();
       ArrayAccess* access = new ArrayAccess(id, i, id->getLocation());
       exprList.push_back(access);
    }
-   for( int i = 0; i < rhsCount; ++i ) {
+   for( unsigned int i = 0; i < rhsCount; ++i ) {
       auto id = (Identifier*)this->getRHS();
       ArrayAccess* access = new ArrayAccess(id, i, id->getLocation());
       exprList.push_back(access);
