@@ -202,7 +202,7 @@ void VisitorPrettyPrint::VisitClassDeclaration( ClassDeclaration* expr )
 
 void VisitorPrettyPrint::VisitArray(Array* expr)
 {
-   out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;
+   out << indent_spaces(indent) << "Create array " << expr->toString() << std::endl;
    ++indent;
    for( auto e : *expr->getExpressions() ) {
       e->Accept(*this);
@@ -222,7 +222,7 @@ void VisitorPrettyPrint::VisitArrayAccess(ArrayAccess* expr)
 
 void VisitorPrettyPrint::VisitArrayAddElement(ArrayAddElement* expr)
 {
-   out << indent_spaces(indent) << "Create " << expr->toString() << " of " << expr->getExpression()->toString() << " to list " << expr->ident->getName() << std::endl;
+   out << indent_spaces(indent) << "Create " << expr->toString() << " of " << expr->getExpression()->toString() << " to array " << expr->ident->getName() << std::endl;
    ++indent;
    if( expr->getExpression() ) {
       expr->getExpression()->Accept(*this);

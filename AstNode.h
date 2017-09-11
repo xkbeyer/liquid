@@ -242,7 +242,7 @@ public:
    ~Array() {}
    virtual llvm::Value* codeGen(CodeGenContext& context);
    virtual NodeType getType() { return NodeType::list; }
-   virtual std::string toString() { return "list"; }
+   virtual std::string toString() { return "array"; }
    virtual void Accept(Visitor& v) { v.VisitArray(this); }
 
    YYLTYPE getLocation() const { return location; }
@@ -263,7 +263,7 @@ public:
    ~ArrayAccess() {}
    virtual llvm::Value* codeGen(CodeGenContext& context);
    virtual NodeType getType() { return NodeType::list; }
-   virtual std::string toString() { return "list-element-access"; }
+   virtual std::string toString() { return "array-element-access"; }
    virtual void Accept(Visitor& v) { v.VisitArrayAccess(this); }
 
    YYLTYPE getLocation() const { return location; }
