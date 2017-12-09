@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.10)
 
 project(liquid)
 
@@ -8,7 +8,6 @@ message(STATUS "==================")
 
 macro(replace_flags flag newflag)
     FOREACH(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE)
-        message(STATUS "repl ${flag_var} ${flag} ${newflag}")  
         IF(${flag_var} MATCHES ${flag})
             STRING(REGEX REPLACE "${flag}" "${newflag}" ${flag_var} "${${flag_var}}")
         ENDIF()
@@ -77,27 +76,27 @@ if(MSVC)
     source_group(Source\ Files FILES ${SOURCE_COMMON})
 endif()
 
+BISON_TARGET(Parser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp)
+FLEX_TARGET(Scanner tokens.l ${CMAKE_CURRENT_BINARY_DIR}/tokens.cpp )
+ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
+
+add_executable(liq ${SOURCES_COMMON} ${HEADER_COMMON} ${BISON_Parser_OUTPUTS} ${FLEX_Scanner_OUTPUTS})
+
 # Check for various language-stuff and compiler versions #
 ##########################################################
 
 # Compiler-dependent and build-depended flags:
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    add_compile_options(-Wall)
+    target_compile_options(liq PRIVATE -Wall)
 elseif(MSVC)
-    add_definitions(-DYY_NO_UNISTD_H)
-    add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    add_definitions(-D__STDC_VERSION__=199901L) #flex/bison to avoid redefinition of int types.
+    target_compile_definitions(liq PRIVATE YY_NO_UNISTD_H)
+    target_compile_definitions(liq PRIVATE _SCL_SECURE_NO_WARNINGS)
+    target_compile_definitions(liq PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(liq PRIVATE __STDC_VERSION__=199901L) #flex/bison to avoid redefinition of int types.
 endif()
 
 # Debug or release ?
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message(STATUS "Configuring for debug")
-    if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        add_definitions(-D_DEBUG)
-    endif()
-endif()
-
+target_compile_definitions(liq PRIVATE $<$<CONFIG:Debug>:_DEBUG>)
 
 # Search for the different needed libs. #
 #########################################
@@ -146,8 +145,7 @@ if(MSVC)
 endif()
 
 # Add the compiler definitions of LLVM
-add_definitions(${LLVM_DEFINITIONS})
-
+target_compile_definitions(liq PRIVATE ${LLVM_DEFINITIONS})
 
 # Now set the header and library paths:
 include_directories( ${LLVM_ROOT}/include )
@@ -159,26 +157,21 @@ llvm_map_components_to_libnames(REQ_LLVM_LIBRARIES mcjit interpreter native ipo)
 
 
 if(NOT LLVM_ENABLE_RTTI)
-    add_definitions(-DLIQ_NO_RTTI)
+    target_compile_definitions(liq PRIVATE LIQ_NO_RTTI)
     if(MSVC)
-        add_compile_options(/GR-)
+        target_compile_options(liq PRIVATE /GR-)
     else()
-        add_compile_options(-fno-rtti)
+        target_compile_options(liq PRIVATE -fno-rtti)
     endif()
 endif()
 
 #enables C++ Exception
-if(LLVM_ENABLE_EH)
-    if(MSVC)
-        add_compile_options(/EHsc)
-    else()
-        add_compile_options(-fexceptions)
-    endif()
-else()
-    if(MSVC)
-        # Don't remove C++ exception for MSVC since they are needed.
-        add_compile_options(/EHsc)
-    endif()
+if(MSVC)
+    # Don't remove C++ exception for MSVC since they are needed.
+    target_compile_options(liq PRIVATE /EHsc)
+endif()
+if(LLVM_ENABLE_EH AND CMAKE_COMPILER_IS_GNUCXX)
+    target_compile_options(liq PRIVATE -fexceptions)
 endif()
 
 set(VER_MAJ 0)
@@ -191,15 +184,9 @@ configure_file(config.in ${liquid_SOURCE_DIR}/config.h)
 ##########################
 
 # Add additional include search directories.
-include_directories(${liquid_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(liq PRIVATE ${liquid_SOURCE_DIR})
+target_include_directories(liq PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-BISON_TARGET(Parser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp)
-FLEX_TARGET(Scanner tokens.l ${CMAKE_CURRENT_BINARY_DIR}/tokens.cpp )
-ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-add_executable(liq ${SOURCES_COMMON} ${HEADER_COMMON} ${BISON_Parser_OUTPUTS} ${FLEX_Scanner_OUTPUTS})
 set_property(TARGET liq PROPERTY CXX_STANDARD 14)
 set_property(TARGET liq PROPERTY CXX_STANDARD_REQUIRED ON)
 
