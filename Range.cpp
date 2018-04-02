@@ -45,7 +45,9 @@ llvm::Value* Range::codeGen(CodeGenContext& context)
    auto wl = new WhileLoop(cond, while_block);
    tmp_code.statements.push_back(wl);
    tmp_code.codeGen(context);
+   #if !defined(LLVM_NO_DUMP)
    context.getModule()->dump();
+   #endif
    rc = context.findVariable("tmp_l");
    return rc;
 }

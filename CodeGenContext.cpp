@@ -126,7 +126,9 @@ bool CodeGenContext::generateCode(Block& root)
     outs << "verifying... ";
     if( verifyModule(*getModule()) ) {
        outs << ": Error constructing function!\n";
+       #if !defined(LLVM_NO_DUMP)
        module->dump();
+       #endif
        return false;
     }
     outs << "done.\n";
@@ -134,11 +136,13 @@ bool CodeGenContext::generateCode(Block& root)
     if( !debug ) {
        optimize();
     }
+    #if !defined(LLVM_NO_DUMP) // Only the debug build of LLVM has a dump() method.
     /* Print the byte code in a human-readable format
      *     to see if our program compiled properly
      */
     if( verbose )
        module->dump();
+    #endif
     return true;
 }
 
