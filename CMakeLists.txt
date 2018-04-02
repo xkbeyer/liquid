@@ -16,27 +16,18 @@ endmacro()
 
 # Setup the make environment. #
 ################################
+# Activate very verbose makefiles.
+set(CMAKE_VERBOSE_MAKEFILE ON)
+# Allow else() and endif() constructs (with empty parentheses)
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 SET(CMAKE_BUILD_TYPE Debug CACHE STRING "default to debug" FORCE)
 
 # Setup the cmake directory containing numerous cmake scripts and macros.
 set(CMAKE_MODULE_PATH "${liquid_SOURCE_DIR}/cmake")
 
-# Allow else() and endif() constructs (with empty parentheses)
-set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
-
-# Activate very verbose makefiles.
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
 FIND_PACKAGE(FLEX)
 FIND_PACKAGE(BISON)
-
-# Disallow in-source builds. #
-##############################
-EXECUTE_PROCESS(COMMAND pwd OUTPUT_VARIABLE CURR_DIR)
-if("${CURR_DIR}" STREQUAL "${liquid_SOURCE_DIR}\n")
-    message(FATAL_ERROR "In-source-builds are not allowed to build the liquid. Please go into the \"build\" directory and type \"ccmake ..\" there.\nThank you.")
-endif()
 
 # Put all source files into one variable. #
 ##########################################
@@ -50,8 +41,6 @@ set(SOURCES_COMMON
             CodeGenContext.cpp
             VisitorSyntaxCheck.cpp
             VisitorPrettyPrint.cpp
-            ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
-            ${CMAKE_CURRENT_BINARY_DIR}/tokens.cpp
             tokens.l
             parser.y
             GetOpt.cpp
@@ -92,7 +81,7 @@ elseif(MSVC)
     target_compile_definitions(liq PRIVATE YY_NO_UNISTD_H)
     target_compile_definitions(liq PRIVATE _SCL_SECURE_NO_WARNINGS)
     target_compile_definitions(liq PRIVATE _CRT_SECURE_NO_WARNINGS)
-    target_compile_definitions(liq PRIVATE __STDC_VERSION__=199901L) #flex/bison to avoid redefinition of int types.
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/tokens.cpp PROPERTIES COMPILE_DEFINITIONS __STDC_VERSION__=199901L)
 endif()
 
 # Debug or release ?
@@ -102,40 +91,24 @@ target_compile_definitions(liq PRIVATE $<$<CONFIG:Debug>:_DEBUG>)
 #########################################
 
 # We incorporate the CMake features provided by LLVM:
+find_package(LLVM
+  PATHS "${LLVM_ROOT}/lib/cmake/llvm" "$ENV{ProgramFiles}/lib/cmake/llvm")
 
-if( CMAKE_SYSTEM_NAME MATCHES Linux )
-    set(LLVM_ROOT "/usr/llvm" CACHE PATH "Root of LLVM installation.")
-elseif( CMAKE_SYSTEM_NAME MATCHES Windows )
-    set(LLVM_ROOT "$ENV{ProgramFiles}/llvm" CACHE PATH "Root of LLVM installation.")
+if( LLVM_FOUND )
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LLVM_DIR}")
 else()
-    set(LLVM_ROOT "" CACHE PATH "Root of LLVM install.")
-endif()
-if( NOT EXISTS ${LLVM_ROOT} )
-    message(FATAL_ERROR "Invalid setup for LLVM installation in ${LLVM_ROOT}. Set the LLVM_ROOT first and then re-run.")
-endif()
-
-# A bit of a sanity check:
-if( NOT EXISTS ${LLVM_ROOT}/include/llvm )
-    message(FATAL_ERROR "LLVM_ROOT (${LLVM_ROOT}) is not a valid LLVM install")
-endif()
-
-if( EXISTS ${LLVM_ROOT}/share/llvm/cmake )
-	# LLVM 3.8 uses this.
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LLVM_ROOT}/share/llvm/cmake")
-elseif( EXISTS ${LLVM_ROOT}/lib/cmake/llvm )
-	# LLVM 3.9 uses this.
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LLVM_ROOT}/lib/cmake/llvm")
-else()
-    message(FATAL_ERROR "LLVM: can't find the cmake support files. Abort!")
+    message(FATAL_ERROR "LLVM installation not found. Set LLVM_ROOT to the installation root path.")
 endif()
 
 include(LLVMConfig)
-
 message(STATUS "Found LLVM Package Version:${LLVM_PACKAGE_VERSION}")
-
+message(STATUS "LLVM Built type : ${LLVM_BUILD_TYPE}")
 string(REGEX MATCH "[0-9]+\\.[0-9]+" LLVM_VER ${LLVM_PACKAGE_VERSION} )
 if(${LLVM_VER} VERSION_LESS "3.8" )
     message(FATAL_ERROR "LLVM version before 3.8 are not supported. Abort!")
+endif()
+if(NOT ${LLVM_VER} VERSION_EQUAL "6.0" )
+    message(WARNING "LLVM version before ${LLVM_VER} is not tested.")
 endif()
 
 if(MSVC)
@@ -145,8 +118,16 @@ if(MSVC)
 endif()
 
 # Add the compiler definitions of LLVM
+if(MSVC)
+    # In order to use it with target_compile_definitions we have to replace the -D
+    # with a semicolon otherwise they are not correctly populated to MSVC and the
+    # IntelliSense is broken (command line error).
+    string(REPLACE "-D" ";" LLVM_DEFINITIONS ${LLVM_DEFINITIONS} )
+endif()
 target_compile_definitions(liq PRIVATE ${LLVM_DEFINITIONS})
-
+if( "${LLVM_BUILD_TYPE}" STREQUAL "Release" )
+  target_compile_definitions(liq PRIVATE LLVM_NO_DUMP)
+endif()
 # Now set the header and library paths:
 include_directories( ${LLVM_ROOT}/include )
 link_directories( ${LLVM_ROOT}/lib )
@@ -154,7 +135,6 @@ link_directories( ${LLVM_ROOT}/lib )
 # Let's suppose we want to build a JIT compiler with support for
 # binary code :
 llvm_map_components_to_libnames(REQ_LLVM_LIBRARIES mcjit interpreter native ipo)
-
 
 if(NOT LLVM_ENABLE_RTTI)
     target_compile_definitions(liq PRIVATE LIQ_NO_RTTI)
@@ -165,11 +145,6 @@ if(NOT LLVM_ENABLE_RTTI)
     endif()
 endif()
 
-#enables C++ Exception
-if(MSVC)
-    # Don't remove C++ exception for MSVC since they are needed.
-    target_compile_options(liq PRIVATE /EHsc)
-endif()
 if(LLVM_ENABLE_EH AND CMAKE_COMPILER_IS_GNUCXX)
     target_compile_options(liq PRIVATE -fexceptions)
 endif()
@@ -187,7 +162,7 @@ configure_file(config.in ${liquid_SOURCE_DIR}/config.h)
 target_include_directories(liq PRIVATE ${liquid_SOURCE_DIR})
 target_include_directories(liq PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-set_property(TARGET liq PROPERTY CXX_STANDARD 14)
+set_property(TARGET liq PROPERTY CXX_STANDARD 17)
 set_property(TARGET liq PROPERTY CXX_STANDARD_REQUIRED ON)
 
 # Finally, we link the LLVM libraries to our executable:
