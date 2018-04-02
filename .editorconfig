@@ -4,6 +4,7 @@ root = true
 # newline ending every file
 [*]
 insert_final_newline = true
+trim_trailing_whitespace = true
 
 # tab indentation
 [*.cpp]
