@@ -200,6 +200,6 @@ import              BEGIN(incl);
 ":"                     return TOKEN(TCOLON);
 "["                     return TOKEN(TLBRACKET);
 "]"                     return TOKEN(TRBRACKET);
-.                       printf("line %d, len %zd Unknown token %s !\n", yylineno, yyleng, yytext); yyterminate();
+.                       printf("line %d, len %d Unknown token %s !\n", yylineno, yyleng, yytext); yyterminate();
 
 %%
