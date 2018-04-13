@@ -125,9 +125,10 @@ if(MSVC)
     string(REPLACE "-D" ";" LLVM_DEFINITIONS ${LLVM_DEFINITIONS} )
 endif()
 target_compile_definitions(liq PRIVATE ${LLVM_DEFINITIONS})
-if( "${LLVM_BUILD_TYPE}" STREQUAL "Release" )
+if( "${LLVM_BUILD_TYPE}" MATCHES  "Release|RelWithDebInfo|MinSizeRel")
   target_compile_definitions(liq PRIVATE LLVM_NO_DUMP)
 endif()
+
 # Now set the header and library paths:
 include_directories( ${LLVM_ROOT}/include )
 link_directories( ${LLVM_ROOT}/lib )
