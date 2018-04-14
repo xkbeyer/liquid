@@ -81,6 +81,7 @@ elseif(MSVC)
     target_compile_definitions(liq PRIVATE YY_NO_UNISTD_H)
     target_compile_definitions(liq PRIVATE _SCL_SECURE_NO_WARNINGS)
     target_compile_definitions(liq PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(liq PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
     set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/tokens.cpp PROPERTIES COMPILE_DEFINITIONS __STDC_VERSION__=199901L)
 endif()
 
