@@ -7,9 +7,9 @@ After reading an article about LLVM and how easy it is to create a DSL with it, 
 # Installation #
 
 ## Prerequisite ##
-- LLVM 3.8 
+- LLVM 6.0 
 - flex and bison.
-- CMake 3.2 
+- CMake 3.10 
 
 ## Build ##
 1. Clone this repository.
@@ -26,6 +26,7 @@ cd build
 ccmake ..
 ```
 Make sure all Variables are set properly and then generate the build.
+
 5. Run the make
 ```
 make
@@ -41,7 +42,7 @@ After cmake was run the solution file is in the build directory. Start Visual St
 
 # Usage #
 ```
-liquid script-file -h -d -v -q -ipath1;path2...;pathn
+liq script-file -h -d -v -q -ipath1;path2...;pathn
 ```
 where
 - h help: shows the usage.
@@ -51,6 +52,13 @@ where
 - i defines a list of additional path to look for files to import.
 
 Liquid does parse the file, generates the code in memory and runs it.
+
+__Note__ _Due to a bug at least one option must be set._
+
+**Example**
+```
+./liq test.liq -q
+```
 
 # Language Syntax #
 ## Literals ##
@@ -111,7 +119,7 @@ list << 5
 ```
 results in `[3, 'Otto', true, 5]`
 
-_Note_ This featue is currently under construction and not stable.
+__Note__ _This featue is currently under construction and not stable._
 
 ## Comments ##
 ### One Line ##
@@ -229,9 +237,9 @@ int i = aFunction( 23 )
 ## Class ##
 ```
 def classname
-	instance variable
-	def method
-		method-body
+    instance variable
+    def method
+        method-body
 ```
 _Hint:_ The keyword `var` can't be used to declare an instance variable.
 
@@ -258,7 +266,7 @@ int i = p.get()
 Any class method can be declared outside a class declaration if the first argument is the class instance object.
 ```
 def set(simple s, int val)
-	s.myint = val
+    s.myint = val
 ```
 On the other side each method of a class can be called in two ways
 ```
