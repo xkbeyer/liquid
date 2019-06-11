@@ -10,3 +10,4 @@ extern "C" DECLSPEC int printvalue( int val );
 extern "C" DECLSPEC double printdouble( double val );
 extern "C" DECLSPEC void display( char * str, ... );
 extern "C" DECLSPEC void displayln( char * str, ... );
+extern "C" DECLSPEC double sinus(double val);

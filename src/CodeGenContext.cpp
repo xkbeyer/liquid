@@ -13,6 +13,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <algorithm>
+#include <cmath>
 
 #include "buildins.h"
 #include "VisitorSyntaxCheck.h"
@@ -76,12 +77,12 @@ void CodeGenContext::setupBuiltIns()
       i->setName("val");
    builtins.push_back({f, (void*)printdouble});
 
-   // ft = FunctionType::get(Type::getDoubleTy(getGlobalContext()), argTypesOneDouble,false);
-   // f = Function::Create( ft, Function::ExternalLinkage, MAKE_LLVM_EXTERNAL_NAME(sin),getModule());
-   // i = f->arg_begin();
-   // if( i != f->arg_end() )
-   //    i->setName("val");
-   //builtins.push_back({f, (void*)sin});
+    ft = FunctionType::get(Type::getDoubleTy(getGlobalContext()), argTypesOneDouble,false);
+    f = Function::Create( ft, Function::ExternalLinkage, MAKE_LLVM_EXTERNAL_NAME(sin),getModule());
+    i = f->arg_begin();
+    if( i != f->arg_end() )
+       i->setName("val");
+   builtins.push_back({f, (void*)sinus});
 
    std::vector<Type*> argTypesInt8Ptr(1, Type::getInt8PtrTy(getGlobalContext()));
    ft = FunctionType::get(Type::getVoidTy(getGlobalContext()), argTypesInt8Ptr, true);
