@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 
 project(liquid)
 
@@ -78,6 +78,8 @@ add_executable(liq ${SOURCES_COMMON} ${HEADER_COMMON} ${BISON_Parser_OUTPUTS} ${
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     target_compile_options(liq PRIVATE -Wall)
 elseif(MSVC)
+    replace_flags("/MDd" "/MTd")
+    replace_flags("/MD" "/MT")
     target_compile_definitions(liq PRIVATE YY_NO_UNISTD_H)
     target_compile_definitions(liq PRIVATE _SCL_SECURE_NO_WARNINGS)
     target_compile_definitions(liq PRIVATE _CRT_SECURE_NO_WARNINGS)
