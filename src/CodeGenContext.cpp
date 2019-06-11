@@ -48,14 +48,6 @@ CodeGenContext::CodeGenContext(std::ostream& outs) : outs(outs)
    module = new llvm::Module("liquid", llvmContext);
 }
 
-   /*! Setup up the built in function:
-    * - printvalue
-    * - printdouble
-    * - sin
-    * - displayln
-    * - display
-    */
-
 #define MAKE_LLVM_EXTERNAL_NAME(a) #a
 void CodeGenContext::setupBuiltIns()
 {
@@ -100,7 +92,6 @@ void CodeGenContext::setupBuiltIns()
    builtins.push_back({f, (void*)displayln});
 }
 
-/*! Compile the AST into a module */
 bool CodeGenContext::generateCode(Block& root)
 {
    outs << "Generating code...\n";
@@ -148,7 +139,6 @@ bool CodeGenContext::generateCode(Block& root)
    return true;
 }
 
-/*! Executes the AST by running the main function */
 GenericValue CodeGenContext::runCode()
 {
    outs << "Running code...\n";
@@ -173,7 +163,6 @@ void CodeGenContext::printCodeGeneration(class Block& root, std::ostream& outs)
    root.Accept(visitor);
 }
 
-/*! Runs the optimizer over all function */
 void CodeGenContext::optimize()
 {
    outs << "Optimize code...\n";
@@ -204,11 +193,6 @@ void CodeGenContext::endScope()
    currentScopeType = ScopeType::CodeBlock;
 }
 
-/*! Searches a variable name in all known locals of the current code block.
- * If not found it looks in the current class block, too.
- * \param[in] varName variable name
- * \return The alloca instruction
- */
 AllocaInst* CodeGenContext::findVariable(std::string varName)
 {
    ValueNames& names = locals();
@@ -224,10 +208,6 @@ AllocaInst* CodeGenContext::findVariable(std::string varName)
    return nullptr;
 }
 
-/*! Deletes a variable name in all known locals of the current code block.
- *
- * \param[in] varName variable name
- */
 void CodeGenContext::deleteVariable(std::string varName)
 {
    ValueNames& names   = locals();
@@ -240,11 +220,6 @@ void CodeGenContext::deleteVariable(std::string varName)
    }
 }
 
-/*! Renames a variable in all known locals of the current code block.
- *
- * \param[in] oldVarName The variable o rename
- * \param[in] newVarName The new name fo the variable
- */
 void CodeGenContext::renameVariable(std::string oldVarName, std::string newVarName)
 {
    ValueNames& names = locals();
@@ -261,7 +236,6 @@ void CodeGenContext::renameVariable(std::string oldVarName, std::string newVarNa
    }
 }
 
-/*! Creates a new class block scope. */
 void CodeGenContext::newKlass(std::string name)
 {
    self                       = codeBlocks.front();
@@ -269,30 +243,14 @@ void CodeGenContext::newKlass(std::string name)
    classAttributes[klassName] = KlassValueNames();
 }
 
-/*! Closes a class block scope */
 void CodeGenContext::endKlass()
 {
    self      = nullptr;
    klassName = "";
 }
 
-/*! Adds a class member variable name and its index to the list of the
- * class attributes map. Since the access to the corresponding llvm structure
- * goes via the index into this structure.
- * \param[in] name Variable name of the current class.
- * \param[in] index into the llvm structure of this class.
- *
- */
 void CodeGenContext::klassAddVariableAccess(std::string name, int index) { classAttributes[klassName][name] = index; }
 
-/*! Returns the load/getelementptr instruction to access a class member.
- * \param[in] klass The class name
- * \param[in] name Class member name
- * \param[in] this_ptr The alloca instruction to be used for the getelementptr instruction.
- * \return Instruction pointer.
- * \remark Is used to access the elements via the alloca where the ptr to the ref of the class object is stored.
- *         Means that the ref is stored in a local (stack) variable.
- */
 Instruction* CodeGenContext::getKlassVarAccessInst(std::string klass, std::string name, AllocaInst* this_ptr)
 {
    assert(classAttributes.find(klass) != classAttributes.end());
@@ -311,10 +269,6 @@ Instruction* CodeGenContext::getKlassVarAccessInst(std::string klass, std::strin
    return ptr;
 }
 
-/*! Get the type of a variable name.
- * \param[in] varName the name of the variable to be looked up.
- * \return The name of the type.
- */
 std::string CodeGenContext::getType(std::string varName)
 {
    if (varName == "self") {
@@ -326,7 +280,6 @@ std::string CodeGenContext::getType(std::string varName)
    return std::string("");
 }
 
-/* Returns an LLVM type based on the identifier */
 Type* CodeGenContext::typeOf(const Identifier& type) { return typeOf(type.getName()); }
 
 Type* CodeGenContext::typeOf(const std::string name)

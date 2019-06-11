@@ -41,6 +41,7 @@ using StatementList = std::vector<class Statement*>;
 using ExpressionList = std::vector<class Expression*>;
 using VariableList = std::vector<class VariableDeclaration*>;
 
+/*! Type of the AST node */
 enum class NodeType
 {
     expression,
@@ -56,14 +57,31 @@ enum class NodeType
     range
 };
 
+/*! Base class of all nodes */
 class Node 
 {
 public:
    virtual ~Node() {}
+
+   /*! Code generation for this node
+    * \param[in] context  The context of the code gen run.
+    * \return Generated code as LLVM value. 
+    */
    virtual llvm::Value* codeGen(CodeGenContext& context) = 0;
+
+   /*! Returns the type of the node. */
    virtual NodeType getType() = 0;
+
+   /*! Returns the textual representation. */
    virtual std::string toString() { return "node\n"; }
+
+   /*! Accept a visitor. */
    virtual void Accept(Visitor& v) = 0;
+
+   /*! Prints the found parsing error.
+    * \param[in] location file, line, col information.
+    * \param[in] msg      The message to print.
+    */
    static void printError(YYLTYPE location, std::string msg)
    {
       std::cerr
@@ -74,12 +92,16 @@ public:
          << location.last_column << ":"
          << msg << std::endl;
    }
+   /*! Prints an error message where no source location is available.
+    * \param[in] msg      The message to print.
+    */
    static void printError(std::string msg)
    {
       std::cerr << msg << std::endl;
    }
 };
 
+/*! Represents an expression. */
 class Expression : public Node 
 {
 public:
@@ -88,7 +110,8 @@ public:
    virtual void Accept(Visitor& v) { v.VisitExpression(this); }
 };
 
-class Statement : public Expression 
+/*! Represents a statement. */
+class Statement : public Expression
 {
 public:
    virtual ~Statement() {}
@@ -97,7 +120,8 @@ public:
    virtual void Accept(Visitor& v) { v.VisitStatement(this); }
 };
 
-class Integer : public Expression 
+/*! Represents an integer. */
+class Integer : public Expression
 {
    long long value;
 public:
@@ -109,7 +133,8 @@ public:
    virtual void Accept(Visitor& v) { v.VisitInteger(this); }
 };
 
-class Double : public Expression 
+/*! Represents a double. */
+class Double : public Expression
 {
    double value;
 public:
@@ -121,7 +146,8 @@ public:
    virtual void Accept(Visitor& v) { v.VisitDouble(this); }
 };
 
-class String : public Expression 
+/*! Represents a string. */
+class String : public Expression
 {
    std::string value;
 public:
@@ -133,7 +159,8 @@ public:
    virtual void Accept(Visitor& v) { v.VisitString(this); }
 };
 
-class Boolean : public Expression 
+/*! Represents a boolean. */
+class Boolean : public Expression
 {
    std::string value;
    int boolVal;
@@ -149,7 +176,8 @@ public:
    virtual void Accept(Visitor& v) { v.VisitBoolean(this); }
 };
 
-class Identifier : public Expression 
+/*! Represents an identifier. */
+class Identifier : public Expression
 {
    std::string name;
    std::string structName;
@@ -169,7 +197,8 @@ public:
 };
 
 
-class UnaryOperator : public Expression 
+/*! Represents a unary operator. */
+class UnaryOperator : public Expression
 {
    int op;
    Expression* rhs;
@@ -186,7 +215,7 @@ public:
    virtual void Accept(Visitor& v) { v.VisitUnaryOperator(this); }
 };
 
-// Binary operators are +,-,*,/
+/*! Represents a binary operators  + - * / */
 class BinaryOp : public Expression 
 {
    int op;
@@ -211,7 +240,8 @@ private:
    llvm::Value* codeGenAddList(llvm::Value* rhsValue, llvm::Value* lhsValue, CodeGenContext& context);
 };
 
-class CompOperator : public Expression 
+/*! Represents a compare operator  == != > < >= <= */
+class CompOperator : public Expression
 {
    int op;
    Expression* lhs;
@@ -232,6 +262,7 @@ public:
    virtual void Accept(Visitor& v) { v.VisitCompOperator(this); }
 };
 
+/*! Represents an array */
 class Array : public Expression
 {
    ExpressionList* exprList = nullptr;
@@ -249,6 +280,7 @@ public:
    ExpressionList* getExpressions() const { return exprList; }
 };
 
+/*! Represents an array element access */
 class ArrayAccess : public Expression
 {
    Identifier* variable = nullptr;
@@ -269,6 +301,7 @@ public:
    YYLTYPE getLocation() const { return location; }
 };
 
+/*! Represents a range */
 class Range : public Expression
 {
    Expression* begin = nullptr;
@@ -286,7 +319,8 @@ public:
    YYLTYPE getLocation() const { return location; }
 };
 
-class Block : public Expression 
+/*! Represents a block */
+class Block : public Expression
 {
 public:
    StatementList statements;
@@ -308,6 +342,7 @@ public:
    }
 };
 
+/*! Represents a expression statement. */
 class ExpressionStatement : public Statement
 {
    Expression* expression;
@@ -321,6 +356,7 @@ public:
    virtual void Accept(Visitor& v) { v.VisitExpressionStatement(this); }
 };
 
+/*! Represents adding an element to the array. */
 class ArrayAddElement : public Statement
 {
    Expression* expr = nullptr;
@@ -340,6 +376,7 @@ public:
    Expression* getExpression() const { return expr; }
 };
 
+/*! Represents an assigment. */
 class Assignment : public Statement
 {
    Identifier* lhs;
@@ -356,6 +393,7 @@ public:
 };
 
 
+/*! Represents a method call. */
 class MethodCall : public Statement
 {
    Identifier* id;
@@ -382,6 +420,7 @@ private:
 };
 
 
+/*! Represents a variable declaration. */
 class VariableDeclaration : public Statement
 {
    Identifier* type;
@@ -430,6 +469,7 @@ public:
    virtual void Accept(Visitor& v) { v.VisitVariablenDeclarationDeduce(this); }
 };
 
+/*! Represents a conditional statement. */
 class Conditional : public Statement
 {
    CompOperator* cmpOp;
@@ -451,6 +491,7 @@ public:
    virtual Expression* getElse() { return elseExpr; }
 };
 
+/*! Represents a while loop. */
 class WhileLoop : public Statement
 {
    Expression* condition;
@@ -472,7 +513,7 @@ public:
    virtual void Accept(Visitor& v) { v.VisitWhileLoop(this); }
 };
 
-
+/*! Represents a return statement. */
 class Return : public Statement
 {
    Expression* retExpr;
