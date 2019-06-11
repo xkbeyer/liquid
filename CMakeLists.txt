@@ -94,6 +94,9 @@ target_compile_definitions(liq PRIVATE $<$<CONFIG:Debug>:_DEBUG>)
 #########################################
 
 # We incorporate the CMake features provided by LLVM:
+if( $ENV{LLVM_ROOT} )
+  set(LLVM_ROOT $ENV{LLVM_ROOT})
+endif()
 find_package(LLVM
   PATHS "${LLVM_ROOT}/lib/cmake/llvm" "$ENV{ProgramFiles}/lib/cmake/llvm")
 
@@ -107,11 +110,11 @@ include(LLVMConfig)
 message(STATUS "Found LLVM Package Version:${LLVM_PACKAGE_VERSION}")
 message(STATUS "LLVM Built type : ${LLVM_BUILD_TYPE}")
 string(REGEX MATCH "[0-9]+\\.[0-9]+" LLVM_VER ${LLVM_PACKAGE_VERSION} )
-if(${LLVM_VER} VERSION_LESS "3.8" )
-    message(FATAL_ERROR "LLVM version before 3.8 are not supported. Abort!")
+if(${LLVM_VER} VERSION_LESS "6.0" )
+    message(FATAL_ERROR "LLVM version before 6.0 are not supported. Abort!")
 endif()
-if(NOT ${LLVM_VER} VERSION_EQUAL "6.0" )
-    message(WARNING "LLVM version before ${LLVM_VER} is not tested.")
+if(${LLVM_VER} VERSION_GREATER "8.0" )
+    message(WARNING "LLVM version ${LLVM_VER} is not tested.")
 endif()
 
 if(MSVC)
