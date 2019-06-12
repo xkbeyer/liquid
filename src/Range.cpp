@@ -1,4 +1,10 @@
-#include "AstNode.h"
+#include "Range.h"
+#include "Assignment.h"
+#include "Declaration.h"
+#include "Array.h"
+#include "BinaryOperator.h"
+#include "CompareOperator.h"
+#include "WhileLoop.h"
 #include "CodeGenContext.h"
 #include "parser.hpp"
 

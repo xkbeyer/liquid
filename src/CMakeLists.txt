@@ -35,6 +35,7 @@ set(SOURCES_COMMON
             main.cpp
             buildins.cpp
             AstNode.cpp
+            Array.cpp
             Declaration.cpp
             FunctionDeclaration.cpp
             ClassDeclaration.cpp
@@ -44,13 +45,22 @@ set(SOURCES_COMMON
             tokens.l
             parser.y
             GetOpt.cpp
-            Array.cpp
             Range.cpp
+            BinaryOperator.cpp
+            UnaryOperator.cpp
+            CompareOperator.cpp
+            Return.cpp
+            WhileLoop.cpp
+            Conditional.cpp
+            Assignment.cpp
+            MethodCall.cpp
    )
 
 set(HEADER_COMMON
             buildins.h
             AstNode.h
+            Array.h
+            Declaration.h
             FunctionDeclaration.h
             ClassDeclaration.h
             CodeGenContext.h
@@ -58,6 +68,15 @@ set(HEADER_COMMON
             VisitorSyntaxCheck.h
             VisitorPrettyPrint.h
             GetOpt.h
+            BinaryOperator.h
+            UnaryOperator.h
+            CompareOperator.h
+            Range.h
+            Return.h
+            WhileLoop.h
+            Conditional.h
+            Assignment.h
+            MethodCall.h
    )
 
 if(MSVC)

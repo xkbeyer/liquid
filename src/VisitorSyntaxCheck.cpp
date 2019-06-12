@@ -2,6 +2,18 @@
 #include "AstNode.h"
 #include "FunctionDeclaration.h"
 #include "ClassDeclaration.h"
+#include "Return.h"
+#include "FunctionDeclaration.h"
+#include "ClassDeclaration.h"
+#include "Conditional.h"
+#include "UnaryOperator.h"
+#include "BinaryOperator.h"
+#include "Assignment.h"
+#include "MethodCall.h"
+#include "Declaration.h"
+#include "WhileLoop.h"
+#include "Array.h"
+#include "Range.h"
 
 namespace liquid {
 

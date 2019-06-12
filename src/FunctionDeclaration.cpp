@@ -13,6 +13,7 @@
 #include "CodeGenContext.h"
 #include "parser.hpp"
 #include "FunctionDeclaration.h"
+#include "Declaration.h"
 
 using namespace std;
 using namespace llvm;

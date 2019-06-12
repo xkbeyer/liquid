@@ -1,7 +1,18 @@
 #include "VisitorPrettyPrint.h"
 #include "AstNode.h"
+#include "Return.h"
 #include "FunctionDeclaration.h"
 #include "ClassDeclaration.h"
+#include "Conditional.h"
+#include "UnaryOperator.h"
+#include "BinaryOperator.h"
+#include "Assignment.h"
+#include "MethodCall.h"
+#include "Declaration.h"
+#include "WhileLoop.h"
+#include "Array.h"
+#include "CompareOperator.h"
+#include "Range.h"
 
 namespace liquid {
 

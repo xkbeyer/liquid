@@ -12,6 +12,8 @@
 #include "CodeGenContext.h"
 #include "parser.hpp"
 #include "ClassDeclaration.h"
+#include "Declaration.h"
+#include "Assignment.h"
 
 using namespace std;
 using namespace llvm;

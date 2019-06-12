@@ -6,8 +6,22 @@
 
 %{
     #include "AstNode.h"
-	#include "FunctionDeclaration.h"
-	#include "ClassDeclaration.h"
+    #include "FunctionDeclaration.h"
+    #include "ClassDeclaration.h"
+    #include "Return.h"
+    #include "FunctionDeclaration.h"
+    #include "ClassDeclaration.h"
+    #include "Conditional.h"
+    #include "UnaryOperator.h"
+    #include "BinaryOperator.h"
+    #include "CompareOperator.h"
+    #include "Assignment.h"
+    #include "MethodCall.h"
+    #include "Declaration.h"
+    #include "WhileLoop.h"
+    #include "Array.h"
+    #include "Range.h"
+
     #include <stdio.h>
     liquid::Block *programBlock; /* the top level root node of our final AST */
 
