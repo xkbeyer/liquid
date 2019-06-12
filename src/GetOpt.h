@@ -34,7 +34,7 @@ public:
    GetOpt( int argc, char* argv[], const std::string optstring, const std::string filename = "" );
    std::string get() { return optionArgument; }
    std::string error() { return errorText; }
-   int getIndex() { return index; }
+   size_t getIndex() { return index; }
    void reset() { index = 1; };
    char operator()();
    std::vector<std::string> getRemainingArguments();
@@ -42,7 +42,7 @@ public:
    class iterator
    {
    public:
-      iterator( GetOpt* getopt ) : getopt( getopt ), position( 1 ) {};
+      iterator( GetOpt* getopt ) : getopt( getopt ), position( 1u ) {};
       iterator( int pos ) : position( pos ) {};
       iterator& operator++() { ++position; return *this; }  // prefix
       bool operator!=(iterator rhs) { 
@@ -50,16 +50,16 @@ public:
       }
       char operator*();
    private:
-      int position;
-      GetOpt* getopt;
+      size_t  position{0};
+      GetOpt* getopt{nullptr};
    };
    iterator begin() { return iterator( this ); }
    iterator end() { return iterator( this ); }
    friend class iterator;
 private:
    std::string optionArgument; /* Global argument pointer. */
-   int index; /* Global argv index. */
-   int argCount;
+   size_t index{0};       /* Global argv index. */
+   size_t argCount{0};
    std::string optionString;
    std::string errorText;
    std::vector<std::string> argStrings;

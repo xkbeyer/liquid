@@ -71,7 +71,7 @@ Value* VariableDeclaration::codeGen(CodeGenContext& context)
         {
             std::vector<Value*> args;
             args.push_back( context.varStruct );
-            CallInst *call = CallInst::Create( fn, args, "", context.currentBlock() );
+            (void) CallInst::Create(fn, args, "", context.currentBlock());
         }
         context.varStruct = nullptr;
     }

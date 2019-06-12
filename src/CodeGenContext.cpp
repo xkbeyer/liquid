@@ -157,9 +157,9 @@ GenericValue CodeGenContext::runCode()
    return v;
 }
 
-void CodeGenContext::printCodeGeneration(class Block& root, std::ostream& outs)
+void CodeGenContext::printCodeGeneration(class Block& root, std::ostream& outstream)
 {
-   VisitorPrettyPrint visitor(outs);
+   VisitorPrettyPrint visitor(outstream);
    root.Accept(visitor);
 }
 
@@ -200,9 +200,9 @@ AllocaInst* CodeGenContext::findVariable(std::string varName)
       return names[varName];
    }
    if (self) {
-      ValueNames& names = self->getValueNames();
-      if (names.find(varName) != names.end()) {
-         return names[varName];
+      ValueNames& vnames = self->getValueNames();
+      if (vnames.find(varName) != vnames.end()) {
+         return vnames[varName];
       }
    }
    return nullptr;
@@ -229,9 +229,9 @@ void CodeGenContext::renameVariable(std::string oldVarName, std::string newVarNa
       names[newVarName] = value;
       auto& typeMap     = codeBlocks.front()->getTypeMap();
       if (typeMap.count(oldVarName)) {
-         auto value = typeMap[oldVarName];
+         auto val = typeMap[oldVarName];
          typeMap.erase(oldVarName);
-         typeMap[newVarName] = value;
+         typeMap[newVarName] = val;
       }
    }
 }

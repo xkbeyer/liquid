@@ -269,7 +269,6 @@ llvm::Value * BinaryOp::codeGenAddList(llvm::Value * rhsValue, llvm::Value * lhs
    // Construct a new list with the contents of the both.
    auto rhsCount = rhsTy->getNumContainedTypes();
    auto lhsCount = lhsTy->getNumContainedTypes();
-   auto totalCount = rhsCount + lhsCount;
    ExpressionList exprList;
    for( unsigned int i = 0; i < lhsCount; ++i ) {
       auto id = (Identifier*)this->getLHS();
@@ -468,10 +467,10 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
 {
     Function* function = context.currentBlock()->getParent();
     BasicBlock* firstCondBlock = BasicBlock::Create(context.getGlobalContext(), "firstcond",function);
-    BasicBlock* condBlock = BasicBlock::Create(context.getGlobalContext(), "cond");
-    BasicBlock* loopBlock = BasicBlock::Create(context.getGlobalContext(), "loop");
-    BasicBlock* elseBlock = BasicBlock::Create(context.getGlobalContext(), "else");
-    BasicBlock* mergeBlock = BasicBlock::Create(context.getGlobalContext(), "merge");
+    BasicBlock* condBB = BasicBlock::Create(context.getGlobalContext(), "cond");
+    BasicBlock* loopBB = BasicBlock::Create(context.getGlobalContext(), "loop");
+    BasicBlock* elseBB = BasicBlock::Create(context.getGlobalContext(), "else");
+    BasicBlock* mergeBB = BasicBlock::Create(context.getGlobalContext(), "merge");
     BranchInst::Create(firstCondBlock,context.currentBlock());
 
     context.setInsertPoint(firstCondBlock);
@@ -481,30 +480,30 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
        context.addError();
        return nullptr;
     }
-    BranchInst::Create(loopBlock,elseBlock,firstCondValue,context.currentBlock());
+    BranchInst::Create(loopBB,elseBB,firstCondValue,context.currentBlock());
 
-    function->getBasicBlockList().push_back(condBlock);
-    context.setInsertPoint(condBlock);
+    function->getBasicBlockList().push_back(condBB);
+    context.setInsertPoint(condBB);
     Value* condValue = this->condition->codeGen(context);
     if(condValue == nullptr) {
        Node::printError("Code gen for condition expression in while loop failed.");
        context.addError();
        return nullptr;
     }
-    BranchInst::Create(loopBlock,mergeBlock,condValue,context.currentBlock());
+    BranchInst::Create(loopBB,mergeBB,condValue,context.currentBlock());
 
-    function->getBasicBlockList().push_back(loopBlock);
-    context.setInsertPoint(loopBlock);
+    function->getBasicBlockList().push_back(loopBB);
+    context.setInsertPoint(loopBB);
     Value* loopValue = this->loopBlock->codeGen(context);
     if(loopValue == nullptr) {
        Node::printError("Code gen for loop value in while loop failed.");
        context.addError();
        return nullptr;
     }
-    BranchInst::Create(condBlock,context.currentBlock());
+    BranchInst::Create(condBB,context.currentBlock());
 
-    function->getBasicBlockList().push_back(elseBlock);
-    context.setInsertPoint(elseBlock);
+    function->getBasicBlockList().push_back(elseBB);
+    context.setInsertPoint(elseBB);
     if( this->elseBlock != nullptr ) {
         Value* elseValue = this->elseBlock->codeGen(context);
         if(elseValue == nullptr) {
@@ -513,11 +512,11 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
            return nullptr;
         }
     }
-    BranchInst::Create(mergeBlock,context.currentBlock());
-    function->getBasicBlockList().push_back(mergeBlock);
-    context.setInsertPoint(mergeBlock);
+    BranchInst::Create(mergeBB,context.currentBlock());
+    function->getBasicBlockList().push_back(mergeBB);
+    context.setInsertPoint(mergeBB);
 
-    return mergeBlock;
+    return mergeBB;
 }
 
 Value* Return::codeGen(CodeGenContext& context)

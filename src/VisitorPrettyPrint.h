@@ -9,7 +9,7 @@ namespace liquid {
 
 class VisitorPrettyPrint : public Visitor
 {
-   int indent = 0;
+   int indent{0};
    std::ostream&  out;
 public:
    VisitorPrettyPrint(std::ostream& outs) : out(outs) {}

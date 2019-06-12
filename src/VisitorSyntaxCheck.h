@@ -11,12 +11,12 @@ namespace liquid {
 
 class VisitorSyntaxCheck : public Visitor
 {
-   int syntaxErrors;
+   int syntaxErrors{0};
    std::vector<YYLTYPE> ReturnStatementLocations;
    std::unordered_set<std::string> TypeNames{ "int","double","string","boolean","var" };
 public:
-   VisitorSyntaxCheck();
-   virtual ~VisitorSyntaxCheck() {}
+   VisitorSyntaxCheck() = default;
+   virtual ~VisitorSyntaxCheck() = default;
    void VisitExpression(Expression* expr);
    void VisitInteger( Integer* expr );
    void VisitDouble( Double* expr );

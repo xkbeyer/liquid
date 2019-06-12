@@ -4,17 +4,10 @@
 #include "ClassDeclaration.h"
 
 namespace liquid {
-VisitorSyntaxCheck::VisitorSyntaxCheck() : syntaxErrors(0) 
-{
-}
 
-void VisitorSyntaxCheck::VisitExpression( Expression* expr )
-{
-}
+void VisitorSyntaxCheck::VisitExpression( Expression* expr ) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitStatement( Statement* stmt )
-{
-}
+void VisitorSyntaxCheck::VisitStatement(Statement* stmt) { (void)stmt; }
 
 void VisitorSyntaxCheck::VisitReturnStatement( Return* retstmt )
 {
@@ -51,37 +44,21 @@ void VisitorSyntaxCheck::VisitConditional( Conditional* cmp )
    }
 }
 
-void VisitorSyntaxCheck::VisitInteger( Integer* expr )
-{
-}
+void VisitorSyntaxCheck::VisitInteger(Integer* expr) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitDouble( Double* expr )
-{
-}
+void VisitorSyntaxCheck::VisitDouble( Double* expr ) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitString( String* expr )
-{
-}
+void VisitorSyntaxCheck::VisitString( String* expr ) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitBoolean( Boolean* expr )
-{
-}
+void VisitorSyntaxCheck::VisitBoolean( Boolean* expr ) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitIdentifier( Identifier* expr )
-{
-}
+void VisitorSyntaxCheck::VisitIdentifier( Identifier* expr ) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitUnaryOperator( UnaryOperator* expr )
-{
-}
+void VisitorSyntaxCheck::VisitUnaryOperator( UnaryOperator* expr ) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitBinaryOp( BinaryOp* expr )
-{
-}
+void VisitorSyntaxCheck::VisitBinaryOp( BinaryOp* expr ) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitCompOperator( CompOperator* expr )
-{
-}
+void VisitorSyntaxCheck::VisitCompOperator( CompOperator* expr ) { (void)expr; }
 
 void VisitorSyntaxCheck::VisitBlock( Block* expr )
 {
@@ -90,17 +67,11 @@ void VisitorSyntaxCheck::VisitBlock( Block* expr )
    }
 }
 
-void VisitorSyntaxCheck::VisitExpressionStatement( ExpressionStatement* expr )
-{
-}
+void VisitorSyntaxCheck::VisitExpressionStatement( ExpressionStatement* expr ) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitAssigment( Assignment* expr )
-{
-}
+void VisitorSyntaxCheck::VisitAssigment( Assignment* expr ) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitMethodCall( MethodCall* expr )
-{
-}
+void VisitorSyntaxCheck::VisitMethodCall( MethodCall* expr ) { (void)expr; }
 
 void VisitorSyntaxCheck::VisitVariablenDeclaration( VariableDeclaration* expr )
 {
@@ -110,13 +81,9 @@ void VisitorSyntaxCheck::VisitVariablenDeclaration( VariableDeclaration* expr )
    }
 }
 
-void VisitorSyntaxCheck::VisitVariablenDeclarationDeduce( VariableDeclarationDeduce* expr )
-{
-}
+void VisitorSyntaxCheck::VisitVariablenDeclarationDeduce( VariableDeclarationDeduce* expr ) { (void)expr; }
 
-void VisitorSyntaxCheck::VisitWhileLoop( WhileLoop* expr )
-{
-}
+void VisitorSyntaxCheck::VisitWhileLoop( WhileLoop* expr ) { (void)expr; }
 
 void VisitorSyntaxCheck::VisitClassDeclaration( ClassDeclaration* expr )
 {
@@ -138,10 +105,7 @@ void VisitorSyntaxCheck::VisitArrayAccess(ArrayAccess* expr)
    }
 }
 
-void VisitorSyntaxCheck::VisitArrayAddElement(ArrayAddElement* expr)
-{
-
-}
+void VisitorSyntaxCheck::VisitArrayAddElement(ArrayAddElement* expr) { (void)expr; }
 
 void VisitorSyntaxCheck::VisitRange(Range* expr)
 {

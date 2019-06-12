@@ -5,9 +5,9 @@
 
 namespace liquid {
 
-static inline std::string indent_spaces(int indent)
+static inline std::string indent_spaces(size_t indent)
 {
-   return std::string(indent * 2, ' ');
+   return std::string(indent * 2u, ' ');
 }
 
 void VisitorPrettyPrint::VisitExpression( Expression* expr )

@@ -67,9 +67,9 @@ void ClassDeclaration::addVarsToClassAttributes( CodeGenContext& context )
                 // Copy it to a place, so that it can be execute at the init time of the class.
                 auto assignmentExpr = vardecl->getAssignment();
                 auto ident = vardecl->getIdentifierOfVariable();
-                Identifier* id = new Identifier( klassName, ident.getName(), ident.getLocation() );
+                Identifier* newident = new Identifier( klassName, ident.getName(), ident.getLocation() );
 
-                auto assn = new Assignment( id, assignmentExpr, vardecl->getLocation() );
+                auto assn = new Assignment( newident, assignmentExpr, vardecl->getLocation() );
                 context.addKlassInitCode( klassName, assn );
             }
         }

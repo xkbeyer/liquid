@@ -505,7 +505,6 @@ class VariableDeclaration : public Statement
 public:
    VariableDeclaration(Identifier* type, Identifier* id, YYLTYPE loc) : type(type), id(id), assignmentExpr(nullptr), location(loc) {}
    VariableDeclaration(Identifier* type, Identifier* id, Expression *assignmentExpr, YYLTYPE loc) : type(type), id(id), assignmentExpr(assignmentExpr), location(loc) {}
-   VariableDeclaration(int ident, Identifier* id, Expression *assignmentExpr, YYLTYPE loc) : type(nullptr), id(id), assignmentExpr(assignmentExpr), location(loc) {}
    virtual ~VariableDeclaration()
    {
       delete assignmentExpr;

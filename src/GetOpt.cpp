@@ -32,7 +32,7 @@
 static std::string removeLeftWhiteSpaces( std::string text )
 {
    std::string newtext;
-   int pos = text.find_first_not_of( " \t\n" );
+   auto pos = text.find_first_not_of( " \t\n" );
    if( pos != std::string::npos ) {
       newtext = text.substr( pos, text.length() - pos );
    } else {
@@ -42,7 +42,7 @@ static std::string removeLeftWhiteSpaces( std::string text )
 }
 
 GetOpt::GetOpt( int argc, char* argv[], const std::string optstring, const std::string filename )
-   : index( 1 )
+   : index( 1u )
    , optionString( optstring )
 {
 
