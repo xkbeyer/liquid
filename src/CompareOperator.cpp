@@ -13,7 +13,21 @@ namespace liquid
 Value* CompOperator::codeGen(CodeGenContext& context)
 {
    Value* rhsVal = rhs->codeGen(context);
+   if (rhsVal == nullptr)
+      return nullptr;
    Value* lhsVal = lhs->codeGen(context);
+   if (lhsVal == nullptr)
+      return nullptr;
+   if ((lhsVal->getType() != Type::getDoubleTy(context.getGlobalContext())) && (lhsVal->getType() != context.getGenericIntegerType())) {
+      Node::printError("Left hand side of compare expression isn't a value type (number)");
+      context.addError();
+      return nullptr;
+   }
+   if ((rhsVal->getType() != Type::getDoubleTy(context.getGlobalContext())) && (rhsVal->getType() != context.getGenericIntegerType())) {
+      Node::printError("Right hand side of compare expression isn't a value type (number)");
+      context.addError();
+      return nullptr;
+   }
    if (rhsVal->getType() != lhsVal->getType()) {
       // since we only support double and int, always cast to double in case of different types.
       auto cinstr = CastInst::getCastOpcode(rhsVal, true, Type::getDoubleTy(context.getGlobalContext()), true);

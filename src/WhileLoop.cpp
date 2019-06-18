@@ -24,6 +24,11 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
       context.addError();
       return nullptr;
    }
+   if (!firstCondValue->getType()->isIntegerTy(1)) {
+      Node::printError( "While condition doesn't result in a boolean expression.");
+      context.addError();
+      return nullptr;
+   }
    BranchInst::Create(loopBB, elseBB, firstCondValue, context.currentBlock());
 
    function->getBasicBlockList().push_back(condBB);

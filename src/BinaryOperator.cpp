@@ -13,7 +13,9 @@ Value* BinaryOp::codeGen(CodeGenContext& context)
 {
    Value* rhsValue = rhs->codeGen(context);
    Value* lhsValue = lhs->codeGen(context);
-
+   if ((rhsValue == nullptr) || (lhsValue == nullptr)) {
+      return nullptr;
+   }
    auto Ty = rhsValue->getType();
    if (Ty->isPointerTy() && Ty->getPointerElementType()->isStructTy()) {
       // A class or list object is added.

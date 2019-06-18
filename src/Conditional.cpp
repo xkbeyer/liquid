@@ -24,6 +24,11 @@ Value* Conditional::codeGen(CodeGenContext& context)
       context.addError();
       return nullptr;
    }
+   if (!comp->getType()->isIntegerTy(1)) {
+      Node::printError("If condition doesn't result in a boolean expression.");
+      context.addError();
+      return nullptr;
+   }
 
    Function*   function   = context.currentBlock()->getParent();
    BasicBlock* thenBlock  = BasicBlock::Create(context.getGlobalContext(), "then", function);
