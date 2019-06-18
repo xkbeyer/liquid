@@ -195,10 +195,24 @@ void CodeGenContext::endScope()
 
 AllocaInst* CodeGenContext::findVariable(std::string varName)
 {
-   ValueNames& names = locals();
-   if (names.find(varName) != names.end()) {
-      return names[varName];
+   if (currentScopeType == ScopeType::FunctionDeclaration) {
+      // Only look in current scope, since outer scope isn't valid while in function declaration.
+      auto& names = locals();
+      if (names.find(varName) != names.end()) {
+         return names[varName];
+      }
+      return nullptr;
    }
+
+   // Travers from inner to outer scope (block) to find the variable.
+   for (auto& cb : codeBlocks) {
+      auto& names = cb->getValueNames();
+      if (names.find(varName) != names.end()) {
+         return names[varName];
+      }
+   }
+
+   // If we are in a class then check the calls variables, too.
    if (self) {
       ValueNames& vnames = self->getValueNames();
       if (vnames.find(varName) != vnames.end()) {

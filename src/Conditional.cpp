@@ -32,7 +32,8 @@ Value* Conditional::codeGen(CodeGenContext& context)
    BranchInst::Create(thenBlock, elseBlock, comp, context.currentBlock());
 
    bool needMergeBlock = false;
-   context.setInsertPoint(thenBlock);
+
+   context.newScope(thenBlock, ScopeType::CodeBlock);
    Value* thenValue = thenExpr->codeGen(context);
    if (thenValue == nullptr) {
       Node::printError("Missing else block of the conditional statement.");
@@ -45,7 +46,9 @@ Value* Conditional::codeGen(CodeGenContext& context)
    }
 
    function->getBasicBlockList().push_back(elseBlock);
-   context.setInsertPoint(elseBlock);
+   context.endScope();
+
+   context.newScope(elseBlock);
    Value* elseValue = nullptr;
    if (elseExpr != nullptr) {
       elseValue = elseExpr->codeGen(context);
@@ -55,7 +58,7 @@ Value* Conditional::codeGen(CodeGenContext& context)
       BranchInst::Create(mergeBlock, context.currentBlock());
       needMergeBlock = true;
    }
-
+   context.endScope();
    if (needMergeBlock) {
       function->getBasicBlockList().push_back(mergeBlock);
       context.setInsertPoint(mergeBlock);

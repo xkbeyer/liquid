@@ -64,7 +64,11 @@ Value* MethodCall::codeGen(CodeGenContext& context)
 
    // Put all parameter values onto the stack.
    for (auto expr : *arguments) {
-      args.push_back(expr->codeGen(context));
+      auto arg = expr->codeGen(context);
+      if (arg == nullptr) {
+         return nullptr;
+      }
+      args.push_back(arg);
    }
    CallInst* call = CallInst::Create(function, args, "", context.currentBlock());
    return call;
