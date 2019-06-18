@@ -17,8 +17,7 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
    BasicBlock* elseBB         = BasicBlock::Create(context.getGlobalContext(), "else");
    BasicBlock* mergeBB        = BasicBlock::Create(context.getGlobalContext(), "merge");
    BranchInst::Create(firstCondBlock, context.currentBlock());
-
-   context.setInsertPoint(firstCondBlock);
+   context.newScope(firstCondBlock);
    Value* firstCondValue = this->condition->codeGen(context);
    if (firstCondValue == nullptr) {
       Node::printError("Missing condition in while loop.");
@@ -28,7 +27,8 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
    BranchInst::Create(loopBB, elseBB, firstCondValue, context.currentBlock());
 
    function->getBasicBlockList().push_back(condBB);
-   context.setInsertPoint(condBB);
+   context.endScope();
+   context.newScope(condBB);
    Value* condValue = this->condition->codeGen(context);
    if (condValue == nullptr) {
       Node::printError("Code gen for condition expression in while loop failed.");
@@ -38,7 +38,8 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
    BranchInst::Create(loopBB, mergeBB, condValue, context.currentBlock());
 
    function->getBasicBlockList().push_back(loopBB);
-   context.setInsertPoint(loopBB);
+   context.endScope();
+   context.newScope(loopBB);
    Value* loopValue = this->loopBlock->codeGen(context);
    if (loopValue == nullptr) {
       Node::printError("Code gen for loop value in while loop failed.");
@@ -48,7 +49,8 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
    BranchInst::Create(condBB, context.currentBlock());
 
    function->getBasicBlockList().push_back(elseBB);
-   context.setInsertPoint(elseBB);
+   context.endScope();
+   context.newScope(elseBB);
    if (this->elseBlock != nullptr) {
       Value* elseValue = this->elseBlock->codeGen(context);
       if (elseValue == nullptr) {
@@ -59,8 +61,8 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
    }
    BranchInst::Create(mergeBB, context.currentBlock());
    function->getBasicBlockList().push_back(mergeBB);
+   context.endScope();
    context.setInsertPoint(mergeBB);
-
    return mergeBB;
 }
 
