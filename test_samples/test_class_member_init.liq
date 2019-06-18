@@ -15,6 +15,4 @@ def cl
 	
 cl d
 d._mem = 2
-display("d.mem=%d (2)\n", d._mem);
-
- 
+display("d.mem=%d (2)\n", d._mem)
