@@ -288,8 +288,11 @@ std::string CodeGenContext::getType(std::string varName)
    if (varName == "self") {
       return klassName;
    }
-   if (codeBlocks.front()->getTypeMap().find(varName) != codeBlocks.front()->getTypeMap().end()) {
-      return codeBlocks.front()->getTypeMap()[varName];
+   for (auto& cb : codeBlocks) {
+      auto iter = cb->getTypeMap().find(varName);
+      if (iter != std::end(cb->getTypeMap())) {
+         return cb->getTypeMap()[varName];
+      }
    }
    return std::string("");
 }
