@@ -323,6 +323,15 @@ void CodeGenContext::addKlassInitCode(std::string name, Assignment* assign) { cl
 
 KlassInitCodeAssign& CodeGenContext::getKlassInitCode(std::string name) { return classInitCode[name]; }
 
+std::string CodeGenContext::findClassNameByType(llvm::Type* ty)
+{
+   auto found = std::find_if(std::begin(classTypeMap), std::end(classTypeMap), [&](auto kv) { return kv.second == ty; });
+   if (found != std::end(classTypeMap)) {
+      return found->first;
+   }
+   return "";
+}
+
 llvm::Type* CodeGenContext::getGenericIntegerType()
 {
 #if defined(UseInt64)

@@ -103,7 +103,10 @@ Value* VariableDeclarationDeduce::codeGen( CodeGenContext& context )
       return nullptr;
    }
 
-   context.setVarType( "var", id->getName() );
+   // If not set by the assignment, set the type of the variable.
+   if (context.getType(id->getName()).empty()) {
+      context.setVarType("var", id->getName());
+   }
 
    return val;
 }

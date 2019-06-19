@@ -218,3 +218,15 @@ var bf = 1.5 - 2.5
 var cf = 1.5 * 2.5
 var df = 1.5 / 2.5
 displayln("Test FP BinOps (+,-,*,/) %lf %lf %lf %lf", af,bf,cf,df)
+
+# Test variable assigned with a class object and then call a method on it.
+def Object
+	int i = 0
+	def set_int(int value)
+		self.i = value
+	def get_int() : int
+		return self.i
+Object o
+o.set_int(42)
+var obj = o
+displayln("obj.get_int() = %d (42)", obj.get_int())

@@ -25,6 +25,10 @@ Value* Assignment::codeGen(CodeGenContext& context)
          Type* ty                         = value->getType();
          var                              = new AllocaInst(ty, 0, lhs->getName().c_str(), context.currentBlock());
          context.locals()[lhs->getName()] = var;
+         auto className                   = context.findClassNameByType(ty);
+         if (!className.empty()) {
+            context.setVarType(className, lhs->getName());
+         }
       }
    } else {
       AllocaInst* varStruct = context.findVariable(lhs->getStructName());

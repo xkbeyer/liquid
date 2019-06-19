@@ -26,11 +26,12 @@ Value* ClassDeclaration::codeGen( CodeGenContext& context )
     std::vector<Type*>StructTy_fields;
     context.newKlass( id->getName() );
     constructStructFields( StructTy_fields, context );
-    StructType::create( context.getGlobalContext(), StructTy_fields, std::string( "class." ) + id->getName(), /*isPacked=*/false );
+    auto classTy = StructType::create( context.getGlobalContext(), StructTy_fields, std::string( "class." ) + id->getName(), /*isPacked=*/false );
     addVarsToClassAttributes( context );
     removeVarDeclStatements();
     Value* retval = block->codeGen( context );
     context.endKlass();
+    context.addClassType(id->getName(), classTy);
     return retval;
 }
 
