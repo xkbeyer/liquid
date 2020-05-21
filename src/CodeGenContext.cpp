@@ -90,6 +90,8 @@ void CodeGenContext::setupBuiltIns()
    if (i != f->arg_end())
       i->setName("format_str");
    builtins.push_back({f, (void*)displayln});
+
+   varType = StructType::create(getGlobalContext(), "var");
 }
 
 bool CodeGenContext::generateCode(Block& root)
@@ -311,12 +313,29 @@ Type* CodeGenContext::typeOf(const std::string name)
       return Type::getInt1Ty(getGlobalContext());
    } else if (name.compare("void") == 0) {
       return Type::getVoidTy(getGlobalContext());
+   } else if (name == "var") {
+      return varType;
    }
    llvm::Type* ty = getModule()->getTypeByName("class." + name);
    if (ty != nullptr) {
       return ty;
    }
    return Type::getVoidTy(getGlobalContext());
+}
+std::string CodeGenContext::typeNameOf(llvm::Type* type)
+{
+   switch( type->getTypeID() ) {
+      case llvm::Type::TypeID::DoubleTyID:
+         return "double";
+      case llvm::Type::TypeID::IntegerTyID:
+         if( type == llvm::Type::getInt1Ty(getGlobalContext()) )
+            return "boolean";
+         return "int";
+      case llvm::Type::TypeID::VoidTyID:
+         return "void";
+      default:
+         return "void";
+   }
 }
 
 void CodeGenContext::addKlassInitCode(std::string name, Assignment* assign) { classInitCode[name].insert(assign); }

@@ -93,7 +93,7 @@
 %type <varvec> func_decl_args
 %type <exprvec> call_args array_elemets_expr 
 %type <block> program stmts block
-%type <stmt> stmt var_decl var_decl_deduce func_decl conditional return while class_decl array_add_element
+%type <stmt> stmt var_decl func_decl conditional return while class_decl array_add_element
 %type <token> comparison 
 
 /* Operator precedence for mathematical operators */
@@ -117,7 +117,6 @@ stmts : stmt { $$ = new liquid::Block(); $$->statements.push_back($<stmt>1); }
       ;
 
 stmt : var_decl
-     | var_decl_deduce
      | func_decl
      | class_decl
      | conditional 
@@ -142,10 +141,10 @@ while : TWHILE expr block TELSE block {$$ = new liquid::WhileLoop($2,$3,$5);}
 
 var_decl : ident ident { $$ = new liquid::VariableDeclaration($1, $2, @$); }
          | ident ident TEQUAL expr { $$ = new liquid::VariableDeclaration($1, $2, $4, @$); }
+         | TVAR ident { $$ = new liquid::VariableDeclarationDeduce($2, @$); }
+         | TVAR ident TEQUAL expr { $$ = new liquid::VariableDeclarationDeduce($2, $4, @$); }
          ;
 
-var_decl_deduce : TVAR ident TEQUAL expr { $$ = new liquid::VariableDeclarationDeduce($2, $4, @$); }
-         ;
 
 func_decl : TDEF ident TLPAREN func_decl_args TRPAREN TCOLON ident block { $$ = new liquid::FunctionDeclaration($7, $2, $4, $8, @$); }
           | TDEF ident TLPAREN func_decl_args TRPAREN block { $$ = new liquid::FunctionDeclaration($2, $4, $6, @$); }
@@ -186,7 +185,7 @@ expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
      | array_expr
      | array_access
      ;
-/* have to write it explecity to have the right operator precedence */
+/* have to write it explicit to have the right operator precedence */
 binop_expr : expr TAND expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
            | expr TOR expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
            | expr TPLUS expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }

@@ -1,6 +1,8 @@
 #include "MethodCall.h"
 #include "CodeGenContext.h"
 #include "parser.hpp"
+#include "FunctionDeclaration.h"
+#include "Declaration.h"
 
 using namespace std;
 using namespace llvm;
@@ -16,21 +18,25 @@ Value* MethodCall::codeGen(CodeGenContext& context)
       functionName += "%" + className;
    }
 
-   Function* function = context.getModule()->getFunction(functionName.c_str());
+   Function* function = context.getModule()->getFunction(functionName);
    if (function == nullptr) {
       // see if it is a added function to the class like function(classname param,...)
       functionName = id->getName();
-      function     = context.getModule()->getFunction(functionName.c_str());
+      function     = context.getModule()->getFunction(functionName);
       if (function == nullptr) {
          // May be it is a class function, but called like a function w/o class prefix
          // like: class.function() -> function(class parameter)
          functionName = id->getName() + "%" + getTypeNameOfFirstArg(context);
-         function     = context.getModule()->getFunction(functionName.c_str());
+         function     = context.getModule()->getFunction(functionName);
 
          if (function == nullptr) {
-            Node::printError(location, " no such function '" + id->getName() + "'");
-            context.addError();
-            return nullptr;
+            // Or it is a function w/ template parameter which will be generated when the parameter types are known.
+            auto funcdecl = context.getTemplateFunction(id->getName());
+            if( funcdecl == nullptr ) {
+               Node::printError(location, " no such function '" + id->getName() + "'");
+               context.addError();
+               return nullptr;
+            }
          }
       }
    }
@@ -70,14 +76,37 @@ Value* MethodCall::codeGen(CodeGenContext& context)
       }
       args.push_back(arg);
    }
-   CallInst* call = CallInst::Create(function, args, "", context.currentBlock());
-   return call;
+
+   if( function == nullptr ) {
+      // Generate the template function, according to the given parameter types.
+      context.setGenerateTemplatedFunction(true);
+      auto funcdeclTemplate = context.getTemplateFunction(id->getName());
+      auto funcdecl = new FunctionDeclaration(*funcdeclTemplate);
+      auto funcparams = funcdecl->getParameter();
+      for( auto i = 0u; i < funcparams->size(); ++i) {
+         auto fparam = funcparams->at(i);
+         // Exchange the var parameter with the type of the real used type by the call.
+         if( fparam->getIdentifierOfVariablenType().getName() == "var" ) {
+            auto actualType = new Identifier(context.typeNameOf(args[i]->getType()), fparam->getLocation());
+            auto identifier = new Identifier(fparam->getIdentifierOfVariable());
+            auto substitudeParam = new VariableDeclaration(actualType, identifier, fparam->getLocation());
+            funcparams->at(i) = substitudeParam;
+            delete fparam;
+         }
+      }
+      // Instantiate the function with the now known parameter types.
+      function = dyn_cast<Function>(funcdecl->codeGen(context));
+      context.setGenerateTemplatedFunction(false);
+      delete funcdecl;
+   }
+
+   return CallInst::Create(function, args, "", context.currentBlock());
 }
 
 std::string MethodCall::getTypeNameOfFirstArg(CodeGenContext& context)
 {
    if (arguments->size() && arguments->front()->getType() == NodeType::identifier) {
-      Identifier* ident = (Identifier*)*(arguments->begin());
+      Identifier* ident = static_cast<Identifier*>(*(arguments->begin()));
       // Check if it is a var of class type...
       return context.getType(ident->getName());
    }

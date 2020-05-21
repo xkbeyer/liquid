@@ -31,26 +31,31 @@ public:
    void Accept(Visitor& v) override { v.VisitVariablenDeclaration(this); }
 
    const Identifier& getIdentifierOfVariable() const { return *id; }
-   const Identifier& getIdentifierOfVariablenType() const { return *type; }
-   std::string       getVariablenTypeName() const { return type->getName(); }
+   virtual const Identifier& getIdentifierOfVariablenType() const { return *type; }
+   virtual std::string       getVariablenTypeName() const { return type->getName(); }
    std::string       getVariablenName() const { return id->getName(); }
-   bool              hasAssignmentExpr() { return assignmentExpr != nullptr; }
-   Expression*       getAssignment() { return assignmentExpr; }
+   bool              hasAssignmentExpr() const { return assignmentExpr != nullptr; }
+   Expression*       getAssignment() const { return assignmentExpr; }
    YYLTYPE&          getLocation() { return location; }
 
-private:
+protected:
    Identifier* type{nullptr};
    Identifier* id{nullptr};
    Expression* assignmentExpr{nullptr};
    YYLTYPE     location;
 };
 
-class VariableDeclarationDeduce : public Statement
+class VariableDeclarationDeduce : public VariableDeclaration
 {
 public:
-   explicit VariableDeclarationDeduce(Identifier* id, Expression* assignmentExpr, YYLTYPE loc) : id(id), assignmentExpr(assignmentExpr), location(loc) {}
+   explicit VariableDeclarationDeduce(Identifier* id, Expression* assignmentExpr, YYLTYPE loc) : VariableDeclaration(new Identifier("var", loc), id, assignmentExpr, loc) {}
+   explicit VariableDeclarationDeduce(Identifier* id, YYLTYPE loc) : VariableDeclaration(new Identifier("var", loc), id, loc)
+   {
+   }
    virtual ~VariableDeclarationDeduce()
    { /*Note: id and assignmentExpr are deleted by Assignment()*/
+      id = nullptr;
+      assignmentExpr = nullptr;
    }
 
    llvm::Value* codeGen(CodeGenContext& context) override;
@@ -63,16 +68,6 @@ public:
    }
    void Accept(Visitor& v) override { v.VisitVariablenDeclarationDeduce(this); }
 
-   const Identifier& getIdentifierOfVariable() const { return *id; }
-   std::string       getVariablenName() const { return id->getName(); }
-   bool              hasAssignmentExpr() { return assignmentExpr != nullptr; }
-   Expression*       getAssignment() { return assignmentExpr; }
-   YYLTYPE&          getLocation() { return location; }
-
-private:
-   Identifier* id{nullptr};
-   Expression* assignmentExpr{nullptr};
-   YYLTYPE     location;
 };
 
 } // namespace liquid

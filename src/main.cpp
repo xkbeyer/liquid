@@ -39,8 +39,9 @@ int main(int argc, char **argv)
              std::string item;
              while( std::getline(ss, item, ';') ) {
                 std::replace(std::begin(item), std::end(item), '\\', '/');
-                if( item[item.size()] != '/' )
+                if( item[item.size()] != '/' ) {
                    item += '/';
+                }
                 libPaths.push_back(item);
              }
           }
@@ -63,9 +64,9 @@ int main(int argc, char **argv)
              return 1;
        }
     }
-    if( !quiet )
+    if( !quiet ) {
       std::cout << "liquid version " << MAJOR_VER << "." << MINOR_VER << "." << REVISION_VER << "\n";
-
+    }
     auto files = getopt.getRemainingArguments();
     assert(files.size() == 1);
     fileName = files[0]; // Currently only one file is supported.

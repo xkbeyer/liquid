@@ -1,5 +1,5 @@
-#ifndef _INC_ASTNODE_H
-#define _INC_ASTNODE_H
+#ifndef INC_ASTNODE_H
+#define INC_ASTNODE_H
 
 #include "main.h"
 
@@ -73,7 +73,7 @@ public:
    virtual NodeType getType() = 0;
 
    /*! Returns the textual representation. */
-   virtual std::string toString() { return "node\n"; }
+   virtual std::string toString() { return "node"; }
 
    /*! Accept a visitor. */
    virtual void Accept(Visitor& v) = 0;
@@ -92,6 +92,7 @@ public:
          << location.last_column << ":"
          << msg << std::endl;
    }
+
    /*! Prints an error message where no source location is available.
     * \param[in] msg      The message to print.
     */
@@ -247,12 +248,7 @@ public:
 
    llvm::Value* codeGen(CodeGenContext& context) override;
    NodeType     getType() override { return NodeType::expression; }
-   std::string  toString() override
-   {
-      std::stringstream s;
-      s << "block ";
-      return s.str();
-   }
+   std::string  toString() override { return "block "; }
    void Accept(Visitor& v) override { v.VisitBlock(this); }
 };
 

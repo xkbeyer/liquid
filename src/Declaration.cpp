@@ -90,9 +90,10 @@ Value* VariableDeclarationDeduce::codeGen( CodeGenContext& context )
    }
 
    if( !hasAssignmentExpr() ) {
-       Node::printError( location, " var statements for '" + id->getName() + "' w/o assignment\n" );
-       context.addError();
-       return nullptr;
+      AllocaInst* alloc = new AllocaInst(context.typeOf("var"), 0, id->getName().c_str(), context.currentBlock());
+      context.locals()[id->getName()] = alloc;
+      context.setVarType("var", id->getName());
+      return alloc;
    }
 
    Assignment assn( id, getAssignment(), location );

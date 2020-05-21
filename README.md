@@ -7,7 +7,7 @@ After reading an article about LLVM and how easy it is to create a DSL with it, 
 # Installation #
 
 ## Prerequisite ##
-- LLVM 6.0 
+- LLVM 10.0 
 - flex and bison.
 - CMake 3.10 
 
@@ -103,7 +103,7 @@ Currently no binary and hex format is supported.
 A boolean can take the symbol `true` or `false`. 
 
 ## Array ##
-An array is a container which can hold elements of arbitary types.
+An array is a container which can hold elements of arbitrary types.
 ```
 var array = [1,2,3,4]
 ```
@@ -111,7 +111,7 @@ The elements don't have to be of the same type.
 ```
 var list = [1+2, 'Otto', true]
 ```
-_Hint:_ Currently only valid with a `var` declaration and an assigment.
+_Hint:_ Currently only valid with a `var` declaration and an assignment.
 
 Adding an element to the array above
 ```
@@ -119,7 +119,7 @@ list << 5
 ```
 results in `[3, 'Otto', true, 5]`
 
-__Note__ _This featue is currently under construction and not stable._
+__Note__ _This feature is currently under construction and not stable._
 
 ## Comments ##
 ### One Line ##
@@ -129,9 +129,9 @@ A comment starts with `@{` and ends with `@}`. All text in between is ignored.
 
 ## Variable ##
 ### Name ###
-The same rules as for literals applies.
+The same rules apply as for literals.
 ### Declaration ###
-Variables can be declared as integer, number or string.
+Variables can be declared as integer, number, boolean or string.
 ```
 int i
 double d
@@ -149,8 +149,9 @@ string text = 'This is a string.'
 ```
 The `var` keyword is used to auto deduce the type of a variable.
 ```
-var abc = 1  #deduce to int
-var s = "Hello" #deduce to string.
+var abc = 1     # deduce to int
+var s = "Hello" # deduce to string.
+var something   # error, can't be deduced.
 ```
 
 ## Program ##
@@ -219,11 +220,27 @@ or if no return value is provided:
 def aFunction( type param1, type param2 )
   statements
 ```
+
+or with return type deduction:
+```
+def aFunction( type param1, type param2 )
+  statements
+  return expression
+```
+
 or if no parameter is needed:
 ```
 def aFunction()
   statements
 ```
+
+or if parameter type can/should be deduced at call time:
+```
+def aFunction(var param1, var param2)
+  statements
+  return expression
+```
+
 and any combination.
 
 Calling a function

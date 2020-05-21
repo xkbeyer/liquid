@@ -21,6 +21,31 @@ using namespace llvm;
 namespace liquid {
 
 
+FunctionDeclaration::FunctionDeclaration(const FunctionDeclaration& other)
+{
+   type = new Identifier(*other.type);
+   id = new Identifier(*other.id);
+   arguments = new VariableList();
+   for( auto arg : *other.arguments ) {
+      arguments->push_back(new VariableDeclaration(new Identifier(arg->getVariablenTypeName(), arg->getLocation()), new Identifier(arg->getVariablenName(), arg->getLocation()), arg->getLocation()));
+   }
+   block = other.block;
+   location = other.location;
+   isaCopy = true; // Quick hack, a copy contains the origin block and shouldn't be deleted.
+}
+
+FunctionDeclaration::FunctionDeclaration(Identifier* type, Identifier* id, VariableList* arguments, Block* block, YYLTYPE loc)
+   : type(type), id(id), arguments(arguments), block(block), location(loc)
+{
+   checkForTemplateParameter();
+}
+
+FunctionDeclaration::FunctionDeclaration(Identifier* id, VariableList* arguments, Block* block, YYLTYPE loc)
+   : type(new Identifier("var", loc)), id(id), arguments(arguments), block(block), location(loc)
+{
+   checkForTemplateParameter();
+}
+
 FunctionDeclaration::~FunctionDeclaration()
 {
     for( auto i : *arguments ) {
@@ -29,12 +54,29 @@ FunctionDeclaration::~FunctionDeclaration()
     delete type;
     delete id;
     delete arguments;
-    delete block;
+    if( !isaCopy ) { // Don't delete the origin block
+       delete block;
+    }
+}
+
+void FunctionDeclaration::checkForTemplateParameter()
+{
+   auto found = std::find_if(std::begin(*arguments), std::end(*arguments), [](auto vardecl) { return vardecl->getVariablenTypeName() == "var"; });
+   if(found != std::end(*arguments)) {
+      hasTemplateParameter = true;
+   }
 }
 
 Value* FunctionDeclaration::codeGen( CodeGenContext& context )
 {
-    vector<Type*> argTypes;
+   if( hasTemplateParameter && !context.codeGenTheTemplatedFunction()) {
+      // This function declaration has at least one unknown parameter type.
+      // Postpone the creation until they are known (call).
+      context.addTemplateFunction( id->getName(), this );
+      return nullptr;
+   }
+
+   vector<Type*> argTypes;
     if( !context.getKlassName().empty() ) {
         // add the self pointer of the class as first argument..
         Type* self_ty = context.typeOf( context.getKlassName() );
@@ -118,7 +160,6 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
         }
     }
 
-
     if( type->getName() == "var" ) {
         if( retTy->isLabelTy() || retTy->isMetadataTy() ) {
             context.endScope();
@@ -126,14 +167,39 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
             context.addError();
             return nullptr;
         }
+
         // Now create the a new function (the real one) since we know the return type now.
-        FunctionType *ftypeNew = FunctionType::get( blockValue->getType(), argTypes, false );
+        auto terminator = context.currentBlock()->getTerminator();
+        auto retInstr = dyn_cast<ReturnInst>(terminator);
+        auto retval = retInstr->getReturnValue();
+        Type* retValTy = nullptr;
+        if( retval == nullptr ) {
+           // The return instruction has no operand and no type it is a ret void.
+           retValTy = Type::getVoidTy(context.getGlobalContext());
+        } else {
+           retValTy = retval->getType();
+        }
+
         std::string functionNameNew = id->getName();
+        if( context.codeGenTheTemplatedFunction() ) {
+           // Now all types are known, check if this type of function already exist
+           auto constructedFctName = buildFunctionName(retValTy, argTypes);
+           auto fct = context.getModule()->getFunction(constructedFctName);
+           if( fct != nullptr ) {
+              // Yes, take that one and remove the newly generated.
+              function->eraseFromParent();
+              context.endScope();
+              return fct;
+           }
+           functionNameNew = constructedFctName;
+        }
+
+        FunctionType* ftypeNew = FunctionType::get(retValTy, argTypes, false);
         if( !context.getKlassName().empty() ) {
             functionNameNew += "%" + context.getKlassName();
         }
 
-        Function *functionNew = Function::Create( ftypeNew, GlobalValue::InternalLinkage, functionNameNew.c_str(), context.getModule() );
+        Function *functionNew = Function::Create( ftypeNew, GlobalValue::InternalLinkage, functionNameNew, context.getModule() );
 
         // Create a value map for all arguments to be mapped to the new function.
         ValueToValueMapTy VMap;
@@ -163,6 +229,16 @@ std::string FunctionDeclaration::toString()
    std::stringstream s;
    s << "function declaration: " << id->getName();
    return s.str();
+}
+
+std::string FunctionDeclaration::buildFunctionName(llvm::Type* retType, std::vector<llvm::Type*> argTypes)
+{
+   std::string constructedName = id->getName() + "_";
+   constructedName += std::to_string(retType->getTypeID());
+   for( auto t : argTypes ) {
+      constructedName += "_" + std::to_string(t->getTypeID());
+   }
+   return constructedName;
 }
 
 }

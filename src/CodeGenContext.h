@@ -114,7 +114,7 @@ public:
 
    ValueNames& locals() { return codeBlocks.front()->getValueNames(); }
 
-   void setVarType(std::string varType, std::string varName) { codeBlocks.front()->getTypeMap()[varName] = varType; }
+   void setVarType(std::string varTypeName, std::string varName) { codeBlocks.front()->getTypeMap()[varName] = varTypeName; }
 
    /*! Get the type of a variable name.
     * \param[in] varName the name of the variable to be looked up.
@@ -182,6 +182,9 @@ public:
    /*! Returns an LLVM type based on the name */
    llvm::Type* typeOf(const std::string name);
 
+   /*! Returns type name based on LLVM Type */
+   std::string typeNameOf(llvm::Type* type);
+
    /*! Store the init code of the class to be used while creation. */
    void addKlassInitCode(std::string name, Assignment * assign);
 
@@ -208,6 +211,11 @@ public:
 
    /*! Increments the error counter. */
    void addError() { ++errors; }
+
+   void addTemplateFunction(const std::string& name, FunctionDeclaration* funcDecl) { templatedFunctionDeclarations[name] = funcDecl; }
+   FunctionDeclaration* getTemplateFunction(const std::string& name) { return templatedFunctionDeclarations[name]; }
+   void setGenerateTemplatedFunction(bool setFlag) { generateTemplatedFunction = setFlag; }
+   bool codeGenTheTemplatedFunction() const { return generateTemplatedFunction; }
 
  private:
    void setCurrentBlock(llvm::BasicBlock * block) { codeBlocks.front()->setCodeBlock(block); }
@@ -238,6 +246,9 @@ public:
       void*           addr{nullptr};
    };
    std::vector<buildin_info_t> builtins;
+   llvm::Type* varType{nullptr};
+   std::map<std::string, FunctionDeclaration*> templatedFunctionDeclarations;
+   bool generateTemplatedFunction {false};
 };
 
 }

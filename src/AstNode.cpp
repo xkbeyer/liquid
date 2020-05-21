@@ -22,7 +22,7 @@ Value* Double::codeGen(CodeGenContext& context)
 
 Value* String::codeGen(CodeGenContext& context)
 {
-    // generate the type for the globale var
+    // generate the type for the global var
     ArrayType* ArrayTy_0 = ArrayType::get(IntegerType::get(context.getGlobalContext(), 8), value.size() +1 );
     // create global var which holds the constant string.
     GlobalVariable* gvar_array__str = new GlobalVariable(*context.getModule(),
@@ -31,7 +31,7 @@ Value* String::codeGen(CodeGenContext& context)
                                                          GlobalValue::PrivateLinkage,
                                                          /*Initializer=*/0, // has initializer, specified below
                                                          ".str");
-    gvar_array__str->setAlignment(1);
+    gvar_array__str->setAlignment(MaybeAlign(1));
     // create the contents for the string global.
     Constant* const_array_str =  ConstantDataArray::getString(context.getGlobalContext(), value);
     // Initialize the global with the string
