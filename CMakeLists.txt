@@ -8,6 +8,7 @@ project(liquid)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 # Allow else() and endif() constructs (with empty parentheses)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON) #To use with clang-tidy, not supported w/ MSVC generator.
 
 # Setup the cmake directory containing numerous cmake scripts and macros.
 set(CMAKE_MODULE_PATH "${liquid_SOURCE_DIR}/cmake")
