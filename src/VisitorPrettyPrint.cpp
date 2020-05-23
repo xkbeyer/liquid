@@ -35,9 +35,11 @@ void VisitorPrettyPrint::VisitStatement( Statement* stmt )
 void VisitorPrettyPrint::VisitReturnStatement( Return* retstmt )
 {
    out << indent_spaces(indent) << "Create " << retstmt->toString() << std::endl;
-   ++indent;
-   retstmt->getRetExpression()->Accept(*this);
-   --indent;
+   if( retstmt->getRetExpression() != nullptr ) {
+      ++indent;
+      retstmt->getRetExpression()->Accept(*this);
+      --indent;
+   }
 }
 
 void VisitorPrettyPrint::VisitFunctionDeclaration( FunctionDeclaration* fndecl )
