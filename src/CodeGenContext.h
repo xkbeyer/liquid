@@ -2,7 +2,7 @@
 
 #include "config.h"
 
-#include <stack>
+#include <vector>
 #include <map>
 #include <list>
 #include <set>
@@ -77,13 +77,13 @@ class CodeGenContext
 {
 public:
    llvm::Value* varStruct{nullptr}; ///< Hold the alloc of the structure variable (class object). TODO move it to a better place.
-   bool         verbose{false};
-   bool         debug{false};
+   bool verbose {false};            ///< Verbose output
+   bool debug {false};              ///< Dump the generated LLVM byte code.
 
    CodeGenContext(std::ostream & outs);
    ~CodeGenContext() { llvm::llvm_shutdown(); }
 
-   llvm::Module*      getModule() { return module; }
+   llvm::Module*      getModule() const { return module; }
 
    llvm::LLVMContext& getGlobalContext() { return llvmContext; }
 
@@ -93,15 +93,17 @@ public:
     */
    void               newScope(llvm::BasicBlock* bb = nullptr, ScopeType scopeType = ScopeType::CodeBlock);
 
-   /*! Leaves current scope, the previous one will be active now.
-    */
+   /*! Leaves current scope, the previous one will be active now.*/
    void endScope();
 
-   ScopeType          getScopeType() { return currentScopeType; }
+   /*! Return the current scope type. */
+   ScopeType getScopeType() { return currentScopeType; }
 
-   void               setInsertPoint(llvm::BasicBlock * bblock) { setCurrentBlock(bblock); }
+   /*! Set the LLVM block where to put the next instructions. */
+   void setInsertPoint(llvm::BasicBlock* bblock) { setCurrentBlock(bblock); }
 
-   llvm::BasicBlock*  getInsertPoint() { return currentBlock(); }
+   /*! Get the current insert block. */
+   llvm::BasicBlock* getInsertPoint() { return currentBlock(); }
 
    /*! Compile the AST into a module */
    bool generateCode(class Block & root);
@@ -112,8 +114,13 @@ public:
    /*! Prints how the code will be generated */
    void printCodeGeneration(class Block & root, std::ostream & outs);
 
+   /*! Get the local variable names (of current scope). */
    ValueNames& locals() { return codeBlocks.front()->getValueNames(); }
 
+   /*! Set type of a variable in current scope.
+    * \param[in] varTypeName Variable type name.
+    * \param[in] varName Variable name.
+    */
    void setVarType(std::string varTypeName, std::string varName) { codeBlocks.front()->getTypeMap()[varName] = varTypeName; }
 
    /*! Get the type of a variable name.
@@ -180,7 +187,7 @@ public:
    llvm::Type* typeOf(const class Identifier& type);
 
    /*! Returns an LLVM type based on the name */
-   llvm::Type* typeOf(const std::string name);
+   llvm::Type* typeOf(const std::string& name);
 
    /*! Returns type name based on LLVM Type */
    std::string typeNameOf(llvm::Type* type);
@@ -212,15 +219,30 @@ public:
    /*! Increments the error counter. */
    void addError() { ++errors; }
 
+   /*! Add a function which has var arguments and has to be generated later at call time.
+    * \param[in] name Function name.
+    * \param[in] funcDecl Function declaration node.
+    */
    void addTemplateFunction(const std::string& name, FunctionDeclaration* funcDecl) { templatedFunctionDeclarations[name] = funcDecl; }
-   FunctionDeclaration* getTemplateFunction(const std::string& name) { return templatedFunctionDeclarations[name]; }
+
+   /*! Returns the function declaration of the 'template' function.
+    * \param[in] name Function name.
+    * \note Does return nullptr if name is not found.
+    */
+   FunctionDeclaration* getTemplateFunction(const std::string& name);
+
+   /*! Start/End of generating a template function (args with type var).
+    * \param[in] setFlag true: begin of generation. false: end of generation.
+    */
    void setGenerateTemplatedFunction(bool setFlag) { generateTemplatedFunction = setFlag; }
+
+   /*! Returns true if a template function is to be generated otherwise false. */
    bool codeGenTheTemplatedFunction() const { return generateTemplatedFunction; }
 
  private:
    void setCurrentBlock(llvm::BasicBlock * block) { codeBlocks.front()->setCodeBlock(block); }
 
-   /*! Setup up the built in function:
+   /*! Setup up the built in functions and types:
     * - printvalue
     * - printdouble
     * - sin
@@ -246,7 +268,13 @@ public:
       void*           addr{nullptr};
    };
    std::vector<buildin_info_t> builtins;
-   llvm::Type* varType{nullptr};
+   llvm::Type* intType {nullptr};
+   llvm::Type* doubleType {nullptr};
+   llvm::Type* stringType {nullptr};
+   llvm::Type* boolType {nullptr};
+   llvm::Type* voidType {nullptr};
+   llvm::Type* varType {nullptr};
+   std::map<std::string, llvm::Type*> llvmTypeMap;
    std::map<std::string, FunctionDeclaration*> templatedFunctionDeclarations;
    bool generateTemplatedFunction {false};
 };

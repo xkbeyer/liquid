@@ -40,6 +40,7 @@ using namespace llvm;
 
 namespace liquid
 {
+
 CodeGenContext::CodeGenContext(std::ostream& outs) : outs(outs)
 {
    llvm::InitializeNativeTarget();
@@ -51,7 +52,18 @@ CodeGenContext::CodeGenContext(std::ostream& outs) : outs(outs)
 #define MAKE_LLVM_EXTERNAL_NAME(a) #a
 void CodeGenContext::setupBuiltIns()
 {
-   auto intType = getGenericIntegerType();
+   intType = getGenericIntegerType();
+   doubleType = Type::getDoubleTy(getGlobalContext());
+   stringType = Type::getInt8PtrTy(getGlobalContext());
+   boolType = Type::getInt1Ty(getGlobalContext());
+   voidType = Type::getVoidTy(getGlobalContext());
+   varType = StructType::create(getGlobalContext(), "var");
+   llvmTypeMap["int"] = intType;
+   llvmTypeMap["double"] = doubleType;
+   llvmTypeMap["string"] = stringType;
+   llvmTypeMap["boolean"] = boolType;
+   llvmTypeMap["void"] = voidType;
+   llvmTypeMap["var"] = varType;
 
    std::vector<Type*>     argTypesOneInt(1, intType);
    FunctionType*          ft = FunctionType::get(intType, argTypesOneInt, false);
@@ -91,7 +103,6 @@ void CodeGenContext::setupBuiltIns()
       i->setName("format_str");
    builtins.push_back({f, (void*)displayln});
 
-   varType = StructType::create(getGlobalContext(), "var");
 }
 
 bool CodeGenContext::generateCode(Block& root)
@@ -301,27 +312,19 @@ std::string CodeGenContext::getType(std::string varName)
 
 Type* CodeGenContext::typeOf(const Identifier& type) { return typeOf(type.getName()); }
 
-Type* CodeGenContext::typeOf(const std::string name)
+Type* CodeGenContext::typeOf(const std::string& name)
 {
-   if (name.compare("int") == 0) {
-      return getGenericIntegerType();
-   } else if (name.compare("double") == 0) {
-      return Type::getDoubleTy(getGlobalContext());
-   } else if (name.compare("string") == 0) {
-      return Type::getInt8PtrTy(getGlobalContext());
-   } else if (name.compare("boolean") == 0) {
-      return Type::getInt1Ty(getGlobalContext());
-   } else if (name.compare("void") == 0) {
-      return Type::getVoidTy(getGlobalContext());
-   } else if (name == "var") {
-      return varType;
+   if( llvmTypeMap.count(name) != 0 ) {
+      return llvmTypeMap[name];
    }
+
    llvm::Type* ty = getModule()->getTypeByName("class." + name);
    if (ty != nullptr) {
       return ty;
    }
-   return Type::getVoidTy(getGlobalContext());
+   return voidType;
 }
+
 std::string CodeGenContext::typeNameOf(llvm::Type* type)
 {
    switch( type->getTypeID() ) {
@@ -366,4 +369,13 @@ bool CodeGenContext::preProcessing(Block& root)
    root.Accept(visitor);
    return !visitor.hasErrors();
 }
+
+FunctionDeclaration* CodeGenContext::getTemplateFunction(const std::string& name)
+{
+   if( templatedFunctionDeclarations.count(name) > 0 ) {
+      return templatedFunctionDeclarations[name];
+   }
+   return nullptr;
+}
+
 }
