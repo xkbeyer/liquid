@@ -147,17 +147,18 @@ import              BEGIN(incl);
                  }
 
 <normal>"\n"     { current_line_indent = 0; BEGIN( indent); yycolumn = 1; }
-<<EOF>>          { 
-                   yypop_buffer_state();
-                   fileNames.pop();
-                   yylineno = lineNo.top();
-                   lineNo.pop();
-                   if( !YY_CURRENT_BUFFER ) {
-                        yyterminate();
-                   }
+<<EOF>>          {
                    if( curr_indents.size() > 1 ) {
                         curr_indents.pop();
                         return TOKEN(UNINDENT);
+                   }
+                   if(lineNo.size() > 1 ) {
+                       yypop_buffer_state();
+                       fileNames.pop();
+                       yylineno = lineNo.top();
+                       lineNo.pop();
+                   } else {
+                        yyterminate();
                    }
                  }
                   
