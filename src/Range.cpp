@@ -36,10 +36,10 @@ llvm::Value* Range::codeGen(CodeGenContext& context)
    ExpressionList exprs;
    exprs.push_back(begin);
    auto l = new Array( &exprs, loc);
-   auto vardecl = new VariableDeclarationDeduce(new Identifier("tmp_l", loc), l, loc);
+   auto vardecl = new VariableDeclaration(new Identifier("tmp_l", loc), l, loc);
    tmp_code.statements.push_back(vardecl);
    // var n = lhs
-   auto vardecl_n = new VariableDeclarationDeduce(new Identifier("tmp_n", loc), this->begin, loc);
+   auto vardecl_n = new VariableDeclaration(new Identifier("tmp_n", loc), this->begin, loc);
    tmp_code.statements.push_back(vardecl_n);
    // while loop
    auto while_block = new Block();

@@ -26,15 +26,15 @@ def testifMax(int a, int b) : int
         max = b
     return max
 
-int m = max( 1,10)
-display("Max is %d expected 10\n", m)
-m = min( 1,10)
-display("Min is %d\ expected 1n", m)
-int n = testif( 1,10)
-display("testif is %d expected 10\n", n)
+int minmax = max( 1,10)
+display("Max is %d expected 10\n", minmax)
+minmax = min( 1,10)
+display("Min is %d\ expected 1n", minmax)
+int nif = testif( 1,10)
+display("testif is %d expected 10\n", nif)
 
-n = testif( 5,5)
-display("testif is %d expected 5\n", n)
+nif = testif( 5,5)
+display("testif is %d expected 5\n", nif)
 
 display("testifMax is %d expected 10 \n", testifMax(1,10))
 display("testifMax is %d expected 10 \n", testifMax(10,1))

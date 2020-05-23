@@ -177,7 +177,7 @@ if(LLVM_ENABLE_EH AND CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 set(VER_MAJ 0)
-set(VER_MIN 2)
+set(VER_MIN 3)
 set(VER_REV 0)
 
 configure_file(config.in ${liquid_SOURCE_DIR}/config.h)

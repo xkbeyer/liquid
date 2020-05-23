@@ -20,7 +20,6 @@ namespace liquid {
    class Assignment;
    class MethodCall;
    class VariableDeclaration;
-   class VariableDeclarationDeduce;
    class Conditional;
    class WhileLoop;
    class ClassDeclaration;
@@ -49,7 +48,6 @@ public:
    virtual void VisitAssigment( Assignment* expr ) = 0;
    virtual void VisitMethodCall( MethodCall* expr ) = 0;
    virtual void VisitVariablenDeclaration( VariableDeclaration* expr ) = 0;
-   virtual void VisitVariablenDeclarationDeduce( VariableDeclarationDeduce* expr ) = 0;
    virtual void VisitConditional( Conditional* expr ) = 0;
    virtual void VisitWhileLoop( WhileLoop* expr ) = 0;
    virtual void VisitClassDeclaration( ClassDeclaration* expr ) = 0 ;

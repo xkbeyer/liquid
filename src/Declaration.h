@@ -13,6 +13,14 @@ public:
       : type(type), id(id), assignmentExpr(assignmentExpr), location(loc)
    {
    }
+   VariableDeclaration(Identifier* id, YYLTYPE loc)
+      : type(new Identifier("var", loc)), id(id), assignmentExpr(nullptr), location(loc)
+   {
+   }
+   VariableDeclaration(Identifier* id, Expression* assignmentExpr, YYLTYPE loc)
+      : type(new Identifier("var", loc)), id(id), assignmentExpr(assignmentExpr), location(loc)
+   {
+   }
    virtual ~VariableDeclaration()
    {
       delete assignmentExpr;
@@ -43,31 +51,6 @@ protected:
    Identifier* id{nullptr};
    Expression* assignmentExpr{nullptr};
    YYLTYPE     location;
-};
-
-class VariableDeclarationDeduce : public VariableDeclaration
-{
-public:
-   explicit VariableDeclarationDeduce(Identifier* id, Expression* assignmentExpr, YYLTYPE loc) : VariableDeclaration(new Identifier("var", loc), id, assignmentExpr, loc) {}
-   explicit VariableDeclarationDeduce(Identifier* id, YYLTYPE loc) : VariableDeclaration(new Identifier("var", loc), id, loc)
-   {
-   }
-   virtual ~VariableDeclarationDeduce()
-   { /*Note: id and assignmentExpr are deleted by Assignment()*/
-      id = nullptr;
-      assignmentExpr = nullptr;
-   }
-
-   llvm::Value* codeGen(CodeGenContext& context) override;
-   NodeType     getType() override { return NodeType::variable; }
-   std::string  toString() override
-   {
-      std::stringstream s;
-      s << "variable declaration for " << id->getName() << " of unknown type ";
-      return s.str();
-   }
-   void Accept(Visitor& v) override { v.VisitVariablenDeclarationDeduce(this); }
-
 };
 
 } // namespace liquid

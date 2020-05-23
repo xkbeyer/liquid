@@ -29,7 +29,10 @@ Value* VariableDeclaration::codeGen(CodeGenContext& context)
     }
 
     Type* ty = context.typeOf(*type);
-    if( ty->isStructTy() && context.getScopeType() != ScopeType::FunctionDeclaration ) {
+    if( ty->isStructTy() && ty->getStructName() == "var" ) {
+       // It is a var declaration, postpone type until assignment.
+       context.locals()[id->getName()] = nullptr;
+    } else if( ty->isStructTy() && context.getScopeType() != ScopeType::FunctionDeclaration ) {
         // It is really a declaration of a class type which we put always onto the heap.
         AllocaInst* alloc = new AllocaInst(ty, 0, id->getName().c_str(), context.currentBlock());
         context.locals()[id->getName()] = alloc;
@@ -76,42 +79,7 @@ Value* VariableDeclaration::codeGen(CodeGenContext& context)
         }
         context.varStruct = nullptr;
     }
-    assert(val != nullptr);
     return val;
 }
-
-
-Value* VariableDeclarationDeduce::codeGen( CodeGenContext& context )
-{
-   if( context.findVariable( id->getName() ) ) {
-      Node::printError( location, " variable '" + id->getName() + "' already exist\n" );
-      context.addError();
-      return nullptr;
-   }
-
-   if( !hasAssignmentExpr() ) {
-      AllocaInst* alloc = new AllocaInst(context.typeOf("var"), 0, id->getName().c_str(), context.currentBlock());
-      context.locals()[id->getName()] = alloc;
-      context.setVarType("var", id->getName());
-      return alloc;
-   }
-
-   Assignment assn( id, getAssignment(), location );
-   auto val = assn.codeGen( context );
-   if( val == nullptr ) {
-      Node::printError( location, " Assignment to '" + id->getName() + "' is empty" );
-      context.addError();
-      return nullptr;
-   }
-
-   // If not set by the assignment, set the type of the variable.
-   if (context.getType(id->getName()).empty()) {
-      context.setVarType("var", id->getName());
-   }
-
-   return val;
-}
-
-
 
 }

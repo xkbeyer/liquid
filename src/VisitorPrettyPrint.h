@@ -31,7 +31,6 @@ public:
    void VisitAssigment(Assignment* expr);
    void VisitMethodCall(MethodCall* expr);
    void VisitVariablenDeclaration(VariableDeclaration* expr);
-   void VisitVariablenDeclarationDeduce(VariableDeclarationDeduce* expr);
    void VisitConditional(Conditional* expr);
    void VisitWhileLoop(WhileLoop* expr);
    void VisitClassDeclaration(ClassDeclaration* expr);

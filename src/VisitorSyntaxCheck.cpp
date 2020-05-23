@@ -93,8 +93,6 @@ void VisitorSyntaxCheck::VisitVariablenDeclaration( VariableDeclaration* expr )
    }
 }
 
-void VisitorSyntaxCheck::VisitVariablenDeclarationDeduce( VariableDeclarationDeduce* expr ) { (void)expr; }
-
 void VisitorSyntaxCheck::VisitWhileLoop( WhileLoop* expr ) { (void)expr; }
 
 void VisitorSyntaxCheck::VisitClassDeclaration( ClassDeclaration* expr )

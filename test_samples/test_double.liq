@@ -13,6 +13,6 @@ displayln("%lf %lf %lf", d7, d8, d9)
 def aKlass
     int eins=1
     
-aKlass x
+aKlass xK
 # a.eins has a pattern .e which could be a double.
-displayln("%d", x.eins)
+displayln("%d", xK.eins)

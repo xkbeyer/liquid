@@ -151,7 +151,7 @@ The `var` keyword is used to auto deduce the type of a variable.
 ```
 var abc = 1     # deduce to int
 var s = "Hello" # deduce to string.
-var something   # error, can't be deduced.
+var something   # type deduce will take place with the next assignment.
 ```
 
 ## Program ##
@@ -254,7 +254,7 @@ int i = aFunction( 23 )
 ## Class ##
 ```
 def classname
-    instance variable
+    type instance-variable
     def method
         method-body
 ```

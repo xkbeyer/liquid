@@ -1,11 +1,11 @@
 # Test scope in if statement
 
-var x = 1
-if x > 0
-	var y = 5
-	x = y
+var xNum = 1
+if xNum > 0
+	var yNum = 5
+	xNum = y
 else
-	printvalue(y) # must fail
+	printvalue(yNum) # must fail
 
-printvalue(x)
-var z = y # must fail y out of scope
+printvalue(xNum)
+var zNum = yNum # must fail yNum out of scope

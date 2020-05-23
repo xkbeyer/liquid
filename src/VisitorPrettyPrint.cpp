@@ -175,16 +175,6 @@ void VisitorPrettyPrint::VisitVariablenDeclaration( VariableDeclaration* expr )
    }
 }
 
-void VisitorPrettyPrint::VisitVariablenDeclarationDeduce( VariableDeclarationDeduce* expr )
-{
-   out << indent_spaces(indent) << "Create " << expr->toString() << " with type deduction" << std::endl;
-   if(expr->hasAssignmentExpr()) {
-      ++indent;
-      expr->getAssignment()->Accept(*this);
-      --indent;
-   }
-}
-
 void VisitorPrettyPrint::VisitWhileLoop( WhileLoop* expr )
 {
    out << indent_spaces(indent) << "Create " << expr->toString() << std::endl;

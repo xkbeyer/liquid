@@ -62,7 +62,6 @@
     liquid::Statement *stmt;
     liquid::Identifier *ident;
     liquid::VariableDeclaration *var_decl;
-    liquid::VariableDeclarationDeduce *var_decl_deduce;
     std::vector<liquid::VariableDeclaration*> *varvec;
     std::vector<liquid::Expression*> *exprvec;
     std::string *string;
@@ -126,7 +125,6 @@ stmt : var_decl
      | expr { $$ = new liquid::ExpressionStatement($1); }
      ;
 
-
 block : INDENT stmts UNINDENT { $$ = $2; }
       | INDENT UNINDENT { $$ = new liquid::Block(); }
       ;
@@ -141,10 +139,9 @@ while : TWHILE expr block TELSE block {$$ = new liquid::WhileLoop($2,$3,$5);}
 
 var_decl : ident ident { $$ = new liquid::VariableDeclaration($1, $2, @$); }
          | ident ident TEQUAL expr { $$ = new liquid::VariableDeclaration($1, $2, $4, @$); }
-         | TVAR ident { $$ = new liquid::VariableDeclarationDeduce($2, @$); }
-         | TVAR ident TEQUAL expr { $$ = new liquid::VariableDeclarationDeduce($2, $4, @$); }
+         | TVAR ident { $$ = new liquid::VariableDeclaration($2, @$); }
+         | TVAR ident TEQUAL expr { $$ = new liquid::VariableDeclaration($2, $4, @$); }
          ;
-
 
 func_decl : TDEF ident TLPAREN func_decl_args TRPAREN TCOLON ident block { $$ = new liquid::FunctionDeclaration($7, $2, $4, $8, @$); }
           | TDEF ident TLPAREN func_decl_args TRPAREN block { $$ = new liquid::FunctionDeclaration($2, $4, $6, @$); }
@@ -157,17 +154,6 @@ func_decl_args : /*blank*/  { $$ = new liquid::VariableList(); }
 
 class_decl: TDEF ident block {$$ = new liquid::ClassDeclaration($2, $3); }
           ;
-
-ident : TIDENTIFIER { $$ = new liquid::Identifier(*$1, @1); delete $1; }
-      | TIDENTIFIER TDOT TIDENTIFIER { $$ = new liquid::Identifier(*$1,*$3, @$); delete $1; delete $3;}
-      ;
-
-literals : TINTEGER { $$ = new liquid::Integer(atol($1->c_str())); delete $1; }
-         | TDOUBLE { $$ = new liquid::Double(atof($1->c_str())); delete $1; }
-         | TSTR { $$ = new liquid::String(*$1); delete $1; }
-         | TBOOL { $$ = new liquid::Boolean(*$1); delete $1; }
-         ;
-
 
 return : TRETURN expr { $$ = new liquid::Return(@$, $2); }
        | TRETURN_SIMPLE { $$ = new liquid::Return(@$); }
@@ -185,6 +171,17 @@ expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
      | array_expr
      | array_access
      ;
+
+ident : TIDENTIFIER { $$ = new liquid::Identifier(*$1, @1); delete $1; }
+      | TIDENTIFIER TDOT TIDENTIFIER { $$ = new liquid::Identifier(*$1,*$3, @$); delete $1; delete $3;}
+      ;
+
+literals : TINTEGER { $$ = new liquid::Integer(atol($1->c_str())); delete $1; }
+         | TDOUBLE { $$ = new liquid::Double(atof($1->c_str())); delete $1; }
+         | TSTR { $$ = new liquid::String(*$1); delete $1; }
+         | TBOOL { $$ = new liquid::Boolean(*$1); delete $1; }
+         ;
+
 /* have to write it explicit to have the right operator precedence */
 binop_expr : expr TAND expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
            | expr TOR expr { $$ = new liquid::BinaryOp($1, $2, $3, @$); }
@@ -222,7 +219,7 @@ array_add_element: ident TLTLT expr { $$ = new liquid::ArrayAddElement($1, $3, @
 array_access: ident TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ArrayAccess($1,atol($3->c_str()), @$); delete $3;}
            | array_access TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ArrayAccess($1,atol($3->c_str()), @$); delete $3;}
            ;
-           
+
 range_expr : TLBRACKET expr TRANGE expr TRBRACKET {$$ = new liquid::Range($2, $4, @$);}
            ;
 
