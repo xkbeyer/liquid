@@ -23,6 +23,7 @@
     #include "Range.h"
 
     #include <stdio.h>
+    #include <stack>
     liquid::Block *programBlock; /* the top level root node of our final AST */
 
     extern int yylex();
@@ -65,6 +66,9 @@
     std::vector<liquid::VariableDeclaration*> *varvec;
     std::vector<liquid::Expression*> *exprvec;
     std::string *string;
+    long long integer;
+    double number;
+    int boolean;
     int token;
 }
 
@@ -72,14 +76,17 @@
    match our tokens.l lex file. We also define the node type
    they represent.
  */
-%token <string> TIDENTIFIER TINTEGER TDOUBLE TSTR TBOOL
-%token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL TLTLT
-%token <token> TCOMMA TDOT TCOLON TRANGE
-%token <token> TLPAREN TRPAREN TLBRACKET TRBRACKET
+%token <string> TIDENTIFIER TSTR
+%token <integer> TINTEGER
+%token <number> TDOUBLE
+%token <boolean> TBOOL
+%token <token> TCEQ TCNE TCLT TCLE TCGT TCGE
+%token <token> TLTLT "<<"
+%token <token> TRANGE
 %token <token> TPLUS TMINUS TMUL TDIV
 %token <token> TNOT TAND TOR
-%token <token> TIF TELSE TWHILE TTO 
-%token <token> TSQUOTE TDEF TRETURN TRETURN_SIMPLE TVAR IS
+%token <token> TIF TELSE TWHILE
+%token <token> TDEF TRETURN TRETURN_SIMPLE TVAR
 %token <token> INDENT UNINDENT 
 
 /* Define the type of node our nonterminal symbols represent.
@@ -107,7 +114,7 @@
 
 %%
 
-program : /* blank */ { programBlock = new liquid::Block(); }
+program : %empty { programBlock = new liquid::Block(); }
         | stmts { programBlock = $1; }
         ;
 
@@ -138,18 +145,18 @@ while : TWHILE expr block TELSE block {$$ = new liquid::WhileLoop($2,$3,$5);}
       ; 
 
 var_decl : ident ident { $$ = new liquid::VariableDeclaration($1, $2, @$); }
-         | ident ident TEQUAL expr { $$ = new liquid::VariableDeclaration($1, $2, $4, @$); }
+         | ident ident '=' expr { $$ = new liquid::VariableDeclaration($1, $2, $4, @$); }
          | TVAR ident { $$ = new liquid::VariableDeclaration($2, @$); }
-         | TVAR ident TEQUAL expr { $$ = new liquid::VariableDeclaration($2, $4, @$); }
+         | TVAR ident '=' expr { $$ = new liquid::VariableDeclaration($2, $4, @$); }
          ;
 
-func_decl : TDEF ident TLPAREN func_decl_args TRPAREN TCOLON ident block { $$ = new liquid::FunctionDeclaration($7, $2, $4, $8, @$); }
-          | TDEF ident TLPAREN func_decl_args TRPAREN block { $$ = new liquid::FunctionDeclaration($2, $4, $6, @$); }
+func_decl : TDEF ident '(' func_decl_args ')' ':' ident block { $$ = new liquid::FunctionDeclaration($7, $2, $4, $8, @$); }
+          | TDEF ident '(' func_decl_args ')' block { $$ = new liquid::FunctionDeclaration($2, $4, $6, @$); }
           ;
 
-func_decl_args : /*blank*/  { $$ = new liquid::VariableList(); }
+func_decl_args : %empty  { $$ = new liquid::VariableList(); }
           | var_decl { $$ = new liquid::VariableList(); $$->push_back($<var_decl>1); }
-          | func_decl_args TCOMMA var_decl { $1->push_back($<var_decl>3); }
+          | func_decl_args ',' var_decl { $1->push_back($<var_decl>3); }
           ;
 
 class_decl: TDEF ident block {$$ = new liquid::ClassDeclaration($2, $3); }
@@ -159,27 +166,27 @@ return : TRETURN expr { $$ = new liquid::Return(@$, $2); }
        | TRETURN_SIMPLE { $$ = new liquid::Return(@$); }
        ;
 
-expr : ident TEQUAL expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
-     | ident TLPAREN call_args TRPAREN { $$ = new liquid::MethodCall($1, $3, @$);  }
+expr : ident '=' expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
+     | ident '(' call_args ')' { $$ = new liquid::MethodCall($1, $3, @$);  }
      | ident { $<ident>$ = $1; }
      | literals
      | boolean_expr 
      | binop_expr
      | unaryop_expr
-     | TLPAREN expr TRPAREN { $$ = $2; }
+     | '(' expr ')' { $$ = $2; }
      | range_expr
      | array_expr
      | array_access
      ;
 
 ident : TIDENTIFIER { $$ = new liquid::Identifier(*$1, @1); delete $1; }
-      | TIDENTIFIER TDOT TIDENTIFIER { $$ = new liquid::Identifier(*$1,*$3, @$); delete $1; delete $3;}
+      | TIDENTIFIER '.' TIDENTIFIER { $$ = new liquid::Identifier(*$1,*$3, @$); delete $1; delete $3;}
       ;
 
-literals : TINTEGER { $$ = new liquid::Integer(atol($1->c_str())); delete $1; }
-         | TDOUBLE { $$ = new liquid::Double(atof($1->c_str())); delete $1; }
+literals : TINTEGER { $$ = new liquid::Integer($1); }
+         | TDOUBLE { $$ = new liquid::Double($1); }
          | TSTR { $$ = new liquid::String(*$1); delete $1; }
-         | TBOOL { $$ = new liquid::Boolean(*$1); delete $1; }
+         | TBOOL { $$ = new liquid::Boolean($1); }
          ;
 
 /* have to write it explicit to have the right operator precedence */
@@ -197,30 +204,30 @@ unaryop_expr : TNOT expr { $$ = new liquid::UnaryOperator($1, $2); }
 boolean_expr : expr comparison expr { $$ = new liquid::CompOperator($1, $2, $3); }
              ;
 
-call_args : /*blank*/  { $$ = new liquid::ExpressionList(); }
+call_args : %empty  { $$ = new liquid::ExpressionList(); }
           | expr { $$ = new liquid::ExpressionList(); $$->push_back($1); }
-          | call_args TCOMMA expr  { $1->push_back($3); }
+          | call_args ',' expr  { $1->push_back($3); }
           ;
  
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE
            ;
           
-array_elemets_expr: /* blank */ {$$ = new liquid::ExpressionList(); }
+array_elemets_expr: %empty {$$ = new liquid::ExpressionList(); }
                  | expr {$$ = new liquid::ExpressionList(); $$->push_back($1);}
-                 | array_elemets_expr TCOMMA expr {$$->push_back($3); }
+                 | array_elemets_expr ',' expr {$$->push_back($3); }
                  ; 
                  
-array_expr : TLBRACKET array_elemets_expr TRBRACKET {$$ = new liquid::Array($2, @$);}
+array_expr : '[' array_elemets_expr ']' {$$ = new liquid::Array($2, @$);}
           ;
           
-array_add_element: ident TLTLT expr { $$ = new liquid::ArrayAddElement($1, $3, @$); }
+array_add_element: ident "<<" expr { $$ = new liquid::ArrayAddElement($1, $3, @$); }
                 ;
                 
-array_access: ident TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ArrayAccess($1,atol($3->c_str()), @$); delete $3;}
-           | array_access TLBRACKET TINTEGER TRBRACKET { $$ = new liquid::ArrayAccess($1,atol($3->c_str()), @$); delete $3;}
+array_access: ident '[' TINTEGER ']' { $$ = new liquid::ArrayAccess($1, $3, @$); }
+           | array_access '[' TINTEGER ']' { $$ = new liquid::ArrayAccess($1, $3, @$); }
            ;
 
-range_expr : TLBRACKET expr TRANGE expr TRBRACKET {$$ = new liquid::Range($2, $4, @$);}
+range_expr : '[' expr TRANGE expr ']' {$$ = new liquid::Range($2, $4, @$);}
            ;
 
 %%

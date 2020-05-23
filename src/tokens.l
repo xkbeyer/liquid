@@ -4,6 +4,9 @@
 #include "AstNode.h"
 #include "parser.hpp"
 #define SAVE_TOKEN yylval.string = new std::string(yytext, yyleng)
+#define SAVE_INTEGER yylval.integer = std::stoll(std::string(yytext, yyleng))
+#define SAVE_NUMBER yylval.number = std::stod(std::string(yytext, yyleng))
+#define SAVE_BOOLEAN yylval.boolean = std::string(yytext, yyleng) == "true" ? 1 : 0
 #define TOKEN(t) (yylval.token = t)
 
 #ifdef _MSC_VER
@@ -18,7 +21,7 @@ int yycolumn = 1;
 int yyerror(char const * s )
 {
     printf("ERROR %s in '%s' at line %d col %d\n", s, yytext, yylineno, yycolumn);
-    printf("  parsed loc %d.%d-%d.%d\n", yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column);
+    printf("  parsed %s %d.%d-%d.%d\n", yylloc.file_name.c_str(), yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column);
     return 1;
 }
 
@@ -170,18 +173,16 @@ import              BEGIN(incl);
 "def"                   return TOKEN(TDEF);
 "var"                   return TOKEN(TVAR);
 "while"                 return TOKEN(TWHILE);
-"is"                    return TOKEN(IS);
-"true"                  SAVE_TOKEN; return TBOOL;
-"false"                 SAVE_TOKEN; return TBOOL;
-"to"                    return TOKEN(TTO);
+"true"                  SAVE_BOOLEAN; return TBOOL;
+"false"                 SAVE_BOOLEAN; return TBOOL;
 #.*                     /* comments one line til nl */
 [ \t\n]                 /* ignore */;
 [a-zA-Z_][a-zA-Z0-9_&%\$\?\-]*  SAVE_TOKEN; return TIDENTIFIER;
--?[0-9]+                SAVE_TOKEN; return TINTEGER;
-{number}                SAVE_TOKEN; return TDOUBLE;
+-?[0-9]+                SAVE_INTEGER; return TINTEGER;
+{number}                SAVE_NUMBER; return TDOUBLE;
 "->"                    return TOKEN(TRANGE);
 "::"                    return TOKEN(TRANGE);
-"="                     return TOKEN(TEQUAL);
+"="                     return '=';
 "=="                    return TOKEN(TCEQ);
 "!="                    return TOKEN(TCNE);
 "<<"                    return TOKEN(TLTLT);
@@ -189,17 +190,17 @@ import              BEGIN(incl);
 "<="                    return TOKEN(TCLE);
 ">"                     return TOKEN(TCGT);
 ">="                    return TOKEN(TCGE);
-"("                     return TOKEN(TLPAREN);
-")"                     return TOKEN(TRPAREN);
-"."                     return TOKEN(TDOT);
-","                     return TOKEN(TCOMMA);
+"("                     return '(';
+")"                     return ')';
+"."                     return '.';
+","                     return ',';
 "+"                     return TOKEN(TPLUS);
 "-"                     return TOKEN(TMINUS);
 "*"                     return TOKEN(TMUL);
 "/"                     return TOKEN(TDIV);
-":"                     return TOKEN(TCOLON);
-"["                     return TOKEN(TLBRACKET);
-"]"                     return TOKEN(TRBRACKET);
+":"                     return ':';
+"["                     return '[';
+"]"                     return ']';
 .                       printf("line %d, len %d Unknown token %s !\n", yylineno, yyleng, yytext); yyterminate();
 
 %%

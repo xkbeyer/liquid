@@ -5,10 +5,8 @@
 
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <string>
 #include <sstream>
-#include <stack>
 
 #if defined(_MSC_VER)
 #pragma warning(push, 0)
@@ -185,20 +183,19 @@ private:
 class Boolean : public Expression
 {
 public:
-   explicit Boolean(const std::string& value) : value(value), boolVal(value == "true") {}
+   explicit Boolean(int const value) : boolVal(value) {}
    virtual ~Boolean() = default;
    llvm::Value* codeGen(CodeGenContext& context) override;
    NodeType     getType() override { return NodeType::boolean; }
    std::string  toString() override
    {
       std::stringstream s;
-      s << "boolean: " << value;
+      s << "boolean: " << (boolVal == 1 ? "true" : "false");
       return s.str();
    }
    void Accept(Visitor& v) override { v.VisitBoolean(this); }
 
 private:
-   std::string value;
    int         boolVal{0};
 };
 
