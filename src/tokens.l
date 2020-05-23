@@ -166,7 +166,6 @@ import              BEGIN(incl);
 \r                      /* cr are ignored */
 "if"                    return TOKEN(TIF);
 "else"                  return TOKEN(TELSE);
-"return"[ \t]*[\n]      return TOKEN(TRETURN_SIMPLE);
 "return"                return TOKEN(TRETURN);
 "not"                   return TOKEN(TNOT);
 "and"                   return TOKEN(TAND);

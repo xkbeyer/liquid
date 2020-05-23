@@ -162,8 +162,8 @@ func_decl_args : %empty  { $$ = new liquid::VariableList(); }
 class_decl: TDEF ident block {$$ = new liquid::ClassDeclaration($2, $3); }
           ;
 
-return : TRETURN expr { $$ = new liquid::Return(@$, $2); }
-       | TRETURN_SIMPLE { $$ = new liquid::Return(@$); }
+return : TRETURN { $$ = new liquid::Return(@$); }
+       | TRETURN expr { $$ = new liquid::Return(@$, $2); }
        ;
 
 expr : ident '=' expr { $$ = new liquid::Assignment($<ident>1, $3, @$); }
