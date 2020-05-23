@@ -86,7 +86,7 @@
 %token <token> TPLUS TMINUS TMUL TDIV
 %token <token> TNOT TAND TOR
 %token <token> TIF TELSE TWHILE
-%token <token> TDEF TRETURN TRETURN_SIMPLE TVAR
+%token <token> TDEF TRETURN TVAR
 %token <token> INDENT UNINDENT 
 
 /* Define the type of node our nonterminal symbols represent.
@@ -111,6 +111,10 @@
 %debug 
 %verbose 
 %locations /* track locations: @n of component N; @$ of entire range */
+/*
+%define parse.lac full
+%define lr.type ielr
+*/
 
 %%
 
