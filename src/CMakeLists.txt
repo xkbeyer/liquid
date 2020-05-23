@@ -178,7 +178,7 @@ endif()
 
 set(VER_MAJ 0)
 set(VER_MIN 3)
-set(VER_REV 0)
+set(VER_REV 1)
 
 configure_file(config.in ${liquid_SOURCE_DIR}/config.h)
 

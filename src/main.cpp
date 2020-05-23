@@ -19,93 +19,93 @@ extern int parsing_error;
 
 void usage();
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    std::string fileName;
-    if( argc == 1 ) {
-        fileName = "./test_full.liq";
-    }
+   std::string fileName;
+   if( argc == 1 ) {
+      fileName = "./test_full.liq";
+   }
 
-    libPaths.push_back("./"); // current path
-    bool verbose = false;
-    bool quiet = false;
-    bool debug = false;
-    GetOpt getopt(argc, argv, "hi:vqd");
-    for( auto opt : getopt ) {
-       switch( opt ) {
-          case 'i':
-          {
-             std::stringstream ss(getopt.get());
-             std::string item;
-             while( std::getline(ss, item, ';') ) {
-                std::replace(std::begin(item), std::end(item), '\\', '/');
-                if( item[item.size()] != '/' ) {
-                   item += '/';
-                }
-                libPaths.push_back(item);
-             }
-          }
-             break;
-          case 'v':
-             verbose = true;
-             break;
-          case 'q':
-             quiet = true;
-             break;
-          case 'd':
-             debug = true;
-             break;
-          case 'h':
-             usage();
-             return 1;
-          default:
-             std::cout << getopt.error() << "\n";
-             usage();
-             return 1;
-       }
-    }
-    if( !quiet ) {
+   libPaths.push_back("./"); // current path
+   bool verbose = false;
+   bool quiet = false;
+   bool debug = false;
+   GetOpt getopt(argc, argv, "hi:vqd");
+   for( auto opt : getopt ) {
+      switch( opt ) {
+         case 'i': {
+            std::stringstream ss(getopt.get());
+            std::string item;
+            while( std::getline(ss, item, ';') ) {
+               std::replace(std::begin(item), std::end(item), '\\', '/');
+               if( item[item.size()] != '/' ) {
+                  item += '/';
+               }
+               libPaths.push_back(item);
+            }
+         } break;
+         case 'v':
+            verbose = true;
+            break;
+         case 'q':
+            quiet = true;
+            break;
+         case 'd':
+            debug = true;
+            break;
+         case 'h':
+            usage();
+            return 1;
+         case EOF:
+            break;
+         default:
+            std::cout << getopt.error() << "\n";
+            usage();
+            return 1;
+      }
+   }
+
+   if( !quiet ) {
       std::cout << "liquid version " << MAJOR_VER << "." << MINOR_VER << "." << REVISION_VER << "\n";
-    }
-    auto files = getopt.getRemainingArguments();
-    assert(files.size() == 1);
-    fileName = files[0]; // Currently only one file is supported.
+   }
+   auto files = getopt.getRemainingArguments();
+   assert(files.size() == 1);
+   fileName = files[0]; // Currently only one file is supported.
 
-    yyin = fopen(fileName.c_str(), "r+") ;
-    if ( yyin == nullptr )
-    {
-       std::cout << "File "<< fileName << "not found. Abort" << std::endl;
-       return -1;
-    }
+   yyin = fopen(fileName.c_str(), "r+");
+   if( yyin == nullptr ) {
+      std::cout << "File " << fileName << "not found. Abort" << std::endl;
+      return -1;
+   }
 
-    fileNames.push(""); // Add the empty file name after last EOF.
-    fileNames.push(fileName); // Add the top level file name.
-    if( yyparse() || parsing_error) {
-       yylex_destroy();
-       return 1;
-    }
+   fileNames.push("");       // Add the empty file name after last EOF.
+   fileNames.push(fileName); // Add the top level file name.
+   if( yyparse() || parsing_error ) {
+      yylex_destroy();
+      return 1;
+   }
 
-    if( programBlock == nullptr ) {
-       std::cout << "Parsing " << fileName << "failed. Abort" << std::endl;
-    } else {
-       std::ostringstream devNull;
-       liquid::CodeGenContext context(quiet ? devNull : std::cout);
-       context.verbose = verbose;
-       context.debug = debug;
-       if( verbose )
-         context.printCodeGeneration( *programBlock, std::cout );
-       if( context.preProcessing( *programBlock ) ) {
-          if(context.generateCode(*programBlock)) {
-             context.runCode();
-          }
-       }
-    }
+   if( programBlock == nullptr ) {
+      std::cout << "Parsing " << fileName << "failed. Abort" << std::endl;
+   } else {
+      std::ostringstream devNull;
+      liquid::CodeGenContext context(quiet ? devNull : std::cout);
+      context.verbose = verbose;
+      context.debug = debug;
+      if( verbose )
+         context.printCodeGeneration(*programBlock, std::cout);
+      if( context.preProcessing(*programBlock) ) {
+         if( context.generateCode(*programBlock) ) {
+            context.runCode();
+         }
+      }
+   }
 
-    if( yyin != nullptr )
+   if( yyin != nullptr )
       fclose(yyin);
-    delete programBlock;
-    yylex_destroy();
-    return 0;
+   delete programBlock;
+   yylex_destroy();
+   return 0;
 }
 
 void usage()

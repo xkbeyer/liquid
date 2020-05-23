@@ -53,11 +53,11 @@ where
 
 Liquid does parse the file, generates the code in memory and runs it.
 
-__Note__ _Due to a bug at least one option must be set._
-
-**Example**
+**Examples**
 ```
+./liq test.liq
 ./liq test.liq -q
+./liq test.liq -v -d -i import/path;import/other/path
 ```
 
 # Language Syntax #
