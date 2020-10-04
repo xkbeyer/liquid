@@ -23,9 +23,10 @@ mkdir build
 3. Change to the build directory and run cmake
 ```
 cd build
-ccmake ..
+cmake ..
 ```
-Make sure all Variables are set properly and then generate the build.
+Make sure all variables are set properly and then generate the build.
+One can use `ccmake` (GUI) to change or check the variables.
 
 5. Run the make
 ```
