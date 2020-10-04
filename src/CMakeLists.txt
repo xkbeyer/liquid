@@ -26,8 +26,44 @@ SET(CMAKE_BUILD_TYPE Debug CACHE STRING "default to debug" FORCE)
 # Setup the cmake directory containing numerous cmake scripts and macros.
 set(CMAKE_MODULE_PATH "${liquid_SOURCE_DIR}/cmake")
 
+# Search for the different needed libs. #
+#########################################
 FIND_PACKAGE(FLEX)
 FIND_PACKAGE(BISON)
+
+# We incorporate the CMake features provided by LLVM:
+if( $ENV{LLVM_ROOT} )
+  set(LLVM_ROOT $ENV{LLVM_ROOT})
+endif()
+find_package(LLVM PATHS "${LLVM_ROOT}/lib/cmake/llvm" "$ENV{ProgramFiles}/lib/cmake/llvm")
+
+if( LLVM_FOUND )
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LLVM_DIR}")
+else()
+    message(FATAL_ERROR "LLVM installation not found. Set LLVM_ROOT to the installation root path.")
+endif()
+
+include(LLVMConfig)
+message(STATUS "Found LLVM Package Version:${LLVM_PACKAGE_VERSION}")
+message(STATUS "LLVM Built type : ${LLVM_BUILD_TYPE}")
+string(REGEX MATCH "[0-9]+\\.[0-9]+" LLVM_VER ${LLVM_PACKAGE_VERSION} )
+if(${LLVM_VER} VERSION_LESS "6.0" )
+    message(FATAL_ERROR "LLVM version before 6.0 are not supported. Abort!")
+endif()
+if(${LLVM_VER} VERSION_GREATER "10.0" )
+    message(WARNING "LLVM version ${LLVM_VER} is not tested.")
+endif()
+
+if(MSVC)
+    if(NOT CMAKE_CL_64)
+        message(FATAL_ERROR "Currently only 64bit compilation is supported!")
+    endif()
+endif()
+
+# Let's suppose we want to build a JIT compiler with support for
+# binary code :
+llvm_map_components_to_libnames(REQ_LLVM_LIBRARIES mcjit interpreter native ipo)
+
 
 # Put all source files into one variable. #
 ##########################################
@@ -84,14 +120,18 @@ if(MSVC)
     source_group(Source\ Files FILES ${SOURCE_COMMON})
 endif()
 
-BISON_TARGET(Parser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp)
+set(VER_MAJ 0)
+set(VER_MIN 3)
+set(VER_REV 1)
+
+configure_file(config.in ${liquid_SOURCE_DIR}/config.h)
+
+
+BISON_TARGET(Parser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp COMPILE_FLAGS --report=solved COMPILE_FLAGS --feature=fixit)
 FLEX_TARGET(Scanner tokens.l ${CMAKE_CURRENT_BINARY_DIR}/tokens.cpp )
 ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
 
 add_executable(liq ${SOURCES_COMMON} ${HEADER_COMMON} ${BISON_Parser_OUTPUTS} ${FLEX_Scanner_OUTPUTS})
-
-# Check for various language-stuff and compiler versions #
-##########################################################
 
 # Compiler-dependent and build-depended flags:
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
@@ -110,38 +150,6 @@ endif()
 # Debug or release ?
 target_compile_definitions(liq PRIVATE $<$<CONFIG:Debug>:_DEBUG>)
 
-# Search for the different needed libs. #
-#########################################
-
-# We incorporate the CMake features provided by LLVM:
-if( $ENV{LLVM_ROOT} )
-  set(LLVM_ROOT $ENV{LLVM_ROOT})
-endif()
-find_package(LLVM
-  PATHS "${LLVM_ROOT}/lib/cmake/llvm" "$ENV{ProgramFiles}/lib/cmake/llvm")
-
-if( LLVM_FOUND )
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LLVM_DIR}")
-else()
-    message(FATAL_ERROR "LLVM installation not found. Set LLVM_ROOT to the installation root path.")
-endif()
-
-include(LLVMConfig)
-message(STATUS "Found LLVM Package Version:${LLVM_PACKAGE_VERSION}")
-message(STATUS "LLVM Built type : ${LLVM_BUILD_TYPE}")
-string(REGEX MATCH "[0-9]+\\.[0-9]+" LLVM_VER ${LLVM_PACKAGE_VERSION} )
-if(${LLVM_VER} VERSION_LESS "6.0" )
-    message(FATAL_ERROR "LLVM version before 6.0 are not supported. Abort!")
-endif()
-if(${LLVM_VER} VERSION_GREATER "8.0" )
-    message(WARNING "LLVM version ${LLVM_VER} is not tested.")
-endif()
-
-if(MSVC)
-    if(NOT CMAKE_CL_64)
-        message(FATAL_ERROR "Currently only 64bit compilation is supported!")
-    endif()
-endif()
 
 # Add the compiler definitions of LLVM
 if(MSVC)
@@ -154,14 +162,6 @@ target_compile_definitions(liq PRIVATE ${LLVM_DEFINITIONS})
 if( "${LLVM_BUILD_TYPE}" MATCHES  "Release|RelWithDebInfo|MinSizeRel")
   target_compile_definitions(liq PRIVATE LLVM_NO_DUMP)
 endif()
-
-# Now set the header and library paths:
-include_directories( ${LLVM_ROOT}/include )
-link_directories( ${LLVM_ROOT}/lib )
-
-# Let's suppose we want to build a JIT compiler with support for
-# binary code :
-llvm_map_components_to_libnames(REQ_LLVM_LIBRARIES mcjit interpreter native ipo)
 
 if(NOT LLVM_ENABLE_RTTI)
     target_compile_definitions(liq PRIVATE LIQ_NO_RTTI)
@@ -176,21 +176,11 @@ if(LLVM_ENABLE_EH AND CMAKE_COMPILER_IS_GNUCXX)
     target_compile_options(liq PRIVATE -fexceptions)
 endif()
 
-set(VER_MAJ 0)
-set(VER_MIN 3)
-set(VER_REV 1)
-
-configure_file(config.in ${liquid_SOURCE_DIR}/config.h)
-
-# The compiling process. #
-##########################
-
 # Add additional include search directories.
-target_include_directories(liq PRIVATE ${liquid_SOURCE_DIR})
+target_include_directories(liq PRIVATE ${liquid_SOURCE_DIR} ${LLVM_INCLUDE_DIRS})
 target_include_directories(liq PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-set_property(TARGET liq PROPERTY CXX_STANDARD 17)
-set_property(TARGET liq PROPERTY CXX_STANDARD_REQUIRED ON)
+target_compile_features(liq PRIVATE cxx_std_17)
 
 # Finally, we link the LLVM libraries to our executable:
 target_link_libraries(liq ${REQ_LLVM_LIBRARIES})
