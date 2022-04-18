@@ -287,12 +287,12 @@ Instruction* CodeGenContext::getKlassVarAccessInst(std::string klass, std::strin
    ConstantInt*        const_int32   = ConstantInt::get(getModule()->getContext(), APInt(32, index));
    ptr_indices.push_back(const_int32_0);
    ptr_indices.push_back(const_int32);
-   if (this_ptr->getType()->getElementType()->isPointerTy()) {
+   if (this_ptr->getType()->getNonOpaquePointerElementType()->isPointerTy()) {
       // since the alloc is a ptr to ptr
-      Value* val = new LoadInst(this_ptr, "", false, currentBlock());
+      Value* val = new LoadInst(this_ptr->getAllocatedType(), this_ptr, "", false, currentBlock());
       return GetElementPtrInst::Create(val->getType()->getPointerElementType(), val, ptr_indices, "", currentBlock());
    }
-   Instruction* ptr = GetElementPtrInst::Create(this_ptr->getType()->getElementType(), this_ptr, ptr_indices, "", currentBlock());
+   Instruction* ptr = GetElementPtrInst::Create(this_ptr->getType()->getNonOpaquePointerElementType(), this_ptr, ptr_indices, "", currentBlock());
    return ptr;
 }
 
@@ -318,7 +318,7 @@ Type* CodeGenContext::typeOf(const std::string& name)
       return llvmTypeMap[name];
    }
 
-   llvm::Type* ty = getModule()->getTypeByName("class." + name);
+   llvm::Type* ty = StructType::getTypeByName(getModule()->getContext(), "class." + name);
    if (ty != nullptr) {
       return ty;
    }

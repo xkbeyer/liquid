@@ -14,3 +14,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON) #To use with clang-tidy, not supported w/ 
 set(CMAKE_MODULE_PATH "${liquid_SOURCE_DIR}/cmake")
 
 add_subdirectory(src)
+
+# Set the visual studio start up project.
+if(MSVC)
+   set_property(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} PROPERTY VS_STARTUP_PROJECT liq)
+endif()

@@ -47,10 +47,7 @@ include(LLVMConfig)
 message(STATUS "Found LLVM Package Version:${LLVM_PACKAGE_VERSION}")
 message(STATUS "LLVM Built type : ${LLVM_BUILD_TYPE}")
 string(REGEX MATCH "[0-9]+\\.[0-9]+" LLVM_VER ${LLVM_PACKAGE_VERSION} )
-if(${LLVM_VER} VERSION_LESS "6.0" )
-    message(FATAL_ERROR "LLVM version before 6.0 are not supported. Abort!")
-endif()
-if(${LLVM_VER} VERSION_GREATER "10.0" )
+if(NOT ${LLVM_VER} VERSION_EQUAL "14.0" )
     message(WARNING "LLVM version ${LLVM_VER} is not tested.")
 endif()
 
@@ -115,14 +112,9 @@ set(HEADER_COMMON
             MethodCall.h
    )
 
-if(MSVC)
-    source_group(Header\ Files FILES ${HEADER_COMMON})
-    source_group(Source\ Files FILES ${SOURCE_COMMON})
-endif()
-
 set(VER_MAJ 0)
 set(VER_MIN 3)
-set(VER_REV 1)
+set(VER_REV 2)
 
 configure_file(config.in ${liquid_SOURCE_DIR}/config.h)
 
@@ -184,3 +176,8 @@ target_compile_features(liq PRIVATE cxx_std_17)
 
 # Finally, we link the LLVM libraries to our executable:
 target_link_libraries(liq ${REQ_LLVM_LIBRARIES})
+
+if(MSVC)
+    source_group(Header\ Files FILES ${HEADER_COMMON})
+    source_group(Source\ Files FILES ${SOURCE_COMMON})
+endif()

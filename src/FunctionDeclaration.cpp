@@ -212,7 +212,7 @@ Value* FunctionDeclaration::codeGen( CodeGenContext& context )
 
         // Clone the function to the new (real) function w/ the correct return type.
         SmallVector<ReturnInst*, 8> Returns;  // Ignore returns cloned.
-        CloneFunctionInto( functionNew, function, VMap, false, Returns );
+        CloneFunctionInto( functionNew, function, VMap, CloneFunctionChangeType::LocalChangesOnly, Returns );
 
         // Remove the old one.
         function->eraseFromParent();

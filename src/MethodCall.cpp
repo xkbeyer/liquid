@@ -59,7 +59,7 @@ Value* MethodCall::codeGen(CodeGenContext& context)
          std::string typeName = context.getType(ident->getName());
          AllocaInst* alloca   = context.findVariable(ident->getName());
          if (alloca != nullptr) {
-            if (alloca->getType()->getElementType()->isStructTy()) {
+            if (alloca->getType()->getNonOpaquePointerElementType()->isStructTy()) {
                args.push_back(alloca);
                delete ident;
                arguments->erase(begin(*arguments));

@@ -4,6 +4,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <cassert>
+#include <stack>
 #include "config.h"
 #include "CodeGenContext.h"
 #include "AstNode.h"

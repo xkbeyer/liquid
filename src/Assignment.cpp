@@ -54,7 +54,7 @@ Value* Assignment::codeGen(CodeGenContext& context)
       Instruction* ptr       = context.getKlassVarAccessInst(klassName, lhs->getName(), varStruct);
       return new StoreInst(value, ptr, false, context.currentBlock());
    }
-   Type* varType = var->getType()->getElementType();
+   Type* varType = var->getType()->getNonOpaquePointerElementType();
 
    if (value->getType()->getTypeID() == varType->getTypeID()) {
       // same type but different bit size.

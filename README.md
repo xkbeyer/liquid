@@ -7,36 +7,33 @@ After reading an article about LLVM and how easy it is to create a DSL with it, 
 # Installation #
 
 ## Prerequisite ##
-- LLVM 10.0 
+- LLVM 14.0 
 - flex and bison.
-- CMake 3.10 
+- CMake 3.12 
 
 ## Build ##
 1. Clone this repository.
 ```
 git clone https://github.com/xkbeyer/liquid.git
 ```
-2. Create a build directory
+2. Run cmake and generate the build files into the build directory `build`.
 ```
-mkdir build
-```
-3. Change to the build directory and run cmake
-```
-cd build
-cmake ..
+cmake -B build -S .
 ```
 Make sure all variables are set properly and then generate the build.
 One can use `ccmake` (GUI) to change or check the variables.
 
-5. Run the make
+3. Run the make
 ```
+cd build
 make
 ```
 or
 ```
+cd build
 make install
 ```
-6. That's it.
+4. That's it.
 
 ### Windows ###
 After cmake was run the solution file is in the build directory. Start Visual Studio and you are ready to compile it.
