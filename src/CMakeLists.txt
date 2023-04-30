@@ -114,7 +114,7 @@ set(HEADER_COMMON
 
 set(VER_MAJ 0)
 set(VER_MIN 3)
-set(VER_REV 2)
+set(VER_REV 3)
 
 configure_file(config.in ${liquid_SOURCE_DIR}/config.h)
 
