@@ -75,9 +75,9 @@ llvm::Value* ArrayAccess::codeGen(CodeGenContext& context)
    ConstantInt* const_int32 = ConstantInt::get(context.getModule()->getContext(), APInt(32, index));
    ptr_indices.push_back(const_int32_0);
    ptr_indices.push_back(const_int32);
-   auto val = new LoadInst(var->getType(), var, "load_var", context.currentBlock());
+   auto val = new LoadInst(var->getAllocatedType(), var, "load_var", context.currentBlock());
    Instruction* ptr = GetElementPtrInst::Create(var_struct_type, val, ptr_indices, "get_struct_element", context.currentBlock());
-   auto value = new LoadInst(ptr->getType(), ptr, "load_ptr_struct", context.currentBlock());
+   auto value = new LoadInst(ptr->getType()->getNonOpaquePointerElementType(), ptr, "load_ptr_struct", context.currentBlock());
    return value;
 }
 
