@@ -23,20 +23,21 @@ namespace liquid {
 
 Value* ClassDeclaration::codeGen( CodeGenContext& context )
 {
-    std::vector<Type*>StructTy_fields;
+    std::vector<Type*> StructTy_fields;
     context.newKlass( id->getName() );
     constructStructFields( StructTy_fields, context );
     auto classTy = StructType::create( context.getGlobalContext(), StructTy_fields, std::string( "class." ) + id->getName(), /*isPacked=*/false );
-    addVarsToClassAttributes( context );
+    addVarsToClassAttributes( context, StructTy_fields );
     removeVarDeclStatements();
+    context.addClassType(id->getName(), classTy);
     Value* retval = block->codeGen( context );
     context.endKlass();
-    context.addClassType(id->getName(), classTy);
     return retval;
 }
 
 void ClassDeclaration::constructStructFields( std::vector<llvm::Type* >& StructTy_fields, CodeGenContext& context )
 {
+    auto structName = id->getName();
     // Get all variables and put them in the struct vector.
     for( auto statement : block->statements ) {
         if( statement->getType() == NodeType::variable ) {
@@ -51,7 +52,7 @@ void ClassDeclaration::constructStructFields( std::vector<llvm::Type* >& StructT
     }
 }
 
-void ClassDeclaration::addVarsToClassAttributes( CodeGenContext& context )
+void ClassDeclaration::addVarsToClassAttributes( CodeGenContext& context, std::vector<llvm::Type*>& StructTy_fields )
 {
     int index = 0;
     for( auto statement : block->statements ) {
@@ -64,7 +65,7 @@ void ClassDeclaration::addVarsToClassAttributes( CodeGenContext& context )
             VariableDeclaration* vardecl = dynamic_cast< VariableDeclaration* >(statement);
             #endif
             std::string varName = vardecl->getVariablenName();
-            context.klassAddVariableAccess( varName, index++ );
+            context.klassAddVariableAccess( varName, index, StructTy_fields[index] );
             if( vardecl->hasAssignmentExpr() ) {
                 // call the assignments when class is instantiated.
                 // Copy it to a place, so that it can be execute at the init time of the class.
@@ -75,6 +76,7 @@ void ClassDeclaration::addVarsToClassAttributes( CodeGenContext& context )
                 auto assn = new Assignment( newident, assignmentExpr, vardecl->getLocation() );
                 context.addKlassInitCode( klassName, assn );
             }
+            ++index;
         }
     }
 

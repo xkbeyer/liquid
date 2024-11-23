@@ -50,7 +50,7 @@ Value* Conditional::codeGen(CodeGenContext& context)
       needMergeBlock = true;
    }
 
-   function->getBasicBlockList().push_back(elseBlock);
+   function->insert(function->end(), elseBlock);
    context.endScope();
 
    context.newScope(elseBlock);
@@ -65,7 +65,7 @@ Value* Conditional::codeGen(CodeGenContext& context)
    }
    context.endScope();
    if (needMergeBlock) {
-      function->getBasicBlockList().push_back(mergeBlock);
+      function->insert(function->end(), mergeBlock);
       context.setInsertPoint(mergeBlock);
    }
 

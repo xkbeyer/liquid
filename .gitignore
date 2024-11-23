@@ -8,7 +8,9 @@ info/*
 **/Debug
 **/Release
 **/html
+**/.vscode
 *.llvm
 msg.txt
 TODO.txt
+TODO.org
 config.h

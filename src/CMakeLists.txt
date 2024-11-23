@@ -16,8 +16,9 @@ endmacro()
 
 # Setup the make environment. #
 ################################
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Activate very verbose makefiles.
-set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 # Allow else() and endif() constructs (with empty parentheses)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
@@ -35,10 +36,12 @@ FIND_PACKAGE(BISON)
 if( $ENV{LLVM_ROOT} )
   set(LLVM_ROOT $ENV{LLVM_ROOT})
 endif()
-find_package(LLVM PATHS "${LLVM_ROOT}/lib/cmake/llvm" "$ENV{ProgramFiles}/lib/cmake/llvm")
+message(STATUS "LLVM root is ${LLVM_ROOT}")
+find_package(LLVM PATHS "${LLVM_ROOT}/lib/cmake/llvm" "$ENV{ProgramFiles}/lib/cmake/llvm" "${LLVM_ROOT}/lib")
 
 if( LLVM_FOUND )
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LLVM_DIR}")
+    message(STATUS "Found LLVM in ${LLVM_DIR}")
 else()
     message(FATAL_ERROR "LLVM installation not found. Set LLVM_ROOT to the installation root path.")
 endif()
@@ -47,7 +50,7 @@ include(LLVMConfig)
 message(STATUS "Found LLVM Package Version:${LLVM_PACKAGE_VERSION}")
 message(STATUS "LLVM Built type : ${LLVM_BUILD_TYPE}")
 string(REGEX MATCH "[0-9]+\\.[0-9]+" LLVM_VER ${LLVM_PACKAGE_VERSION} )
-if(NOT ${LLVM_VER} VERSION_EQUAL "14.0" )
+if(NOT ${LLVM_VER} VERSION_EQUAL "18.0" )
     message(WARNING "LLVM version ${LLVM_VER} is not tested.")
 endif()
 
@@ -59,8 +62,9 @@ endif()
 
 # Let's suppose we want to build a JIT compiler with support for
 # binary code :
-llvm_map_components_to_libnames(REQ_LLVM_LIBRARIES mcjit interpreter native ipo)
-
+llvm_map_components_to_libnames(REQ_LLVM_LIBRARIES mcjit interpreter native ipo core Analysis  Support
+  TransformUtils Passes
+)
 
 # Put all source files into one variable. #
 ##########################################
@@ -129,8 +133,8 @@ add_executable(liq ${SOURCES_COMMON} ${HEADER_COMMON} ${BISON_Parser_OUTPUTS} ${
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     target_compile_options(liq PRIVATE -Wall)
 elseif(MSVC)
-    replace_flags("/MDd" "/MTd")
-    replace_flags("/MD" "/MT")
+#    replace_flags("/MDd" "/MTd")
+#    replace_flags("/MD" "/MT")
     target_compile_options(liq PRIVATE /W4 /permissive-)
     target_compile_definitions(liq PRIVATE YY_NO_UNISTD_H)
     target_compile_definitions(liq PRIVATE _SCL_SECURE_NO_WARNINGS)

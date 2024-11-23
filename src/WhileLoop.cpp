@@ -31,7 +31,7 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
    }
    BranchInst::Create(loopBB, elseBB, firstCondValue, context.currentBlock());
 
-   function->getBasicBlockList().push_back(condBB);
+   function->insert(function->end(), condBB);
    context.endScope();
    context.newScope(condBB);
    Value* condValue = this->condition->codeGen(context);
@@ -42,7 +42,7 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
    }
    BranchInst::Create(loopBB, mergeBB, condValue, context.currentBlock());
 
-   function->getBasicBlockList().push_back(loopBB);
+   function->insert(function->end(), loopBB);
    context.endScope();
    context.newScope(loopBB);
    Value* loopValue = this->loopBlock->codeGen(context);
@@ -53,7 +53,7 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
    }
    BranchInst::Create(condBB, context.currentBlock());
 
-   function->getBasicBlockList().push_back(elseBB);
+   function->insert(function->end(), elseBB);
    context.endScope();
    context.newScope(elseBB);
    if (this->elseBlock != nullptr) {
@@ -65,7 +65,7 @@ Value* WhileLoop::codeGen(CodeGenContext& context)
       }
    }
    BranchInst::Create(mergeBB, context.currentBlock());
-   function->getBasicBlockList().push_back(mergeBB);
+   function->insert(function->end(), mergeBB);
    context.endScope();
    context.setInsertPoint(mergeBB);
    return mergeBB;

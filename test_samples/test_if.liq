@@ -29,7 +29,7 @@ def testifMax(int a, int b) : int
 int minmax = max( 1,10)
 display("Max is %d expected 10\n", minmax)
 minmax = min( 1,10)
-display("Min is %d\ expected 1n", minmax)
+display("Min is %d\ expected 1\n", minmax)
 int nif = testif( 1,10)
 display("testif is %d expected 10\n", nif)
 
