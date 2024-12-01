@@ -59,10 +59,6 @@ Value* MethodCall::codeGen(CodeGenContext& context)
          std::string typeName = context.getType(ident->getName());
          AllocaInst* allocInst   = context.findVariable(ident->getName());
          if( allocInst != nullptr ) {
-            auto tt = allocInst->getAllocatedType();
-            auto t = allocInst->getAllocatedType()->isStructTy();
-            auto tt2 = allocInst->getType();
-            auto tt3 = allocInst->getType()->isStructTy();
             if( allocInst->getAllocatedType()->isStructTy() ) {
                args.push_back(allocInst);
                delete ident;

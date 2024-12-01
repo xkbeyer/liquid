@@ -4,7 +4,6 @@
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/ADT/ArrayRef.h>
 
-using namespace std;
 using namespace llvm;
 
 namespace liquid {
@@ -20,16 +19,17 @@ llvm::Value* Array::codeGen(CodeGenContext& context)
       values.push_back(code);
       types.push_back(code->getType());
    }
-   StructType* str = StructType::create(context.getGlobalContext(), makeArrayRef(types), "list");
+   auto str = llvm::StructType::create(context.getGlobalContext(), types, "list");
    auto alloc_str = new AllocaInst(str, 0, "alloc_list",context.currentBlock());
    std::vector<Value*> ptr_indices;
    ConstantInt* const_int32_0 = ConstantInt::get(context.getModule()->getContext(), APInt(32, 0));
-   for( int index = 0; index < values.size(); ++index ) {
+   for( size_t index = 0u; index < values.size(); ++index ) {
+      ConstantInt* const_int32 = ConstantInt::get(context.getModule()->getContext(), APInt(32, index));
       ptr_indices.clear();
       ptr_indices.push_back(const_int32_0);
-      ConstantInt* const_int32 = ConstantInt::get(context.getModule()->getContext(), APInt(32, index));
       ptr_indices.push_back(const_int32);
-      Instruction* ptr = GetElementPtrInst::Create(alloc_str->getType()->getNonOpaquePointerElementType(), alloc_str, ptr_indices, "", context.currentBlock());
+      auto allocStructMemberType = alloc_str->getAllocatedType()->getContainedType(index);
+      Instruction* ptr = GetElementPtrInst::Create(str, alloc_str, ptr_indices, "getEl#" + std::to_string(index), context.currentBlock());
       new StoreInst(values[index], ptr, context.currentBlock());
    }
    return alloc_str; 
@@ -38,13 +38,11 @@ llvm::Value* Array::codeGen(CodeGenContext& context)
 llvm::Value* ArrayAccess::codeGen(CodeGenContext& context)
 {
    AllocaInst* var = nullptr;
-   Type* var_type = nullptr;
    Type* var_struct_type = nullptr;
    if( other != nullptr ) {
       auto tmp = other->codeGen(context);
       var = new AllocaInst(tmp->getType(), 0, "tmp_alloc_list_other", context.currentBlock());
       new StoreInst(tmp, var, context.currentBlock());
-      var_type = var->getAllocatedType();
       var_struct_type = var->getAllocatedType()->getContainedType(0);
    } else {
       var = context.findVariable(variable->getName());
@@ -52,8 +50,7 @@ llvm::Value* ArrayAccess::codeGen(CodeGenContext& context)
          Node::printError(location, "unknown variable " + variable->getName());
          return nullptr;
       }
-      var_type = var->getAllocatedType();
-      var_struct_type = var_type->getContainedType(0);
+      var_struct_type = var->getAllocatedType();
    }
    if( var_struct_type == nullptr ) {
       Node::printError(location, "Type mismatch: variable " + variable->getName() + " must have type list but has type " + context.getType(variable->getName()));
@@ -75,9 +72,10 @@ llvm::Value* ArrayAccess::codeGen(CodeGenContext& context)
    ConstantInt* const_int32 = ConstantInt::get(context.getModule()->getContext(), APInt(32, index));
    ptr_indices.push_back(const_int32_0);
    ptr_indices.push_back(const_int32);
-   auto val = new LoadInst(var->getAllocatedType(), var, "load_var", context.currentBlock());
-   Instruction* ptr = GetElementPtrInst::Create(var_struct_type, val, ptr_indices, "get_struct_element", context.currentBlock());
-   auto value = new LoadInst(ptr->getType()->getNonOpaquePointerElementType(), ptr, "load_ptr_struct", context.currentBlock());
+   Instruction* ptr = GetElementPtrInst::Create( var_struct_type, /*val*/ var, ptr_indices, "get_struct_element", context.currentBlock());
+   auto valueType = var_struct_type->getContainedType(index);
+   context.currentBlock()->dump();
+   auto value = new LoadInst(valueType, ptr, "load_ptr_struct", context.currentBlock());
    return value;
 }
 

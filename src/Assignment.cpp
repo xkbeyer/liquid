@@ -22,9 +22,21 @@ Value* Assignment::codeGen(CodeGenContext& context)
       var = context.findVariable(lhs->getName());
       if (var == nullptr) {
          /* In this case the type deductions takes place. This is an assignment with the var keyword. */
-         Type* ty                         = value->getType();
-         var                              = new AllocaInst(ty, 0, lhs->getName().c_str(), context.currentBlock());
-         context.locals()[lhs->getName()] = var;
+         auto ty = value->getType();
+         if( ty->isPointerTy() ) {
+            auto alloca = dyn_cast<AllocaInst>(value);
+            if( (alloca != nullptr) && (alloca->getAllocatedType()->isStructTy()) ) {
+               context.locals()[lhs->getName()] = alloca;
+            } else {
+               Node::printError(location, "Assignment expression: Auto deduction of " + lhs->getName() + "results in nothing");
+               context.addError();
+               return nullptr;
+            }
+         }
+         var = new AllocaInst(ty, 0, lhs->getName().c_str(), context.currentBlock());
+         if(context.locals()[lhs->getName()] == nullptr) {
+            context.locals()[lhs->getName()] = var;
+         }
          auto className                   = context.findClassNameByType(ty);
          if (!className.empty()) {
             context.setVarType(className, lhs->getName());

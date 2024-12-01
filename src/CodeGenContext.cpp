@@ -4,6 +4,7 @@
 #include "CodeGenContext.h"
 #include "parser.hpp"
 #include "llvm/Support/DynamicLibrary.h"
+#include "llvm/Support/raw_os_ostream.h"
 #include "llvm/Analysis/Passes.h"
 #include "llvm/Analysis/LoopAnalysisManager.h"
 #include "llvm/Analysis/CGSCCPassManager.h"
@@ -132,7 +133,8 @@ bool CodeGenContext::generateCode(Block& root)
    outs << "Code is generated.\n";
 
    outs << "verifying... ";
-   if (verifyModule(*getModule())) {
+   llvm::raw_os_ostream rawouts(outs);
+   if (verifyModule(*getModule(), &rawouts)) {
       outs << ": Error constructing function!\n";
 #if !defined(LLVM_NO_DUMP)
       module->dump();
@@ -394,6 +396,7 @@ FunctionDeclaration* CodeGenContext::getTemplateFunction(const std::string& name
             return classAttributes[klassName][ident.getName()].second;
          }
       }
+      return voidType;
    }
 
    llvm::Type* CodeGenContext::getKlassMemberType(std::string const& klassName, std::string const& memberName)

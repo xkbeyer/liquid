@@ -15,39 +15,20 @@ Value* BinaryOp::codeGen(CodeGenContext& context)
    if ((rhsValue == nullptr) || (lhsValue == nullptr)) {
       return nullptr;
    }
-   context.getModule()->dump();
-   //context.currentBlock()->dump();
    auto Ty = rhsValue->getType();
    if (Ty->isPointerTy() && Ty->getPointerTo()->isStructTy()) {
       // A class or list object is added.
       return codeGenAddList(rhsValue, lhsValue, context);
    }
 
-   // IF lhs is a pointer a load of the value has to be done.
-   if( lhsValue->getType()->isPointerTy() ) {
-      auto x = lhs->getType();
-      if( x == NodeType::identifier) {
-         auto y = static_cast<Identifier*>(lhs);
-         auto z = context.getType(*y);
-         auto value = new LoadInst(z, lhsValue, "test", context.getInsertPoint());
-         value->dump();
-      }
-      // auto valueTy = value->getAccessType();
-      // auto valueTy2 = value->getType();
-      // auto tt1 = value->getPointerOperand();
-      // auto tt2 = value->getPointerOperandType();
-      // auto tt3 = tt1->getType();
-      // auto tt4 = lhsValue->getType()->getPointerTo();
-      auto ee = 5;
+   if (rhsValue->getType() != lhsValue->getType()) {
+     // since we only support double and int, always cast to double in case of different types.
+     auto doubleTy = Type::getDoubleTy(context.getGlobalContext());
+     auto cinstr   = CastInst::getCastOpcode(rhsValue, true, doubleTy, true);
+     rhsValue      = CastInst::Create(cinstr, rhsValue, doubleTy, "castdb", context.currentBlock());
+     cinstr        = CastInst::getCastOpcode(lhsValue, true, doubleTy, true);
+     lhsValue      = CastInst::Create(cinstr, lhsValue, doubleTy, "castdb", context.currentBlock());
    }
-   //if (rhsValue->getType() != lhsValue->getType()) {
-   //   // since we only support double and int, always cast to double in case of different types.
-   //   auto doubleTy = Type::getDoubleTy(context.getGlobalContext());
-   //   auto cinstr   = CastInst::getCastOpcode(rhsValue, true, doubleTy, true);
-   //   rhsValue      = CastInst::Create(cinstr, rhsValue, doubleTy, "castdb", context.currentBlock());
-   //   cinstr        = CastInst::getCastOpcode(lhsValue, true, doubleTy, true);
-   //   lhsValue      = CastInst::Create(cinstr, lhsValue, doubleTy, "castdb", context.currentBlock());
-   //}
 
    bool isDoubleTy = rhsValue->getType()->isFloatingPointTy();
    if (isDoubleTy && (op == TAND || op == TOR)) {
