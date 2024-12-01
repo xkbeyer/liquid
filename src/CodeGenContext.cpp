@@ -123,6 +123,9 @@ bool CodeGenContext::generateCode(Block& root)
    root.codeGen(*this); /* emit byte code for the top level block */
    if (errors) {
       outs << "Compilation error(s). Abort.\n";
+      #ifdef _DEBUG
+      module->dump();
+      #endif
       return false;
    }
    if (currentBlock()->getTerminator() == nullptr) {

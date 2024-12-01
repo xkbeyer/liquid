@@ -28,7 +28,6 @@ llvm::Value* Array::codeGen(CodeGenContext& context)
       ptr_indices.clear();
       ptr_indices.push_back(const_int32_0);
       ptr_indices.push_back(const_int32);
-      auto allocStructMemberType = alloc_str->getAllocatedType()->getContainedType(index);
       Instruction* ptr = GetElementPtrInst::Create(str, alloc_str, ptr_indices, "getEl#" + std::to_string(index), context.currentBlock());
       new StoreInst(values[index], ptr, context.currentBlock());
    }
@@ -92,8 +91,7 @@ llvm::Value* ArrayAddElement::codeGen(CodeGenContext& context)
       Node::printError(location, "unknown variable " + ident->getName());
       return nullptr;
    }
-   auto var_type = var->getAllocatedType();
-   auto var_struct_type = var_type->getContainedType(0);
+   auto var_struct_type = var->getAllocatedType();
    auto count = var_struct_type->getNumContainedTypes();
    Identifier tmpIdent(tmpVarName, loc);
    for( decltype(count) i = 0; i < count; ++i ) {
