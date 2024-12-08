@@ -66,7 +66,7 @@ Value* Identifier::codeGen(CodeGenContext& context)
         if (alloc != nullptr) {
             std::string klassName = context.getType(structName);
             Instruction * ptr = context.getKlassVarAccessInst(klassName, name, alloc);
-            auto Ty = context.getKlassMemberType(klassName,name);
+            auto Ty = context.getKlassMemberType(klassName, name);
             return new LoadInst(Ty, ptr, name, false, context.currentBlock());
         }
     }

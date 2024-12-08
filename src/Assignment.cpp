@@ -28,9 +28,8 @@ Value* Assignment::codeGen(CodeGenContext& context)
             if( (alloca != nullptr) && (alloca->getAllocatedType()->isStructTy()) ) {
                context.locals()[lhs->getName()] = alloca;
             } else {
-               Node::printError(location, "Assignment expression: Auto deduction of " + lhs->getName() + "results in nothing");
-               context.addError();
-               return nullptr;
+               // In this case the type could only be a string (i8*).
+               ty = PointerType::getUnqual(Type::getInt8Ty(context.getGlobalContext()));
             }
          }
          var = new AllocaInst(ty, 0, lhs->getName().c_str(), context.currentBlock());

@@ -204,7 +204,7 @@ def simple
 
 simple ps
 
-i = ps.get
+i = ps.get()
 displayln("ps.get returns %d should be 5", ps.get())
 
 # Test var keyword
