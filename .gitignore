@@ -9,8 +9,11 @@ info/*
 **/Release
 **/html
 **/.vscode
+**/.vs
 *.llvm
-msg.txt
-TODO.txt
-TODO.org
-config.h
+**/*.txt
+**/*.org
+**/config.h
+CMakeSettings.json
+**/.clang-tidy
+**/.clang_complete
