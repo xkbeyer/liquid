@@ -17,3 +17,4 @@ info/*
 CMakeSettings.json
 **/.clang-tidy
 **/.clang_complete
+!CMakeLists.txt

@@ -50,7 +50,10 @@ include(LLVMConfig)
 message(STATUS "Found LLVM Package Version:${LLVM_PACKAGE_VERSION}")
 message(STATUS "LLVM Built type : ${LLVM_BUILD_TYPE}")
 string(REGEX MATCH "[0-9]+\\.[0-9]+" LLVM_VER ${LLVM_PACKAGE_VERSION} )
-if(NOT ${LLVM_VER} VERSION_EQUAL "18.0" )
+if(NOT ${LLVM_VER} VERSION_GREATER_EQUAL "18" )
+    message(FATAL_ERROR "LLVM version ${LLVM_VER} is not supported.")
+endif()
+if(NOT ${LLVM_VER} VERSION_LESS_EQUAL "20" )
     message(WARNING "LLVM version ${LLVM_VER} is not tested.")
 endif()
 
@@ -118,7 +121,7 @@ set(HEADER_COMMON
 
 set(VER_MAJ 0)
 set(VER_MIN 3)
-set(VER_REV 3)
+set(VER_REV 4)
 
 configure_file(config.in ${liquid_SOURCE_DIR}/config.h)
 
