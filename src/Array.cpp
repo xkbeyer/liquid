@@ -16,8 +16,10 @@ llvm::Value* Array::codeGen(CodeGenContext& context)
    TypeList types;
    for( auto e : *exprList ) {
       auto code = e->codeGen(context);
-      values.push_back(code);
-      types.push_back(code->getType());
+      if( code != nullptr ) {
+         values.push_back(code);
+         types.push_back(code->getType());
+      }
    }
    auto str = llvm::StructType::create(context.getGlobalContext(), types, "list");
    auto alloc_str = new AllocaInst(str, 0, "alloc_list",context.currentBlock());
