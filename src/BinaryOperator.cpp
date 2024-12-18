@@ -16,7 +16,7 @@ Value* BinaryOp::codeGen(CodeGenContext& context)
       return nullptr;
    }
    auto Ty = rhsValue->getType();
-   if (Ty->isPointerTy() && Ty->getPointerTo()->isStructTy()) {
+   if ( Ty->isStructTy() ) {
       // A class or list object is added.
       return codeGenAddList(rhsValue, lhsValue, context);
    }
@@ -96,8 +96,8 @@ std::string BinaryOp::toString()
 
 llvm::Value* BinaryOp::codeGenAddList(llvm::Value* rhsValue, llvm::Value* lhsValue, CodeGenContext& context)
 {
-   auto rhsTy = rhsValue->getType()->getNonOpaquePointerElementType();
-   auto lhsTy = lhsValue->getType()->getNonOpaquePointerElementType();
+   auto rhsTy = rhsValue->getType();
+   auto lhsTy = lhsValue->getType();
    if (!lhsTy->isStructTy()) {
       Node::printError(location, "First operand is not of a list type.");
       return nullptr;
