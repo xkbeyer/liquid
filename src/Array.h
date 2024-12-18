@@ -21,8 +21,8 @@ public:
    ExpressionList* getExpressions() const { return exprList; }
 
 private:
-   ExpressionList* exprList = nullptr;
-   YYLTYPE         location;
+   ExpressionList* exprList {nullptr};
+   YYLTYPE         location {};
 };
 
 /*! Represents an array element access */
@@ -30,7 +30,7 @@ class ArrayAccess : public Expression
 {
 public:
    ArrayAccess(Identifier* id, long long index, YYLTYPE loc) : variable(id), index(index), location(loc) {}
-   ArrayAccess(Expression* id, long long index, YYLTYPE loc) : other(id), index(index), location(loc) {}
+   ArrayAccess(Expression* id, long long index, YYLTYPE loc) : index(index), location(loc), other(id) {}
    virtual ~ArrayAccess() = default;
 
    llvm::Value* codeGen(CodeGenContext& context) override;
@@ -42,8 +42,8 @@ public:
 
 private:
    Identifier* variable{nullptr};
-   long long   index{0};
-   YYLTYPE     location;
+   long long   index{0LL};
+   YYLTYPE     location{};
    Expression* other{nullptr};
    friend class VisitorSyntaxCheck;
    friend class VisitorPrettyPrint;
@@ -53,7 +53,7 @@ private:
 class ArrayAddElement : public Statement
 {
 public:
-   ArrayAddElement(Identifier* ident, Expression* expr, YYLTYPE loc) : ident(ident), expr(expr), location(loc) {}
+   ArrayAddElement(Identifier* ident, Expression* expr, YYLTYPE loc) : expr(expr), ident(ident), location(loc) {}
    virtual ~ArrayAddElement() = default;
 
    llvm::Value* codeGen(CodeGenContext& context) override;

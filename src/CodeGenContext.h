@@ -45,7 +45,7 @@ enum class ScopeType {
 ///< Maps a variable name to its alloca instruction.
 using ValueNames = std::map<std::string, llvm::AllocaInst*>;
 ///< Maps a variable name of a class definition to its position in the llvm structure type.
-using KlassValueNames = std::map<std::string, int>;
+using KlassValueNames = std::map<std::string, std::pair<int, llvm::Type*>>;
 ///< Maps a class name to its attributes (member variables).
 using KlassAttributes = std::map<std::string, KlassValueNames>;
 ///< Maps a variable name to its type name.
@@ -91,7 +91,7 @@ public:
     * \param[in] bb         The basic block containing of the new scope. If nullptr then a new block is created.
     * \param[in] scopeType  Type of scope @see ScopeType
     */
-   void               newScope(llvm::BasicBlock* bb = nullptr, ScopeType scopeType = ScopeType::CodeBlock);
+   void newScope(llvm::BasicBlock* bb = nullptr, ScopeType scopeType = ScopeType::CodeBlock);
 
    /*! Leaves current scope, the previous one will be active now.*/
    void endScope();
@@ -166,9 +166,10 @@ public:
     * goes via the index into this structure.
     * \param[in] name Variable name of the current class.
     * \param[in] index into the llvm structure of this class.
+    * \param[in] type LLVM Type of the struct field.
     *
     */
-   void klassAddVariableAccess(std::string name, int index);
+   void klassAddVariableAccess(std::string name, int index, llvm::Type* type);
 
    /*! Returns the load/getelementptr instruction to access a class member.
     * \param[in] klass The class name
@@ -238,6 +239,9 @@ public:
 
    /*! Returns true if a template function is to be generated otherwise false. */
    bool codeGenTheTemplatedFunction() const { return generateTemplatedFunction; }
+
+   llvm::Type* getType(Identifier const& ident);
+   llvm::Type* getKlassMemberType(std::string const& klassName, std::string const& memberName);
 
  private:
    void setCurrentBlock(llvm::BasicBlock * block) { codeBlocks.front()->setCodeBlock(block); }

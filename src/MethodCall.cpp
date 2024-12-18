@@ -57,10 +57,10 @@ Value* MethodCall::codeGen(CodeGenContext& context)
          Identifier* ident = (Identifier*)*(arguments->begin());
          // Check if it is a var of class type...
          std::string typeName = context.getType(ident->getName());
-         AllocaInst* alloca   = context.findVariable(ident->getName());
-         if (alloca != nullptr) {
-            if (alloca->getType()->getNonOpaquePointerElementType()->isStructTy()) {
-               args.push_back(alloca);
+         AllocaInst* allocInst   = context.findVariable(ident->getName());
+         if( allocInst != nullptr ) {
+            if( allocInst->getAllocatedType()->isStructTy() ) {
+               args.push_back(allocInst);
                delete ident;
                arguments->erase(begin(*arguments));
             }

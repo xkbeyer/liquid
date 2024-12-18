@@ -5,7 +5,7 @@ project(liquid)
 # Setup the make environment. #
 ################################
 # Activate very verbose makefiles.
-set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 # Allow else() and endif() constructs (with empty parentheses)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) #To use with clang-tidy, not supported w/ MSVC generator.

@@ -8,7 +8,13 @@ info/*
 **/Debug
 **/Release
 **/html
+**/.vscode
+**/.vs
 *.llvm
-msg.txt
-TODO.txt
-config.h
+**/*.txt
+**/*.org
+**/config.h
+CMakeSettings.json
+**/.clang-tidy
+**/.clang_complete
+!CMakeLists.txt

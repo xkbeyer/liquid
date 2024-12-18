@@ -3,7 +3,6 @@
 #include "Array.h"
 #include "parser.hpp"
 
-using namespace std;
 using namespace llvm;
 
 namespace liquid
@@ -17,18 +16,18 @@ Value* BinaryOp::codeGen(CodeGenContext& context)
       return nullptr;
    }
    auto Ty = rhsValue->getType();
-   if (Ty->isPointerTy() && Ty->getPointerElementType()->isStructTy()) {
+   if ( Ty->isStructTy() ) {
       // A class or list object is added.
       return codeGenAddList(rhsValue, lhsValue, context);
    }
 
    if (rhsValue->getType() != lhsValue->getType()) {
-      // since we only support double and int, always cast to double in case of different types.
-      auto doubleTy = Type::getDoubleTy(context.getGlobalContext());
-      auto cinstr   = CastInst::getCastOpcode(rhsValue, true, doubleTy, true);
-      rhsValue      = CastInst::Create(cinstr, rhsValue, doubleTy, "castdb", context.currentBlock());
-      cinstr        = CastInst::getCastOpcode(lhsValue, true, doubleTy, true);
-      lhsValue      = CastInst::Create(cinstr, lhsValue, doubleTy, "castdb", context.currentBlock());
+     // since we only support double and int, always cast to double in case of different types.
+     auto doubleTy = Type::getDoubleTy(context.getGlobalContext());
+     auto cinstr   = CastInst::getCastOpcode(rhsValue, true, doubleTy, true);
+     rhsValue      = CastInst::Create(cinstr, rhsValue, doubleTy, "castdb", context.currentBlock());
+     cinstr        = CastInst::getCastOpcode(lhsValue, true, doubleTy, true);
+     lhsValue      = CastInst::Create(cinstr, lhsValue, doubleTy, "castdb", context.currentBlock());
    }
 
    bool isDoubleTy = rhsValue->getType()->isFloatingPointTy();
@@ -97,8 +96,8 @@ std::string BinaryOp::toString()
 
 llvm::Value* BinaryOp::codeGenAddList(llvm::Value* rhsValue, llvm::Value* lhsValue, CodeGenContext& context)
 {
-   auto rhsTy = rhsValue->getType()->getPointerElementType();
-   auto lhsTy = lhsValue->getType()->getPointerElementType();
+   auto rhsTy = rhsValue->getType();
+   auto lhsTy = lhsValue->getType();
    if (!lhsTy->isStructTy()) {
       Node::printError(location, "First operand is not of a list type.");
       return nullptr;

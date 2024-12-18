@@ -1,6 +1,6 @@
 var id = 5
 int x = 24 + id
-display("id = %d x = %d\n", id, x)
+display("id = %d x = %d (id + 5)\n", id, x)
 
 var otto = "Hello"
 displayln("otto = %s (Hello)", otto)

@@ -29,7 +29,7 @@ public:
 private:
     void removeVarDeclStatements();
     void constructStructFields(std::vector<llvm::Type*>& StructTy_fields, CodeGenContext& context);
-    void addVarsToClassAttributes(CodeGenContext& context);
+    void addVarsToClassAttributes(CodeGenContext& context, std::vector<llvm::Type*>& StructTy_fields);
 
     Identifier* id{nullptr};
     Block*      block{nullptr};

@@ -4,10 +4,13 @@
 #include "CodeGenContext.h"
 #include "parser.hpp"
 #include "llvm/Support/DynamicLibrary.h"
+#include "llvm/Support/raw_os_ostream.h"
 #include "llvm/Analysis/Passes.h"
+#include "llvm/Analysis/LoopAnalysisManager.h"
+#include "llvm/Analysis/CGSCCPassManager.h"
+#include "llvm/Passes/PassBuilder.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/Scalar.h"
-#include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/ExecutionEngine/Interpreter.h"
 #include "llvm/ExecutionEngine/MCJIT.h"
 #include <stdarg.h>
@@ -54,7 +57,7 @@ void CodeGenContext::setupBuiltIns()
 {
    intType = getGenericIntegerType();
    doubleType = Type::getDoubleTy(getGlobalContext());
-   stringType = Type::getInt8PtrTy(getGlobalContext());
+   stringType = PointerType::getUnqual(Type::getInt8Ty(getGlobalContext()));
    boolType = Type::getInt1Ty(getGlobalContext());
    voidType = Type::getVoidTy(getGlobalContext());
    varType = StructType::create(getGlobalContext(), "var");
@@ -88,7 +91,7 @@ void CodeGenContext::setupBuiltIns()
        i->setName("val");
    builtins.push_back({f, (void*)sinus});
 
-   std::vector<Type*> argTypesInt8Ptr(1, Type::getInt8PtrTy(getGlobalContext()));
+   std::vector<Type*> argTypesInt8Ptr(1, stringType);
    ft = FunctionType::get(Type::getVoidTy(getGlobalContext()), argTypesInt8Ptr, true);
    f  = Function::Create(ft, Function::ExternalLinkage, MAKE_LLVM_EXTERNAL_NAME(display), getModule());
    i  = f->arg_begin();
@@ -120,6 +123,9 @@ bool CodeGenContext::generateCode(Block& root)
    root.codeGen(*this); /* emit byte code for the top level block */
    if (errors) {
       outs << "Compilation error(s). Abort.\n";
+      #ifdef _DEBUG
+      module->dump();
+      #endif
       return false;
    }
    if (currentBlock()->getTerminator() == nullptr) {
@@ -130,7 +136,8 @@ bool CodeGenContext::generateCode(Block& root)
    outs << "Code is generated.\n";
 
    outs << "verifying... ";
-   if (verifyModule(*getModule())) {
+   llvm::raw_os_ostream rawouts(outs);
+   if (verifyModule(*getModule(), &rawouts)) {
       outs << ": Error constructing function!\n";
 #if !defined(LLVM_NO_DUMP)
       module->dump();
@@ -179,14 +186,19 @@ void CodeGenContext::printCodeGeneration(class Block& root, std::ostream& outstr
 void CodeGenContext::optimize()
 {
    outs << "Optimize code...\n";
-   legacy::FunctionPassManager fpm(getModule());
-   PassManagerBuilder          builder;
-   builder.OptLevel = 3;
-   builder.populateFunctionPassManager(fpm);
-   for (auto& fn : getModule()->getFunctionList()) {
-      fpm.run(fn);
-   }
-   fpm.run(*mainFunction);
+   LoopAnalysisManager LAM;
+   FunctionAnalysisManager FAM;
+   CGSCCAnalysisManager CGAM;
+   ModuleAnalysisManager MAM;
+   PassBuilder PB;
+   PB.registerModuleAnalyses(MAM);
+   PB.registerCGSCCAnalyses(CGAM);
+   PB.registerFunctionAnalyses(FAM);
+   PB.registerLoopAnalyses(LAM);
+   PB.crossRegisterProxies(LAM, FAM, CGAM, MAM);
+   ModulePassManager MPM = PB.buildPerModuleDefaultPipeline(OptimizationLevel::O2);
+   // Optimize the IR!
+   MPM.run(*getModule(), MAM);
 }
 
 void CodeGenContext::newScope(BasicBlock* bb, ScopeType scopeType)
@@ -276,23 +288,26 @@ void CodeGenContext::endKlass()
    klassName = "";
 }
 
-void CodeGenContext::klassAddVariableAccess(std::string name, int index) { classAttributes[klassName][name] = index; }
+void CodeGenContext::klassAddVariableAccess(std::string name, int index, llvm::Type* type) { classAttributes[klassName][name] = {index, type}; }
 
 Instruction* CodeGenContext::getKlassVarAccessInst(std::string klass, std::string name, AllocaInst* this_ptr)
 {
    assert(classAttributes.find(klass) != classAttributes.end());
-   int                 index = classAttributes[klass][name];
+   int                 index = std::get<0>(classAttributes[klass][name]);
    std::vector<Value*> ptr_indices;
    ConstantInt*        const_int32_0 = ConstantInt::get(getModule()->getContext(), APInt(32, 0));
    ConstantInt*        const_int32   = ConstantInt::get(getModule()->getContext(), APInt(32, index));
    ptr_indices.push_back(const_int32_0);
    ptr_indices.push_back(const_int32);
-   if (this_ptr->getType()->getNonOpaquePointerElementType()->isPointerTy()) {
+   auto structTy = classTypeMap[klass];
+   auto valType = std::get<1>(classAttributes[klass][name]);
+   if (this_ptr->getAllocatedType()->isPointerTy()) {
       // since the alloc is a ptr to ptr
-      Value* val = new LoadInst(this_ptr->getAllocatedType(), this_ptr, "", false, currentBlock());
-      return GetElementPtrInst::Create(val->getType()->getPointerElementType(), val, ptr_indices, "", currentBlock());
+      auto klassPtr = new LoadInst(this_ptr->getType(), this_ptr, "load.this", currentBlock());
+      auto instr = GetElementPtrInst::Create(structTy, klassPtr, ptr_indices, "", currentBlock());
+      return instr;
    }
-   Instruction* ptr = GetElementPtrInst::Create(this_ptr->getType()->getNonOpaquePointerElementType(), this_ptr, ptr_indices, "", currentBlock());
+   Instruction* ptr = GetElementPtrInst::Create(structTy, this_ptr, ptr_indices, "", currentBlock());
    return ptr;
 }
 
@@ -377,5 +392,19 @@ FunctionDeclaration* CodeGenContext::getTemplateFunction(const std::string& name
    }
    return nullptr;
 }
+   llvm::Type* CodeGenContext::getType(Identifier const& ident)
+   {
+      if( ident.getStructName() == "self" ) {
+         if(classAttributes[klassName].count(ident.getName()) != 0u) {
+            return classAttributes[klassName][ident.getName()].second;
+         }
+      }
+      return voidType;
+   }
+
+   llvm::Type* CodeGenContext::getKlassMemberType(std::string const& klassName, std::string const& memberName)
+   {
+      return classAttributes[klassName][memberName].second;
+   }
 
 }
