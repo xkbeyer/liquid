@@ -161,6 +161,7 @@ endif()
 
 if(NOT LLVM_ENABLE_RTTI)
     target_compile_definitions(liq PRIVATE LIQ_NO_RTTI)
+    # Disable run time type information.
     if(MSVC)
         target_compile_options(liq PRIVATE /GR-)
     else()

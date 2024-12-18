@@ -7,7 +7,7 @@ After reading an article about LLVM and how easy it is to create a DSL with it, 
 # Installation #
 
 ## Prerequisite ##
-- LLVM 14.0 
+- LLVM 19.0 
 - flex and bison.
 - CMake 3.12 
 
@@ -20,20 +20,32 @@ git clone https://github.com/xkbeyer/liquid.git
 ```
 cmake -B build -S .
 ```
+
+### Optional arguments
+
+| Define Name | Description               |
+| ---------- | ------------------------- |
+| LLVM_ROOT  | path to llvm installation |
+| BISON_ROOT | path to bison             |
+| FLEX_ROOT  | path to flex              |
+
+These are helpful in case cmake can't find the packages.
+
+```
+cmake -B build -S . -DLLVM_ROOT=/path/to/llvm -DBISON_ROOT=/path/to/bison -DFLEX_ROOT=/path/to/flex
+```
+
 Make sure all variables are set properly and then generate the build.
-One can use `ccmake` (GUI) to change or check the variables.
+One can use `ccmake` or `cmake-gui` on windows to change or check the variables.
 
 3. Run the make
 ```
-cd build
-make
+cmake --build build
 ```
 or
 ```
-cd build
-make install
+cmake --build build --target install
 ```
-4. That's it.
 
 ### Windows ###
 After cmake was run the solution file is in the build directory. Start Visual Studio and you are ready to compile it.
@@ -298,3 +310,12 @@ Importing other script files can be done via the `import` keyword.
 import some-other-file
 ```
 
+# Known issues #
+## Array
+Adding a member to a array in an inner scope doesn't work.
+```
+var myArray = []
+if true
+    myArray << 5
+```
+In the above example the variable `myArray` is unknown in the scope of the if block.
